@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control Financiero</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        .btn-secondary {
+            background-color: #10b981;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #059669;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+        }
+        .alert-card {
+            border-left: 5px solid #f59e0b;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dotted #4f46e5;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-800">Panel de Control Financiero</h1>
+                <p class="text-gray-500 mt-1">Tu copiloto para la independencia financiera.</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap justify-center">
+                <button id="importDataBtn" class="btn bg-green-500 text-white hover:bg-green-600"><i class="fas fa-upload mr-2"></i>Importar</button>
+                <input type="file" id="importFile" class="hidden" accept=".json">
+                <button id="exportDataBtn" class="btn bg-blue-500 text-white hover:bg-blue-600"><i class="fas fa-download mr-2"></i>Exportar</button>
+                <button id="resetDataBtn" class="btn bg-red-500 text-white hover:bg-red-600"><i class="fas fa-trash-alt mr-2"></i>Resetear</button>
+            </div>
+        </header>
+
+        <!-- Pestaña de Configuración -->
+        <div id="configuracion" class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4 flex items-center"><i class="fas fa-cogs mr-3 text-gray-400"></i>Configuración y Capital</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                 <div class="card col-span-1 md:col-span-2 lg:col-span-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <h3 class="md:col-span-3 text-lg font-semibold text-gray-600">Capital y Carteras</h3>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Fondo Oscuro Inicial (€)</label>
+                        <input type="number" id="fondoOscuroInicial" class="input-field font-semibold text-lg" value="65000">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Valor Cartera Metal (€)</label>
+                        <input type="number" id="valorCarteraMetal" class="input-field font-semibold text-lg" value="86000">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Valor Cartera Rock (€)</label>
+                        <input type="number" id="valorCarteraRock" class="input-field font-semibold text-lg" value="58000">
+                    </div>
+                </div>
+                <div class="card">
+                    <label class="block text-sm font-medium text-gray-500 mb-1">Aportación Base Inicial (€)</label>
+                    <input type="number" id="aportacionBaseInicial" class="input-field font-semibold text-lg" value="3600">
+                </div>
+                <div class="card">
+                    <label class="block text-sm font-medium text-gray-500 mb-1">Ahorro Base Mensual (€)</label>
+                    <input type="number" id="ahorroBase" class="input-field font-semibold text-lg" value="300">
+                </div>
+                 <div class="card">
+                    <label class="block text-sm font-medium text-gray-500 mb-1">% Inversión Excedente</label>
+                    <input type="number" id="porcInversionExtra" class="input-field font-semibold text-lg" value="70">
+                </div>
+                <div class="card">
+                    <label class="block text-sm font-medium text-gray-500 mb-1">Retención IRPF (%)</label>
+                    <input type="number" id="irpfRate" class="input-field font-semibold text-lg" value="20">
+                </div>
+                 <div class="card col-span-1 md:col-span-2">
+                     <label class="block text-sm font-medium text-gray-500 mb-1">Objetivo Fondo Oscuro (€)</label>
+                    <input type="number" id="objetivoFondoOscuro" class="input-field font-semibold text-lg" value="50000">
+                </div>
+                 <div class="card col-span-1 md:col-span-2 flex items-center justify-center">
+                    <label for="useFondoSurplus" class="flex items-center cursor-pointer">
+                        <input type="checkbox" id="useFondoSurplus" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-3 text-gray-700 font-medium">Usar excedente del Fondo Oscuro para la Hucha Anual</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard / Torre de Control -->
+        <div id="dashboard" class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4 flex items-center"><i class="fas fa-tachometer-alt mr-3 text-gray-400"></i>Dashboard</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div id="alertCardAnual" class="card lg:col-span-2 alert-card"></div>
+                <div id="alertCardTurbo" class="card lg:col-span-2 alert-card"></div>
+
+                <div class="card">
+                    <h3 class="text-gray-500 font-semibold mb-2 flex items-center"><i class="fas fa-shield-alt mr-2 text-slate-400"></i>Fondo Oscuro (Actual)</h3>
+                    <p class="text-4xl font-bold text-gray-800" id="fondoOscuroSaldo">€0.00</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-gray-500 font-semibold mb-2 flex items-center"><i class="fas fa-piggy-bank mr-2 text-indigo-400"></i>Hucha Anual (Pendiente)</h3>
+                    <p class="text-4xl font-bold text-gray-800" id="huchaAnualSaldo">€0.00</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-gray-500 font-semibold mb-2 flex items-center"><i class="fas fa-box-open mr-2 text-orange-400"></i>Hucha Turbo (Pendiente)</h3>
+                    <p class="text-4xl font-bold text-gray-800" id="huchaTurboSaldo">€0.00</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-gray-500 font-semibold mb-2 flex items-center"><i class="fas fa-rocket mr-2 text-red-400"></i>Capital Invertido</h3>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Base</p>
+                        <p class="text-2xl font-bold text-gray-800" id="totalInvertidoBase">€0.00</p>
+                         <p class="text-sm text-gray-500 mt-2">Turbo</p>
+                        <p class="text-2xl font-bold text-gray-800" id="totalInvertidoTurbo">€0.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registro Mensual -->
+        <div id="registro" class="card mb-8">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4 flex items-center"><i class="fas fa-edit mr-3 text-gray-400"></i>Registro Mensual</h2>
+            <form id="registroForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Mes (MM/YYYY)</label>
+                    <input type="text" id="mes" class="input-field mt-1 bg-gray-100" readonly>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Ingresos Brutos del Mes (€)</label>
+                    <input type="number" id="ingresosBrutos" placeholder="1000" class="input-field mt-1" required>
+                </div>
+                 <div>
+                    <label class="block text-sm font-medium text-gray-700">Gastos (€)</label>
+                    <input type="number" id="gastos" class="input-field mt-1" required>
+                </div>
+                 <div>
+                    <label class="block text-sm font-medium text-gray-700">Seguridad Social (€)</label>
+                    <input type="number" id="seguridadSocial" class="input-field mt-1" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-full h-12 text-base">
+                    <i class="fas fa-plus-circle mr-2"></i>Añadir Registro
+                </button>
+            </form>
+        </div>
+
+        <!-- Historial de Registros -->
+        <div id="historial">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4 flex items-center"><i class="fas fa-history mr-3 text-gray-400"></i>Historial</h2>
+            <div class="card">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th scope="col" class="py-3 px-6">Mes</th>
+                                <th scope="col" class="py-3 px-6">Ing. Brutos (€)</th>
+                                <th scope="col" class="py-3 px-6">Ahorro Neto (€)</th>
+                                <th scope="col" class="py-3 px-6 text-indigo-600">Aport. Hucha (€)</th>
+                                <th scope="col" class="py-3 px-6 text-orange-600">Aport. Turbo (€)</th>
+                                <th scope="col" class="py-3 px-6 text-slate-600">Impacto F. Oscuro (€)</th>
+                                <th scope="col" class="py-3 px-6">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="confirmationModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-4"></h3>
+            <p id="modalText" class="text-gray-600 mb-6"></p>
+            <div class="flex justify-center gap-4">
+                <button id="modalCancelBtn" class="btn bg-gray-300 text-gray-800 hover:bg-gray-400">Cancelar</button>
+                <button id="modalConfirmBtn" class="btn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- ESTADO Y CONFIGURACIÓN ---
+    const configInputs = {
+        aportacionBaseInicial: document.getElementById('aportacionBaseInicial'),
+        ahorroBase: document.getElementById('ahorroBase'),
+        porcInversionExtra: document.getElementById('porcInversionExtra'),
+        irpfRate: document.getElementById('irpfRate'),
+        fondoOscuroInicial: document.getElementById('fondoOscuroInicial'),
+        objetivoFondoOscuro: document.getElementById('objetivoFondoOscuro'),
+        useFondoSurplus: document.getElementById('useFondoSurplus'),
+        valorCarteraMetal: document.getElementById('valorCarteraMetal'),
+        valorCarteraRock: document.getElementById('valorCarteraRock')
+    };
+
+    const registroForm = document.getElementById('registroForm');
+    const historialBody = document.getElementById('historialBody');
+    const resetDataBtn = document.getElementById('resetDataBtn');
+    const importDataBtn = document.getElementById('importDataBtn');
+    const importFile = document.getElementById('importFile');
+    const exportDataBtn = document.getElementById('exportDataBtn');
+    const confirmationModal = document.getElementById('confirmationModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalText = document.getElementById('modalText');
+    const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+    let state = {
+        config: {
+            aportacionBaseInicial: 1000,
+            ahorroBase: 150,
+            porcInversionExtra: 70,
+            irpfRate: 20,
+            fondoOscuroInicial: 5000,
+            objetivoFondoOscuro: 10000,
+            useFondoSurplus: true,
+            valorCarteraMetal: 5000,
+            valorCarteraRock: 2500,
+        },
+        registros: []
+    };
+    let confirmAction = null;
+
+    // --- LÓGICA DE DATOS Y ESTADO ---
+    function loadState() {
+        const savedState = localStorage.getItem('financieroAppStateV14');
+        if (savedState) {
+            state = JSON.parse(savedState);
+            // Asegurar compatibilidad
+            if (state.config.aportacionBaseInicial === undefined) state.config.aportacionBaseInicial = 0;
+        } else {
+             state.registros = [];
+        }
+    }
+
+    function saveState() {
+        localStorage.setItem('financieroAppStateV14', JSON.stringify(state));
+    }
+
+    function updateConfigUI() {
+        for (const key in configInputs) {
+            if(configInputs[key]) {
+                if(configInputs[key].type === 'checkbox') {
+                    configInputs[key].checked = state.config[key];
+                } else {
+                    configInputs[key].value = state.config[key];
+                }
+            }
+        }
+    }
+
+    function handleConfigChange() {
+        for (const key in configInputs) {
+            if(configInputs[key]) {
+                 if(configInputs[key].type === 'checkbox') {
+                    state.config[key] = configInputs[key].checked;
+                } else {
+                    state.config[key] = Number(configInputs[key].value);
+                }
+            }
+        }
+        saveState();
+        render();
+    }
+    
+    function addRegistro(e) {
+        e.preventDefault();
+        const mes = document.getElementById('mes').value;
+        const ingresosBrutos = Number(document.getElementById('ingresosBrutos').value);
+        const gastos = Number(document.getElementById('gastos').value);
+        const seguridadSocial = Number(document.getElementById('seguridadSocial').value);
+
+        if (!mes || !ingresosBrutos) {
+            showModal('Error', 'El campo de ingresos brutos es obligatorio.', 'bg-red-500', true);
+            return;
+        }
+
+        const newRegistro = { id: Date.now(), mes, ingresosBrutos, gastos, seguridadSocial, turboInvertido: false, anualInvertido: false };
+        state.registros.push(newRegistro);
+        saveState();
+        render();
+        registroForm.reset();
+        updateFormDefaults();
+    }
+    
+    function deleteRegistro(id) {
+        confirmAction = () => {
+            state.registros = state.registros.filter(r => r.id !== id);
+            saveState();
+            render();
+            updateFormDefaults();
+            hideModal();
+        };
+        showModal('Confirmar Borrado', `¿Estás seguro de que quieres borrar este registro?`, 'bg-red-500 hover:bg-red-600');
+    }
+    
+    function resetData() {
+        confirmAction = () => {
+            localStorage.removeItem('financieroAppStateV14');
+            location.reload();
+        };
+        showModal('Resetear Todos los Datos', '¡Atención! Esta acción borrará permanentemente toda la configuración y el historial. ¿Estás seguro?', 'bg-red-500 hover:bg-red-600');
+    }
+
+    // --- LÓGICA DE IMPORTAR/EXPORTAR ---
+    function exportData() {
+        const dataStr = JSON.stringify(state, null, 2);
+        const dataBlob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        const date = new Date().toISOString().slice(0, 10);
+        link.download = `panel_financiero_backup_${date}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function handleFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (importedData.config && importedData.registros) {
+                    confirmAction = () => {
+                        state = importedData;
+                        saveState();
+                        updateConfigUI();
+                        render();
+                        updateFormDefaults();
+                        hideModal();
+                    };
+                    showModal('Confirmar Importación', 'Importar este archivo sobreescribirá tus datos actuales. ¿Estás seguro?', 'bg-green-500 hover:bg-green-600');
+                } else { throw new Error("Formato de archivo inválido."); }
+            } catch (error) {
+                showModal('Error de Importación', `No se pudo importar el archivo. Error: ${error.message}`, 'bg-red-500', true);
+            }
+        };
+        reader.readAsText(file);
+        importFile.value = '';
+    }
+    
+    // --- LÓGICA DE INVERSIONES ---
+    function executeTurboInvestment() {
+        confirmAction = () => {
+            state.registros.forEach(r => { if (!r.turboInvertido) r.turboInvertido = true; });
+            saveState();
+            render();
+            hideModal();
+        };
+        showModal('Confirmar Inversión Turbo', 'Esto marcará todo el dinero pendiente en la "Hucha Turbo" como invertido. ¿Estás seguro?', 'bg-green-500 hover:bg-green-600');
+    }
+    
+    function executeAnualInvestment() {
+        confirmAction = () => {
+            const idsToUpdate = state.registros
+                .filter(r => !r.anualInvertido)
+                .slice(0, 12)
+                .map(r => r.id);
+
+            state.registros.forEach(r => {
+                if (idsToUpdate.includes(r.id)) {
+                    r.anualInvertido = true;
+                }
+            });
+            saveState();
+            render();
+            hideModal();
+        };
+        showModal('Confirmar Inversión Anual', 'Esto marcará los 12 ahorros más antiguos como invertidos y reseteará la Hucha Anual. ¿Estás seguro?', 'bg-green-500 hover:bg-green-600');
+    }
+
+    // --- LÓGICA DE UI Y RENDERIZADO ---
+    function showModal(title, text, confirmClass, isError = false) {
+        modalTitle.textContent = title;
+        modalText.textContent = text;
+        modalConfirmBtn.className = `btn ${confirmClass}`;
+        modalCancelBtn.style.display = isError ? 'none' : 'inline-block';
+        modalConfirmBtn.textContent = isError ? 'Entendido' : 'Confirmar';
+        confirmAction = isError ? hideModal : confirmAction;
+        confirmationModal.classList.add('visible');
+    }
+
+    function hideModal() {
+        confirmationModal.classList.remove('visible');
+        confirmAction = null;
+    }
+
+    function getNextMonthString() {
+        if (state.registros.length === 0) {
+            const now = new Date();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            return `${month}/${now.getFullYear()}`;
+        }
+        const sortedRegistros = [...state.registros].sort((a,b) => new Date(a.mes.split('/').reverse().join('-')) - new Date(b.mes.split('/').reverse().join('-')));
+        const lastRegistro = sortedRegistros[sortedRegistros.length - 1];
+        const [lastMonth, lastYear] = lastRegistro.mes.split('/').map(Number);
+        const nextDate = new Date(lastYear, lastMonth, 1);
+        const nextMonth = (nextDate.getMonth() + 1).toString().padStart(2, '0');
+        const nextYear = nextDate.getFullYear();
+        return `${nextMonth}/${nextYear}`;
+    }
+
+    function updateFormDefaults() {
+        document.getElementById('mes').value = getNextMonthString();
+        document.getElementById('gastos').value = 500;
+        document.getElementById('seguridadSocial').value = 200;
+    }
+    
+    function getProcessedData() {
+        let fondoOscuroTracker = state.config.fondoOscuroInicial;
+        const processedRecords = [];
+        const sortedRegistros = [...state.registros].sort((a,b) => new Date(a.mes.split('/').reverse().join('-')) - new Date(b.mes.split('/').reverse().join('-')));
+
+        for(const r of sortedRegistros) {
+            const irpf = r.ingresosBrutos * (state.config.irpfRate / 100);
+            const ingresosNetos = r.ingresosBrutos - irpf;
+            const gastosTotales = r.gastos + r.seguridadSocial;
+            const ahorroNeto = ingresosNetos - gastosTotales;
+            
+            let aporteHucha = 0;
+            let aporteTurbo = 0;
+            let impactoFondoOscuro = 0;
+            let fundedBySurplus = false;
+            
+            if (ahorroNeto > 0) {
+                const potencialHucha = Math.min(ahorroNeto, state.config.ahorroBase);
+                const surplus = fondoOscuroTracker - state.config.objetivoFondoOscuro;
+                
+                if (state.config.useFondoSurplus && surplus > 0 && !r.anualInvertido) {
+                    const aporteDesdeFondo = Math.min(surplus, potencialHucha);
+                    aporteHucha = aporteDesdeFondo;
+                    impactoFondoOscuro -= aporteDesdeFondo;
+                    fundedBySurplus = true;
+                } else {
+                    aporteHucha = potencialHucha;
+                }
+
+                const excedente = ahorroNeto - aporteHucha;
+
+                if (excedente > 0) {
+                    aporteTurbo = excedente * (state.config.porcInversionExtra / 100);
+                    impactoFondoOscuro += excedente * (1 - state.config.porcInversionExtra / 100);
+                }
+
+            } else {
+                impactoFondoOscuro = ahorroNeto;
+            }
+            
+            fondoOscuroTracker += impactoFondoOscuro;
+            processedRecords.push({ ...r, ahorroNeto, aporteHucha, aporteTurbo, impactoFondoOscuro, fundedBySurplus });
+        }
+        return processedRecords;
+    }
+
+    function renderHistorial() {
+        historialBody.innerHTML = '';
+        const processedRecords = getProcessedData();
+
+        processedRecords.forEach(r => {
+            const inversionMetal = r.aporteTurbo * 0.66;
+            const inversionRock = r.aporteTurbo * 0.33;
+            const tooltipText = `A Metal: ${inversionMetal.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })} | A Rock: ${inversionRock.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}`;
+            const huchaText = r.anualInvertido ? 'Invertido' : r.aporteHucha.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+            
+            const row = document.createElement('tr');
+            row.className = 'bg-white border-b';
+            row.innerHTML = `
+                <td class="py-4 px-6 font-medium text-gray-900">${r.mes}</td>
+                <td class="py-4 px-6">${r.ingresosBrutos.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</td>
+                <td class="py-4 px-6 font-semibold ${r.ahorroNeto < 0 ? 'text-red-500' : 'text-green-600'}">${r.ahorroNeto.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</td>
+                <td class="py-4 px-6 font-semibold text-indigo-600 flex items-center gap-2">
+                    ${huchaText}
+                    ${r.fundedBySurplus ? '<i class="fas fa-shield-alt text-slate-400" title="Pagado con excedente del Fondo Oscuro"></i>' : ''}
+                </td>
+                <td class="py-4 px-6 font-semibold text-orange-600 tooltip" title="${tooltipText}">${r.turboInvertido ? 'Invertido' : r.aporteTurbo.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</td>
+                <td class="py-4 px-6 font-semibold ${r.impactoFondoOscuro < 0 ? 'text-red-500' : 'text-green-600'}">${r.impactoFondoOscuro.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</td>
+                <td class="py-4 px-6">
+                    <button class="text-red-500 hover:text-red-700 delete-btn" data-id="${r.id}"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+            historialBody.appendChild(row);
+        });
+    }
+
+    function updateDashboard() {
+        const processedRecords = getProcessedData();
+        
+        let totalAhorroHuchaPendiente = 0;
+        let totalAhorroHuchaInvertido = state.config.aportacionBaseInicial;
+        let huchaTurboPendiente = 0;
+        let totalInvertidoTurboConfirmado = 0;
+        let fondoOscuroActual = state.config.fondoOscuroInicial;
+
+        processedRecords.forEach(r => {
+            fondoOscuroActual += r.impactoFondoOscuro;
+
+            if (r.anualInvertido) {
+                totalAhorroHuchaInvertido += r.aporteHucha;
+            } else {
+                 totalAhorroHuchaPendiente += r.aporteHucha;
+            }
+            if (r.turboInvertido) {
+                totalInvertidoTurboConfirmado += r.aporteTurbo;
+            } else {
+                huchaTurboPendiente += r.aporteTurbo;
+            }
+        });
+
+        document.getElementById('huchaAnualSaldo').textContent = totalAhorroHuchaPendiente.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+        document.getElementById('huchaTurboSaldo').textContent = huchaTurboPendiente.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+        document.getElementById('totalInvertidoTurbo').textContent = totalInvertidoTurboConfirmado.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+        document.getElementById('fondoOscuroSaldo').textContent = fondoOscuroActual.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+        document.getElementById('totalInvertidoBase').textContent = totalAhorroHuchaInvertido.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+        
+        // Alerta Anual
+        const alertCardAnual = document.getElementById('alertCardAnual');
+        const registrosPendientesAnual = state.registros.filter(r => !r.anualInvertido);
+        const numeroPendientes = registrosPendientesAnual.length;
+
+        if (numeroPendientes >= 12) {
+             const huchaAcumuladaParaInvertir = processedRecords
+                    .filter(pr => !pr.anualInvertido)
+                    .slice(0, 12)
+                    .reduce((sum, pr) => sum + pr.aporteHucha, 0);
+
+            alertCardAnual.innerHTML = `
+                <h3 class="font-bold text-lg text-gray-800 mb-2 flex items-center"><i class="fas fa-check-circle mr-3 text-green-500"></i>ACCIÓN: Inversión Anual Lista</h3>
+                <p class="text-gray-600">Has acumulado 12 ahorros. Transfiere el total de la hucha a tus carteras.</p>
+                <div class="mt-2 text-sm">
+                    <p><strong>Total a Invertir:</strong> <span class="font-bold">${huchaAcumuladaParaInvertir.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span></p>
+                    <p><strong>A Metal (66%):</strong> <span class="font-semibold">${(huchaAcumuladaParaInvertir * 0.66).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span></p>
+                    <p><strong>A Rock (33%):</strong> <span class="font-semibold">${(huchaAcumuladaParaInvertir * 0.33).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span></p>
+                </div>
+                <button id="confirmAnualBtn" class="btn btn-secondary mt-4">Confirmar Inversión Anual</button>`;
+            document.getElementById('confirmAnualBtn').addEventListener('click', executeAnualInvestment);
+        } else {
+            alertCardAnual.innerHTML = `
+                <h3 class="font-bold text-lg text-gray-800 mb-2 flex items-center"><i class="fas fa-hourglass-half mr-3 text-amber-500"></i>Modo Acumulación Anual</h3>
+                <p class="text-gray-600">Sigue ahorrando. Has acumulado ${numeroPendientes} de 12 aportaciones para la inversión anual.</p>`;
+        }
+        
+        // Alerta Turbo
+        const alertCardTurbo = document.getElementById('alertCardTurbo');
+        const umbralMetal = 150 + (state.config.valorCarteraMetal * 0.005);
+        const umbralRock = 150 + (state.config.valorCarteraRock * 0.005);
+        const turboParaMetal = huchaTurboPendiente * 0.66;
+        const turboParaRock = huchaTurboPendiente * 0.33;
+
+        if (huchaTurboPendiente > 0 && turboParaMetal >= umbralMetal && turboParaRock >= umbralRock) {
+             alertCardTurbo.innerHTML = `
+                <h3 class="font-bold text-lg text-gray-800 mb-2 flex items-center"><i class="fas fa-bolt mr-3 text-green-500"></i>ACCIÓN: Inversión Turbo Lista</h3>
+                <p class="text-gray-600">La Hucha Turbo ha superado el umbral. ¡Puedes invertirla cuando quieras!</p>
+                <div class="mt-2 text-sm">
+                     <p><strong>A Metal:</strong> ${turboParaMetal.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })} (Umbral: ${umbralMetal.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })})</p>
+                     <p><strong>A Rock:</strong> ${turboParaRock.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })} (Umbral: ${umbralRock.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })})</p>
+                </div>
+                <button id="confirmTurboBtn" class="btn btn-secondary mt-4">Confirmar Inversión Turbo</button>`;
+            document.getElementById('confirmTurboBtn').addEventListener('click', executeTurboInvestment);
+        } else {
+            alertCardTurbo.innerHTML = `
+                <h3 class="font-bold text-lg text-gray-800 mb-2 flex items-center"><i class="fas fa-box mr-3 text-orange-500"></i>Acumulando Inversión Turbo</h3>
+                <p class="text-gray-600">El dinero del excedente se está acumulando en la "Hucha Turbo" hasta que supere el umbral de inversión de tus carteras.</p>`;
+        }
+    }
+    
+    // Función de renderizado principal
+    function render() {
+        renderHistorial();
+        updateDashboard();
+    }
+    
+    // --- INICIALIZACIÓN Y EVENTOS ---
+    loadState();
+    updateConfigUI();
+    render();
+    updateFormDefaults();
+
+    Object.values(configInputs).forEach(input => input.addEventListener('change', handleConfigChange));
+    registroForm.addEventListener('submit', addRegistro);
+    resetDataBtn.addEventListener('click', resetData);
+    exportDataBtn.addEventListener('click', exportData);
+    importDataBtn.addEventListener('click', () => importFile.click());
+    importFile.addEventListener('change', handleFileImport);
+    
+    historialBody.addEventListener('click', (e) => {
+        const deleteButton = e.target.closest('.delete-btn');
+        if (deleteButton) {
+            const id = Number(deleteButton.dataset.id);
+            deleteRegistro(id);
+        }
+    });
+
+    modalCancelBtn.addEventListener('click', hideModal);
+    modalConfirmBtn.addEventListener('click', () => {
+        if (typeof confirmAction === 'function') {
+            confirmAction();
+        }
+    });
+});
+</script>
+</body>
+</html>
