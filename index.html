@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control Financiero</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='1em' font-size='80'>🏦</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const potencialHucha = Math.min(ahorroNeto, state.config.ahorroBase);
                 const surplus = fondoOscuroTracker - state.config.objetivoFondoOscuro;
                 
-                if (state.config.useFondoSurplus && surplus > 0 && !r.anualInvertido) {
+                if (state.config.useFondoSurplus && surplus > 0) {
                     const aporteDesdeFondo = Math.min(surplus, potencialHucha);
                     aporteHucha = aporteDesdeFondo;
                     impactoFondoOscuro -= aporteDesdeFondo;
