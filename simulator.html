@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Inversión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for a better look in dark mode */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        /* Number input spinner buttons for webkit browsers */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white antialiased">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-cyan-400">Simulador de Inversión</h1>
+            <p class="text-gray-400 mt-2">Proyecta tu patrimonio futuro ajustando diferentes variables.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- CONTROLS PANEL -->
+            <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-lg flex flex-col space-y-6">
+                
+                <div>
+                    <h2 class="text-xl font-bold mb-4 text-cyan-300 border-b border-gray-700 pb-2">Parámetros Principales</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="initialInvestment" class="block text-sm font-medium text-gray-300 mb-1">Inversión Inicial (€)</label>
+                            <input type="number" id="initialInvestment" value="20000" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label for="years" class="block text-sm font-medium text-gray-300 mb-1">Horizonte Temporal (años)</label>
+                            <input type="number" id="years" value="15" step="5" min="5" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                     <h3 class="text-lg font-semibold mb-3 text-cyan-300">Aportación Periódica</h3>
+                     <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="periodicInvestment" class="block text-sm font-medium text-gray-300 mb-1">Cantidad (€)</label>
+                                <input type="number" id="periodicInvestment" value="300" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label for="investmentFrequency" class="block text-sm font-medium text-gray-300 mb-1">Frecuencia</label>
+                                <select id="investmentFrequency" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
+                                    <option value="monthly">Mensual</option>
+                                    <option value="yearly">Anual (Lump Sum)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="stopContributionsYear" class="block text-sm font-medium text-gray-300 mb-1">Año fin aportaciones (0 = nunca)</label>
+                            <input type="number" id="stopContributionsYear" value="0" min="0" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
+                        </div>
+                     </div>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-cyan-300">Escenarios de Rentabilidad (% Anual)</h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label for="pessimisticRate" class="block text-xs font-medium text-gray-400 text-center">Pesimista</label>
+                            <input type="number" id="pessimisticRate" value="4" class="w-full mt-1 bg-gray-700 border-gray-600 rounded-lg p-2 text-white text-center focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <div>
+                            <label for="intermediateRate" class="block text-xs font-medium text-gray-400 text-center">Intermedio</label>
+                            <input type="number" id="intermediateRate" value="5" class="w-full mt-1 bg-gray-700 border-gray-600 rounded-lg p-2 text-white text-center focus:ring-yellow-500 focus:border-yellow-500">
+                        </div>
+                        <div>
+                            <label for="optimisticRate" class="block text-xs font-medium text-gray-400 text-center">Optimista</label>
+                            <input type="number" id="optimisticRate" value="6" class="w-full mt-1 bg-gray-700 border-gray-600 rounded-lg p-2 text-white text-center focus:ring-green-500 focus:border-green-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold mb-4 text-cyan-300 border-b border-gray-700 pb-2">Inversiones 'Turbo'</h2>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-3 gap-3 items-end">
+                             <div class="col-span-1">
+                                <label for="turboYear" class="block text-sm font-medium text-gray-300 mb-1">Año</label>
+                                <input type="number" id="turboYear" placeholder="Ej: 5" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
+                             </div>
+                             <div class="col-span-2">
+                                <label for="turboAmount" class="block text-sm font-medium text-gray-300 mb-1">Cantidad (€)</label>
+                                 <div class="flex">
+                                    <input type="number" id="turboAmount" placeholder="Ej: 10000" class="w-full bg-gray-700 border-gray-600 rounded-l-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
+                                    <button id="addTurbo" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-2 rounded-r-lg transition-colors">Añadir</button>
+                                 </div>
+                             </div>
+                        </div>
+                        <div id="turboList" class="space-y-2 max-h-32 overflow-y-auto pr-2">
+                           <!-- Turbo investments will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold mb-4 text-cyan-300 border-b border-gray-700 pb-2">Acciones</h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <button id="resetButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Reiniciar</button>
+                        <button id="exportButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Exportar</button>
+                        <button id="importButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Importar</button>
+                        <input type="file" id="fileInput" class="hidden" accept=".json">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CHART AND SUMMARY -->
+            <div class="lg:col-span-2 bg-gray-800 p-6 rounded-2xl shadow-lg">
+                <div class="relative h-[450px]">
+                    <canvas id="investmentChart"></canvas>
+                </div>
+                <div id="summary" class="mt-6 text-center">
+                    <!-- Summary will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- DOM Elements ---
+        const inputs = {
+            initialInvestment: document.getElementById('initialInvestment'),
+            years: document.getElementById('years'),
+            periodicInvestment: document.getElementById('periodicInvestment'),
+            investmentFrequency: document.getElementById('investmentFrequency'),
+            stopContributionsYear: document.getElementById('stopContributionsYear'),
+            pessimisticRate: document.getElementById('pessimisticRate'),
+            intermediateRate: document.getElementById('intermediateRate'),
+            optimisticRate: document.getElementById('optimisticRate'),
+            turboYear: document.getElementById('turboYear'),
+            turboAmount: document.getElementById('turboAmount'),
+        };
+        const buttons = {
+            addTurbo: document.getElementById('addTurbo'),
+            reset: document.getElementById('resetButton'),
+            export: document.getElementById('exportButton'),
+            import: document.getElementById('importButton'),
+            fileInput: document.getElementById('fileInput'),
+        };
+        const turboListContainer = document.getElementById('turboList');
+        const summaryContainer = document.getElementById('summary');
+        const ctx = document.getElementById('investmentChart').getContext('2d');
+        
+        let investmentChart;
+
+        // --- State Management ---
+        const defaultState = {
+            initialInvestment: 20000,
+            years: 15,
+            periodicInvestment: 300,
+            investmentFrequency: 'monthly',
+            stopContributionsYear: 0,
+            rates: { pessimistic: 4, intermediate: 5, optimistic: 6 },
+            turbos: []
+        };
+
+        let state = {};
+
+        function saveState() {
+            localStorage.setItem('investmentSimState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem('investmentSimState');
+            state = savedState ? JSON.parse(savedState) : { ...defaultState };
+            // Ensure new/optional properties exist
+            state.turbos = state.turbos || [];
+            state.stopContributionsYear = state.stopContributionsYear || 0;
+            updateUIFromState();
+        }
+        
+        function updateUIFromState() {
+            inputs.initialInvestment.value = state.initialInvestment;
+            inputs.years.value = state.years;
+            inputs.periodicInvestment.value = state.periodicInvestment;
+            inputs.investmentFrequency.value = state.investmentFrequency;
+            inputs.stopContributionsYear.value = state.stopContributionsYear;
+            inputs.pessimisticRate.value = state.rates.pessimistic;
+            inputs.intermediateRate.value = state.rates.intermediate;
+            inputs.optimisticRate.value = state.rates.optimistic;
+            renderTurboList();
+        }
+        
+        // --- Calculation Logic ---
+        function calculateProjection(rate) {
+            const totalYears = parseInt(state.years, 10);
+            const annualRate = parseFloat(rate) / 100;
+            const annualContribution = state.investmentFrequency === 'monthly'
+                ? parseFloat(state.periodicInvestment) * 12
+                : parseFloat(state.periodicInvestment);
+            const stopYear = parseInt(state.stopContributionsYear, 10);
+
+            const turboMap = new Map(state.turbos.map(t => [t.year, t.amount]));
+            
+            let history = [parseFloat(state.initialInvestment)];
+            
+            for (let year = 1; year <= totalYears; year++) {
+                const lastYearValue = history[year - 1];
+                const growth = lastYearValue * annualRate;
+                const turboAmount = turboMap.get(year) || 0;
+                // Add contribution only if the stop year hasn't been reached
+                const contributionThisYear = (stopYear === 0 || year <= stopYear) ? annualContribution : 0;
+                const currentYearValue = lastYearValue + growth + contributionThisYear + turboAmount;
+                history.push(currentYearValue);
+            }
+            return history;
+        }
+
+        // --- UI Rendering ---
+        function updateSimulation() {
+            // 1. Update state from UI
+            state.initialInvestment = parseFloat(inputs.initialInvestment.value) || 0;
+            state.years = parseInt(inputs.years.value, 10) || 15;
+            state.periodicInvestment = parseFloat(inputs.periodicInvestment.value) || 0;
+            state.investmentFrequency = inputs.investmentFrequency.value;
+            state.stopContributionsYear = parseInt(inputs.stopContributionsYear.value, 10) || 0;
+            state.rates.pessimistic = parseFloat(inputs.pessimisticRate.value) || 0;
+            state.rates.intermediate = parseFloat(inputs.intermediateRate.value) || 0;
+            state.rates.optimistic = parseFloat(inputs.optimisticRate.value) || 0;
+
+            // 2. Perform calculations
+            const pessimisticData = calculateProjection(state.rates.pessimistic);
+            const intermediateData = calculateProjection(state.rates.intermediate);
+            const optimisticData = calculateProjection(state.rates.optimistic);
+            
+            // 3. Update Chart
+            updateChart(pessimisticData, intermediateData, optimisticData);
+
+            // 4. Update Summary
+            updateSummary(pessimisticData, intermediateData, optimisticData);
+
+            // 5. Save state
+            saveState();
+        }
+
+        function updateChart(pessimisticData, intermediateData, optimisticData) {
+            const totalYears = parseInt(state.years, 10);
+            const allLabels = Array.from({ length: totalYears + 1 }, (_, i) => `Año ${i}`);
+            
+            // Filter data to show every 5 years + the last year
+            const filteredIndices = allLabels.map((_, i) => i).filter(i => i % 5 === 0 || i === totalYears);
+            const filteredLabels = filteredIndices.map(i => allLabels[i]);
+            
+            const filterData = (data) => filteredIndices.map(i => data[i]);
+
+            const datasets = [
+                {
+                    label: 'Pesimista',
+                    data: filterData(pessimisticData),
+                    borderColor: '#ef4444',
+                    backgroundColor: '#ef444420',
+                    tension: 0.1,
+                    fill: true,
+                },
+                {
+                    label: 'Intermedio',
+                    data: filterData(intermediateData),
+                    borderColor: '#f59e0b',
+                    backgroundColor: '#f59e0b20',
+                    tension: 0.1,
+                    fill: true,
+                },
+                {
+                    label: 'Optimista',
+                    data: filterData(optimisticData),
+                    borderColor: '#22c55e',
+                    backgroundColor: '#22c55e20',
+                    tension: 0.1,
+                    fill: true,
+                }
+            ];
+            
+            if (investmentChart) {
+                investmentChart.data.labels = filteredLabels;
+                investmentChart.data.datasets = datasets;
+                investmentChart.update();
+            } else {
+                investmentChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: filteredLabels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { color: '#d1d5db' }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { 
+                                    color: '#9ca3af',
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+                                    }
+                                },
+                                grid: { color: '#374151' }
+                            },
+                            x: {
+                                ticks: { color: '#9ca3af' },
+                                grid: { color: '#374151' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateSummary(pessimisticData, intermediateData, optimisticData){
+            const formatCurrency = (value) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value);
+            
+            // Final values from projections
+            const finalPessimisticValue = pessimisticData[pessimisticData.length - 1];
+            const finalIntermediateValue = intermediateData[intermediateData.length - 1];
+            const finalOptimisticValue = optimisticData[optimisticData.length - 1];
+
+            // Total investment calculation
+            const periodicContribution = parseFloat(state.periodicInvestment) || 0;
+            const years = parseInt(state.years, 10) || 0;
+            const initialInvestment = parseFloat(state.initialInvestment) || 0;
+            const stopYear = parseInt(state.stopContributionsYear, 10) || 0;
+
+            const contributionYears = (stopYear > 0 && stopYear < years) ? stopYear : years;
+            
+            const totalPeriodicContribution = state.investmentFrequency === 'monthly'
+                ? periodicContribution * 12 * contributionYears
+                : periodicContribution * contributionYears;
+            
+            const totalTurboContribution = state.turbos.reduce((sum, turbo) => sum + (parseFloat(turbo.amount) || 0), 0);
+
+            const totalInvested = initialInvestment + totalPeriodicContribution + totalTurboContribution;
+            
+            // Net gains for the intermediate scenario
+            const gainsIntermediate = finalIntermediateValue - totalInvested;
+
+            // Formatting for display
+            const formattedTotalInvested = formatCurrency(totalInvested);
+            const formattedGainsIntermediate = formatCurrency(gainsIntermediate);
+            const gainsColor = gainsIntermediate >= 0 ? 'text-green-400' : 'text-red-400';
+            
+            // Render HTML into the summary container
+            summaryContainer.innerHTML = `
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-cyan-300">Desglose de la Inversión</h3>
+                    <div class="max-w-md mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-sky-900/50 p-4 rounded-lg">
+                            <p class="text-sm text-sky-300 mb-1">Total Invertido</p>
+                            <p class="text-2xl font-semibold">${formattedTotalInvested}</p>
+                        </div>
+                        <div class="bg-gray-700/60 p-4 rounded-lg">
+                            <p class="text-sm text-gray-300 mb-1">Ganancia Neta (Intermedio)</p>
+                            <p class="text-2xl font-semibold ${gainsColor}">${formattedGainsIntermediate}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-700 my-6"></div>
+                
+                <h3 class="text-xl font-bold mb-4 text-cyan-300">Valor Final Estimado (Año ${state.years})</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-red-900/50 p-4 rounded-lg">
+                        <p class="text-sm text-red-300">Pesimista</p>
+                        <p class="text-2xl font-semibold">${formatCurrency(finalPessimisticValue)}</p>
+                    </div>
+                    <div class="bg-yellow-900/50 p-4 rounded-lg">
+                        <p class="text-sm text-yellow-300">Intermedio</p>
+                        <p class="text-2xl font-semibold">${formatCurrency(finalIntermediateValue)}</p>
+                    </div>
+                    <div class="bg-green-900/50 p-4 rounded-lg">
+                        <p class="text-sm text-green-300">Optimista</p>
+                        <p class="text-2xl font-semibold">${formatCurrency(finalOptimisticValue)}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderTurboList() {
+            turboListContainer.innerHTML = '';
+            if (state.turbos.length === 0) {
+                 turboListContainer.innerHTML = '<p class="text-xs text-gray-500 italic">No hay inversiones turbo añadidas.</p>';
+            } else {
+                state.turbos.forEach((turbo, index) => {
+                    const turboEl = document.createElement('div');
+                    turboEl.className = 'flex justify-between items-center bg-gray-700 p-2 rounded-lg';
+                    turboEl.innerHTML = `
+                        <span class="text-sm">Año ${turbo.year}: ${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(turbo.amount)}</span>
+                        <button data-index="${index}" class="remove-turbo text-red-400 hover:text-red-300 font-bold">&times;</button>
+                    `;
+                    turboListContainer.appendChild(turboEl);
+                });
+            }
+        }
+
+        // --- Event Handlers ---
+        function handleAddTurbo() {
+            const year = parseInt(inputs.turboYear.value, 10);
+            const amount = parseFloat(inputs.turboAmount.value);
+            if (!year || !amount || year <= 0 || amount <= 0 || year > state.years) {
+                alert('Por favor, introduce un año y una cantidad válidos para la inversión turbo. El año no puede ser mayor que el horizonte temporal.');
+                return;
+            }
+            state.turbos.push({ year, amount });
+            state.turbos.sort((a,b) => a.year - b.year); // Keep them sorted
+            inputs.turboYear.value = '';
+            inputs.turboAmount.value = '';
+            renderTurboList();
+            updateSimulation();
+        }
+
+        function handleRemoveTurbo(e) {
+            if (e.target.classList.contains('remove-turbo')) {
+                const index = parseInt(e.target.dataset.index, 10);
+                state.turbos.splice(index, 1);
+                renderTurboList();
+                updateSimulation();
+            }
+        }
+
+        function handleReset() {
+            if (confirm('¿Estás seguro de que quieres reiniciar la simulación? Se perderán todos los datos actuales.')) {
+                localStorage.removeItem('investmentSimState');
+                loadState(); // This reloads defaults
+                updateSimulation();
+            }
+        }
+        
+        function handleExport() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "simulacion_inversion.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function handleImport() {
+            buttons.fileInput.click();
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedState = JSON.parse(e.target.result);
+                    // Basic validation
+                    if (importedState.initialInvestment !== undefined && importedState.rates) {
+                       state = { ...defaultState, ...importedState };
+                       updateUIFromState();
+                       updateSimulation();
+                    } else {
+                        alert('El archivo JSON no parece tener un formato válido.');
+                    }
+                } catch (error) {
+                    alert('Error al leer el archivo JSON.');
+                    console.error("JSON Parse Error:", error);
+                }
+            };
+            reader.readAsText(file);
+            // Reset file input to allow re-uploading the same file
+            e.target.value = null; 
+        }
+
+        // --- Initialization ---
+        function init() {
+            Object.values(inputs).forEach(input => {
+                if(input) input.addEventListener('input', updateSimulation);
+            });
+            
+            buttons.addTurbo.addEventListener('click', handleAddTurbo);
+            turboListContainer.addEventListener('click', handleRemoveTurbo);
+            buttons.reset.addEventListener('click', handleReset);
+            buttons.export.addEventListener('click', handleExport);
+            buttons.import.addEventListener('click', handleImport);
+            buttons.fileInput.addEventListener('change', handleFileSelect);
+
+            loadState();
+            updateSimulation();
+        }
+
+        init();
+    </script>
+</body>
+</html>
