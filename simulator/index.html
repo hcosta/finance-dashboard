@@ -67,19 +67,25 @@
 
                 <div>
                      <h3 class="text-lg font-semibold mb-3 text-cyan-300">Aportación Periódica</h3>
-                     <div class="grid grid-cols-2 gap-4">
-                         <div>
-                            <label for="periodicInvestment" class="block text-sm font-medium text-gray-300 mb-1">Cantidad (€)</label>
-                            <input type="number" id="periodicInvestment" value="300" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
-                         </div>
-                         <div>
-                            <label for="investmentFrequency" class="block text-sm font-medium text-gray-300 mb-1">Frecuencia</label>
-                            <select id="investmentFrequency" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
-                                <option value="monthly">Mensual</option>
-                                <option value="yearly">Anual (Lump Sum)</option>
-                            </select>
-                         </div>
-                    </div>
+                     <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="periodicInvestment" class="block text-sm font-medium text-gray-300 mb-1">Cantidad (€)</label>
+                                <input type="number" id="periodicInvestment" value="300" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label for="investmentFrequency" class="block text-sm font-medium text-gray-300 mb-1">Frecuencia</label>
+                                <select id="investmentFrequency" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
+                                    <option value="monthly">Mensual</option>
+                                    <option value="yearly">Anual (Lump Sum)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="stopContributionsYear" class="block text-sm font-medium text-gray-300 mb-1">Año fin aportaciones (0 = nunca)</label>
+                            <input type="number" id="stopContributionsYear" value="0" min="0" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white focus:ring-cyan-500 focus:border-cyan-500">
+                        </div>
+                     </div>
                 </div>
 
                 <div>
@@ -153,6 +159,7 @@
             years: document.getElementById('years'),
             periodicInvestment: document.getElementById('periodicInvestment'),
             investmentFrequency: document.getElementById('investmentFrequency'),
+            stopContributionsYear: document.getElementById('stopContributionsYear'),
             pessimisticRate: document.getElementById('pessimisticRate'),
             intermediateRate: document.getElementById('intermediateRate'),
             optimisticRate: document.getElementById('optimisticRate'),
@@ -178,6 +185,7 @@
             years: 15,
             periodicInvestment: 300,
             investmentFrequency: 'monthly',
+            stopContributionsYear: 0,
             rates: { pessimistic: 4, intermediate: 5, optimistic: 6 },
             turbos: []
         };
@@ -191,8 +199,9 @@
         function loadState() {
             const savedState = localStorage.getItem('investmentSimState');
             state = savedState ? JSON.parse(savedState) : { ...defaultState };
-            // Ensure turbos is always an array
+            // Ensure new/optional properties exist
             state.turbos = state.turbos || [];
+            state.stopContributionsYear = state.stopContributionsYear || 0;
             updateUIFromState();
         }
         
@@ -201,6 +210,7 @@
             inputs.years.value = state.years;
             inputs.periodicInvestment.value = state.periodicInvestment;
             inputs.investmentFrequency.value = state.investmentFrequency;
+            inputs.stopContributionsYear.value = state.stopContributionsYear;
             inputs.pessimisticRate.value = state.rates.pessimistic;
             inputs.intermediateRate.value = state.rates.intermediate;
             inputs.optimisticRate.value = state.rates.optimistic;
@@ -214,6 +224,7 @@
             const annualContribution = state.investmentFrequency === 'monthly'
                 ? parseFloat(state.periodicInvestment) * 12
                 : parseFloat(state.periodicInvestment);
+            const stopYear = parseInt(state.stopContributionsYear, 10);
 
             const turboMap = new Map(state.turbos.map(t => [t.year, t.amount]));
             
@@ -223,7 +234,9 @@
                 const lastYearValue = history[year - 1];
                 const growth = lastYearValue * annualRate;
                 const turboAmount = turboMap.get(year) || 0;
-                const currentYearValue = lastYearValue + growth + annualContribution + turboAmount;
+                // Add contribution only if the stop year hasn't been reached
+                const contributionThisYear = (stopYear === 0 || year <= stopYear) ? annualContribution : 0;
+                const currentYearValue = lastYearValue + growth + contributionThisYear + turboAmount;
                 history.push(currentYearValue);
             }
             return history;
@@ -236,6 +249,7 @@
             state.years = parseInt(inputs.years.value, 10) || 15;
             state.periodicInvestment = parseFloat(inputs.periodicInvestment.value) || 0;
             state.investmentFrequency = inputs.investmentFrequency.value;
+            state.stopContributionsYear = parseInt(inputs.stopContributionsYear.value, 10) || 0;
             state.rates.pessimistic = parseFloat(inputs.pessimisticRate.value) || 0;
             state.rates.intermediate = parseFloat(inputs.intermediateRate.value) || 0;
             state.rates.optimistic = parseFloat(inputs.optimisticRate.value) || 0;
@@ -359,10 +373,13 @@
             const periodicContribution = parseFloat(state.periodicInvestment) || 0;
             const years = parseInt(state.years, 10) || 0;
             const initialInvestment = parseFloat(state.initialInvestment) || 0;
+            const stopYear = parseInt(state.stopContributionsYear, 10) || 0;
 
+            const contributionYears = (stopYear > 0 && stopYear < years) ? stopYear : years;
+            
             const totalPeriodicContribution = state.investmentFrequency === 'monthly'
-                ? periodicContribution * 12 * years
-                : periodicContribution * years;
+                ? periodicContribution * 12 * contributionYears
+                : periodicContribution * contributionYears;
             
             const totalTurboContribution = state.turbos.reduce((sum, turbo) => sum + (parseFloat(turbo.amount) || 0), 0);
 
