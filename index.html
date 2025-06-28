@@ -527,8 +527,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const processedRecords = getProcessedData();
 
         processedRecords.forEach(r => {
-            const inversionMetal = r.aporteTurbo * 0.66;
-            const inversionRock = r.aporteTurbo * 0.33;
+            const inversionMetal = r.aporteTurbo * 0.66666;
+            const inversionRock = r.aporteTurbo * 0.33333;
             const tooltipText = `A Metal: ${inversionMetal.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })} | A Rock: ${inversionRock.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}`;
             const huchaText = r.anualInvertido ? 'Invertido' : r.aporteHucha.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
             
@@ -598,8 +598,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="text-gray-600">Has acumulado 12 ahorros. Transfiere el total de la hucha a tus carteras.</p>
                 <div class="mt-2 text-sm">
                     <p><strong>Total a Invertir:</strong> <span class="font-bold">${huchaAcumuladaParaInvertir.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span></p>
-                    <p><strong>A Metal (66%):</strong> <span class="font-semibold">${(huchaAcumuladaParaInvertir * 0.66).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span></p>
-                    <p><strong>A Rock (33%):</strong> <span class="font-semibold">${(huchaAcumuladaParaInvertir * 0.33).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span></p>
+                    <p><strong>A Metal (66%):</strong> <span class="font-semibold">${(huchaAcumuladaParaInvertir * 0.66666).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span></p>
+                    <p><strong>A Rock (33%):</strong> <span class="font-semibold">${(huchaAcumuladaParaInvertir * 0.33333).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}</span></p>
                 </div>
                 <button id="confirmAnualBtn" class="btn btn-secondary mt-4">Confirmar Inversión Anual</button>`;
             document.getElementById('confirmAnualBtn').addEventListener('click', executeAnualInvestment);
@@ -613,8 +613,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const alertCardTurbo = document.getElementById('alertCardTurbo');
         const umbralMetal = 150 + (state.config.valorCarteraMetal * 0.005);
         const umbralRock = 150 + (state.config.valorCarteraRock * 0.005);
-        const turboParaMetal = huchaTurboPendiente * 0.66;
-        const turboParaRock = huchaTurboPendiente * 0.33;
+        const turboParaMetal = huchaTurboPendiente * 0.66666;
+        const turboParaRock = huchaTurboPendiente * 0.33333;
 
         if (huchaTurboPendiente > 0 && turboParaMetal >= umbralMetal && turboParaRock >= umbralRock) {
              alertCardTurbo.innerHTML = `
