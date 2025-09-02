@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Inversiones - Renta Variable vs Renta Fija</title>
+    <title>Simulador de Inversiones Avanzado</title>
+    <!-- Librerías de terceros -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        /* Estilos generales y diseño visual del simulador */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -27,338 +27,193 @@
             padding: 30px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 2em;
-        }
-        
-        .main-controls {
+        h1, h2 { text-align: center; color: #333; }
+        h1 { margin-bottom: 30px; font-size: 2em; }
+        h2 { margin-bottom: 20px; font-size: 1.5em; margin-top: 40px; }
+
+        .main-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; }
+        .control-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; color: #555; margin-bottom: 5px; font-size: 0.9em; }
+        input, select, textarea { padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .chart-container { position: relative; height: 400px; margin-bottom: 30px; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .actions-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .action-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .action-card h3 { color: #333; margin-bottom: 15px; font-size: 1.2em; }
+        .action-inputs { display: grid; gap: 10px; margin-bottom: 15px; }
+        .action-inputs input, .action-inputs select { width: 100%; }
+        button { padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3); }
+        .list-container { flex-grow: 1; max-height: 200px; overflow-y: auto; margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; margin-bottom: 8px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 0.9em; }
+        .list-item span { flex-grow: 1; margin-right: 10px; }
+        .list-item div { display: flex; }
+        .list-item button { padding: 5px 10px; font-size: 0.85em; background: #dc3545; }
+        .list-item button.edit { background: #28a745; margin-right: 5px; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; margin-bottom: 30px; }
+        .summary-item { text-align: center; }
+        .summary-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 5px; }
+        .summary-value { font-size: 1.5em; font-weight: bold; }
+        .file-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .file-actions button { background: #28a745; }
+        .file-actions button.reset { background: #dc3545; }
+        .file-actions button.export { background: #17a2b8; }
+        #fileInput { display: none; }
+
+        /* Estilos para el Plan de Acción */
+        #action-planner { background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 30px;}
+        .action-planner-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .control-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        label {
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-        
-        input, select {
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: all 0.3s;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .actions-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .action-card-column {
-            display: flex;
-            flex-direction: column;
+            grid-template-columns: 300px 1fr;
             gap: 20px;
         }
-        
-        .action-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .action-card h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-        
-        .action-inputs {
-            display: grid;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .action-inputs input, .action-inputs select {
+        .flatpickr-calendar {
+            box-shadow: none !important;
             width: 100%;
         }
-        
-        button {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .list-container {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 15px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            margin-bottom: 8px;
-            background: white;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .list-item button {
-            padding: 5px 10px;
-            font-size: 0.85em;
-            background: #dc3545;
-        }
-        
-        .list-item button.edit {
-            background: #28a745;
-            margin-right: 5px;
-        }
-        
-        .summary {
+        .action-tables-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .action-table-wrapper { display: flex; flex-direction: column; }
+        .action-table-wrapper h3 { text-align: center; margin-bottom: 10px; font-size: 1.1em; color: #333; }
+        .action-table-container { max-height: 400px; overflow-y: auto; }
+        .action-table { width: 100%; border-collapse: collapse; }
+        .action-table th, .action-table td { padding: 10px; text-align: left; border-bottom: 1px solid #dee2e6; font-size: 0.9em; }
+        .action-table th { background-color: #e9ecef; font-weight: 600; }
+        .action-table tr:hover { background-color: #f1f3f5; }
+        .action-table .highlight {
+            background-color: #d1c4e9 !important;
+            transition: background-color 0.3s ease-in-out;
+        }
+        .action-table input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer;}
+        .completed-row td { text-decoration: line-through; color: #6c757d; }
+        .flatpickr-day.action-day {
+            background: #667eea;
             color: white;
-            margin-bottom: 30px;
-        }
-        
-        .summary-item {
-            text-align: center;
-        }
-        
-        .summary-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-        
-        .summary-value {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        
-        .file-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        
-        .file-actions button {
-            background: #28a745;
-        }
-        
-        .file-actions button.reset {
-            background: #dc3545;
-        }
-        
-        .file-actions button.export {
-            background: #17a2b8;
-        }
-        
-        #fileInput {
-            display: none;
+            border-radius: 50%;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📈 Simulador de Inversiones: Renta Variable vs Renta Fija</h1>
+        <h1>📈 Simulador de Inversiones Avanzado</h1>
         
+        <!-- Controles, Resumen y Gráfico (sin cambios) -->
         <div class="main-controls">
-            <div class="control-group">
-                <label>Capital Inicial RV (€)</label>
-                <input type="number" id="initialCapitalRV" value="5000" min="0">
-            </div>
-            <div class="control-group">
-                <label>Capital Inicial RF (€)</label>
-                <input type="number" id="initialCapitalRF" value="5000" min="0">
-            </div>
-            <div class="control-group">
-                <label>Años de Inversión</label>
-                <input type="number" id="years" value="10" min="1" max="50">
-            </div>
-            <div class="control-group">
-                <label>Rentabilidad RV (%)</label>
-                <input type="number" id="rvReturn" value="7" step="0.1">
-            </div>
-            <div class="control-group">
-                <label>Rentabilidad RF (%)</label>
-                <input type="number" id="rfReturn" value="3" step="0.1">
-            </div>
+            <div class="control-group"><label>Capital Inicial RV (€)</label><input type="number" id="initialCapitalRV" value="5000" min="0"></div>
+            <div class="control-group"><label>Capital Inicial RF (€)</label><input type="number" id="initialCapitalRF" value="5000" min="0"></div>
+            <div class="control-group"><label>Años de Inversión</label><input type="number" id="years" value="10" min="1" max="50"></div>
+            <div class="control-group"><label>Rentabilidad RV (%)</label><input type="number" id="rvReturn" value="7" step="0.1"></div>
+            <div class="control-group"><label>Rentabilidad RF (%)</label><input type="number" id="rfReturn" value="3" step="0.1"></div>
         </div>
-        
         <div class="summary" id="summary">
-            <div class="summary-item">
-                <div class="summary-label">Valor Final RV</div>
-                <div class="summary-value" id="rvFinal">€0</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Valor Final RF</div>
-                <div class="summary-value" id="rfFinal">€0</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Valor Final Total</div>
-                <div class="summary-value" id="totalFinal" style="color: #FFD700;">€0</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Aportado RV</div>
-                <div class="summary-value" id="rvContributed">€0</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Aportado RF</div>
-                <div class="summary-value" id="rfContributed">€0</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Total Aportado</div>
-                <div class="summary-value" id="totalContributed">€0</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Rentabilidad Total</div>
-                <div class="summary-value" id="totalReturn">0%</div>
-            </div>
+            <div class="summary-item"><div class="summary-label">Valor Final RV</div><div class="summary-value" id="rvFinal">€0</div></div>
+            <div class="summary-item"><div class="summary-label">Valor Final RF</div><div class="summary-value" id="rfFinal">€0</div></div>
+            <div class="summary-item"><div class="summary-label">Valor Final Total</div><div class="summary-value" id="totalFinal" style="color: #FFD700;">€0</div></div>
+            <div class="summary-item"><div class="summary-label">Aportado RV</div><div class="summary-value" id="rvContributed">€0</div></div>
+            <div class="summary-item"><div class="summary-label">Aportado RF</div><div class="summary-value" id="rfContributed">€0</div></div>
+            <div class="summary-item"><div class="summary-label">Total Aportado</div><div class="summary-value" id="totalContributed">€0</div></div>
+            <div class="summary-item"><div class="summary-label">Rentabilidad Total</div><div class="summary-value" id="totalReturn">0%</div></div>
         </div>
-        
-        <div class="chart-container">
-            <canvas id="investmentChart"></canvas>
-        </div>
-        
+        <div class="chart-container"><canvas id="investmentChart"></canvas></div>
+
+        <!-- Secciones de configuración de acciones (sin cambios) -->
         <div class="actions-section">
             <div class="action-card">
                 <h3>💰 Aportaciones</h3>
                 <div class="action-inputs">
-                    <input type="month" id="contribDate" placeholder="Fecha inicio">
-                    <input type="number" id="contribAmount" placeholder="Cantidad (€)" min="0">
-                    <select id="contribPeriod">
-                        <option value="monthly">Mensual</option>
-                        <option value="quarterly">Trimestral</option>
-                        <option value="yearly">Anual</option>
-                    </select>
+                    <input type="month" id="contribDate"><input type="number" id="contribAmount" placeholder="Cantidad (€)" min="0">
+                    <select id="contribPeriod"><option value="monthly">Mensual</option><option value="quarterly">Trimestral</option><option value="yearly">Anual</option></select>
                     <input type="number" id="contribTimes" placeholder="Número de veces" min="1">
-                    <select id="contribTarget">
-                        <option value="rv">Renta Variable</option>
-                        <option value="rf">Renta Fija</option>
-                    </select>
+                    <select id="contribTarget"><option value="rv">Renta Variable</option><option value="rf">Renta Fija</option></select>
                 </div>
                 <button onclick="addContribution()">Añadir Aportación</button>
                 <div class="list-container" id="contributionsList"></div>
             </div>
-            
-            <div class="action-card-column">
-                <div class="action-card">
-                    <h3>📉 Correcciones/Crisis (RV)</h3>
-                    <div class="action-inputs">
-                        <input type="month" id="crisisDate" placeholder="Fecha">
-                        <input type="number" id="crisisPercent" placeholder="Caída (%)" min="0" max="100">
-                    </div>
-                    <button onclick="addCrisis()">Añadir Crisis</button>
-                    <div class="list-container" id="crisisList"></div>
-                </div>
-                
-                <div class="action-card">
-                    <h3>📝 Observaciones</h3>
-                    <textarea id="observations" placeholder="Escribe aquí tus notas sobre la simulación..." 
-                              style="width: 100%; min-height: 150px; padding: 10px; border: 2px solid #e0e0e0; 
-                                     border-radius: 8px; font-family: inherit; font-size: 0.95em; resize: vertical;"
-                              oninput="saveObservations()"></textarea>
-                </div>
-            </div>
-            
             <div class="action-card">
-                <h3>🔄 Transferencias</h3>
+                <h3>🔄 Rebalanceos</h3>
                 <div class="action-inputs">
-                    <input type="month" id="transferDate" placeholder="Fecha">
+                    <input type="month" id="transferDate">
                     <input type="number" id="transferAmount" placeholder="Cantidad (€)" min="0">
-                    <select id="transferDirection">
-                        <option value="rv-rf">RV → RF</option>
-                        <option value="rf-rv">RF → RV</option>
-                    </select>
+                    <select id="transferPeriod"><option value="once">Una vez</option><option value="monthly">Mensual</option><option value="quarterly">Trimestral</option><option value="yearly">Anual</option></select>
+                    <input type="number" id="transferTimes" placeholder="Número de veces (si es periódico)" min="1">
+                    <select id="transferDirection"><option value="rv-rf">RV → RF</option><option value="rf-rv">RF → RV</option></select>
                 </div>
                 <button onclick="addTransfer()">Añadir Transferencia</button>
                 <div class="list-container" id="transfersList"></div>
             </div>
+            <div class="action-card">
+                <h3>📉 Correcciones/Crisis (RV)</h3>
+                <div class="action-inputs">
+                    <input type="month" id="crisisDate">
+                    <input type="number" id="crisisPercent" placeholder="Caída (%)" min="0" max="100">
+                </div>
+                <button onclick="addCrisis()">Añadir Crisis</button>
+                <div class="list-container" id="crisisList"></div>
+            </div>
+             <div class="action-card">
+                <h3>📝 Observaciones</h3>
+                <textarea id="observations" placeholder="Escribe aquí tus notas sobre la simulación..." style="min-height: 200px; resize: vertical;" oninput="saveToMemory()"></textarea>
+            </div>
         </div>
         
+        <!-- Acciones de Ficheros (ahora antes del Plan de Acción) -->
         <div class="file-actions">
             <button onclick="resetAll()" class="reset">🔄 Resetear Todo</button>
             <button onclick="exportData()" class="export">💾 Exportar JSON</button>
             <button onclick="document.getElementById('fileInput').click()">📂 Importar JSON</button>
             <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
         </div>
+
+        <!-- PLAN DE ACCIÓN (NUEVA SECCIÓN REUBICADA Y MEJORADA) -->
+        <div id="action-planner">
+            <h2>🗓️ Plan de Acción Mensual</h2>
+            <div class="action-planner-content">
+                <!-- Calendario Flatpickr -->
+                <div class="calendar-wrapper">
+                    <input type="text" id="action-calendar" style="display:none;">
+                </div>
+                <!-- Tablas de Acciones -->
+                <div class="action-tables-container">
+                    <div class="action-table-wrapper">
+                        <h3>Acciones por Realizar</h3>
+                        <div class="action-table-container">
+                             <table class="action-table">
+                                <thead><tr><th>Fecha</th><th>Acción</th><th></th></tr></thead>
+                                <tbody id="actionTableBodyPending"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="action-table-wrapper">
+                        <h3>Acciones Realizadas</h3>
+                        <div class="action-table-container">
+                            <table class="action-table">
+                                <thead><tr><th>Fecha</th><th>Acción</th><th></th></tr></thead>
+                                <tbody id="actionTableBodyCompleted"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Estado de la aplicación
+        // --- ESTADO GLOBAL DE LA APLICACIÓN ---
         let state = {
-            initialCapitalRV: 5000,
-            initialCapitalRF: 5000,
-            years: 10,
-            rvReturn: 7,
-            rfReturn: 3,
-            contributions: [],
-            crises: [],
-            transfers: [],
-            observations: ''
+            initialCapitalRV: 5000, initialCapitalRF: 5000, years: 10,
+            rvReturn: 7, rfReturn: 3, contributions: [], crises: [],
+            transfers: [], observations: '', completedActions: {}
         };
 
         let chart = null;
+        let calendar = null;
 
-        // Inicialización
+        // --- INICIALIZACIÓN ---
         document.addEventListener('DOMContentLoaded', () => {
+            flatpickr.localize(flatpickr.l10ns.es);
             loadFromMemory();
             setupEventListeners();
             updateSimulation();
@@ -372,450 +227,313 @@
                 });
             });
         }
-
+        
+        // --- LÓGICA DE MANEJO DE ESTADO Y DATOS ---
         function updateStateFromInputs() {
             state.initialCapitalRV = parseFloat(document.getElementById('initialCapitalRV').value) || 0;
             state.initialCapitalRF = parseFloat(document.getElementById('initialCapitalRF').value) || 0;
             state.years = parseInt(document.getElementById('years').value) || 1;
             state.rvReturn = parseFloat(document.getElementById('rvReturn').value) || 0;
             state.rfReturn = parseFloat(document.getElementById('rfReturn').value) || 0;
-            saveToMemory();
         }
 
+        // --- FUNCIONES PARA AÑADIR/EDITAR/BORRAR EVENTOS ---
         function addContribution() {
             const date = document.getElementById('contribDate').value;
             const amount = parseFloat(document.getElementById('contribAmount').value);
             const period = document.getElementById('contribPeriod').value;
             const times = parseInt(document.getElementById('contribTimes').value);
             const target = document.getElementById('contribTarget').value;
-            
-            if (!date || !amount || !times) {
-                alert('Por favor, completa todos los campos');
-                return;
-            }
-            
-            const contribution = { id: Date.now(), date, amount, period, times, target };
-            state.contributions.push(contribution);
-            
-            updateContributionsList();
-            updateSimulation();
-            saveToMemory();
-            
-            // Limpiar campos
+            if (!date || !amount || !times) return alert('Por favor, completa todos los campos de aportación.');
+            state.contributions.push({ id: Date.now(), date, amount, period, times, target });
+            updateAndSave();
             document.getElementById('contribDate').value = '';
             document.getElementById('contribAmount').value = '';
             document.getElementById('contribTimes').value = '';
         }
 
+        function addTransfer() {
+            const date = document.getElementById('transferDate').value;
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+            const period = document.getElementById('transferPeriod').value;
+            const timesInput = document.getElementById('transferTimes');
+            const times = period === 'once' ? 1 : parseInt(timesInput.value);
+            const direction = document.getElementById('transferDirection').value;
+            if (!date || !amount || (period !== 'once' && !times)) return alert('Por favor, completa los campos de transferencia.');
+            state.transfers.push({ id: Date.now(), date, amount, period, times, direction });
+            updateAndSave();
+            document.getElementById('transferDate').value = '';
+            document.getElementById('transferAmount').value = '';
+            timesInput.value = '';
+        }
+        
         function addCrisis() {
             const date = document.getElementById('crisisDate').value;
             const percent = parseFloat(document.getElementById('crisisPercent').value);
-            
-            if (!date || !percent) {
-                alert('Por favor, completa todos los campos');
-                return;
-            }
-            
-            const crisis = { id: Date.now(), date, percent };
-            state.crises.push(crisis);
-            
-            updateCrisisList();
-            updateSimulation();
-            saveToMemory();
-            
-            // Limpiar campos
+            if (!date || !percent) return alert('Por favor, completa todos los campos de crisis.');
+            state.crises.push({ id: Date.now(), date, percent });
+            updateAndSave();
             document.getElementById('crisisDate').value = '';
             document.getElementById('crisisPercent').value = '';
         }
 
-        function addTransfer() {
-            const date = document.getElementById('transferDate').value;
-            const amount = parseFloat(document.getElementById('transferAmount').value);
-            const direction = document.getElementById('transferDirection').value;
-            
-            if (!date || !amount) {
-                alert('Por favor, completa todos los campos');
-                return;
-            }
-            
-            const transfer = { id: Date.now(), date, amount, direction };
-            state.transfers.push(transfer);
-            
-            updateTransfersList();
-            updateSimulation();
-            saveToMemory();
-            
-            // Limpiar campos
-            document.getElementById('transferDate').value = '';
-            document.getElementById('transferAmount').value = '';
-        }
-
-        function updateContributionsList() {
-            const list = document.getElementById('contributionsList');
-            list.innerHTML = state.contributions.map(c => `
-                <div class="list-item">
-                    <span>${c.date} - €${c.amount} - ${c.period} - ${c.times}x - ${c.target.toUpperCase()}</span>
-                    <div>
-                        <button class="edit" onclick="editContribution(${c.id})">✏️</button>
-                        <button onclick="deleteContribution(${c.id})">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateCrisisList() {
-            const list = document.getElementById('crisisList');
-            list.innerHTML = state.crises.map(c => `
-                <div class="list-item">
-                    <span>${c.date} - Caída ${c.percent}%</span>
-                    <div>
-                        <button class="edit" onclick="editCrisis(${c.id})">✏️</button>
-                        <button onclick="deleteCrisis(${c.id})">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateTransfersList() {
-            const list = document.getElementById('transfersList');
-            list.innerHTML = state.transfers.map(t => `
-                <div class="list-item">
-                    <span>${t.date} - €${t.amount} - ${t.direction === 'rv-rf' ? 'RV→RF' : 'RF→RV'}</span>
-                    <div>
-                        <button class="edit" onclick="editTransfer(${t.id})">✏️</button>
-                        <button onclick="deleteTransfer(${t.id})">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function deleteContribution(id) {
-            state.contributions = state.contributions.filter(c => c.id !== id);
-            updateContributionsList();
-            updateSimulation();
-            saveToMemory();
-        }
-
-        function deleteCrisis(id) {
-            state.crises = state.crises.filter(c => c.id !== id);
-            updateCrisisList();
-            updateSimulation();
-            saveToMemory();
-        }
-
-        function deleteTransfer(id) {
-            state.transfers = state.transfers.filter(t => t.id !== id);
-            updateTransfersList();
-            updateSimulation();
-            saveToMemory();
+        function deleteItem(type, id) {
+            state[type] = state[type].filter(item => item.id !== id);
+            updateAndSave();
         }
 
         function editContribution(id) {
-            const contrib = state.contributions.find(c => c.id === id);
-            if (contrib) {
-                document.getElementById('contribDate').value = contrib.date;
-                document.getElementById('contribAmount').value = contrib.amount;
-                document.getElementById('contribPeriod').value = contrib.period;
-                document.getElementById('contribTimes').value = contrib.times;
-                document.getElementById('contribTarget').value = contrib.target;
-                deleteContribution(id);
-            }
-        }
-
-        function editCrisis(id) {
-            const crisis = state.crises.find(c => c.id === id);
-            if (crisis) {
-                document.getElementById('crisisDate').value = crisis.date;
-                document.getElementById('crisisPercent').value = crisis.percent;
-                deleteCrisis(id);
-            }
+            const c = state.contributions.find(item => item.id === id); if (!c) return;
+            document.getElementById('contribDate').value = c.date;
+            document.getElementById('contribAmount').value = c.amount;
+            document.getElementById('contribPeriod').value = c.period;
+            document.getElementById('contribTimes').value = c.times;
+            document.getElementById('contribTarget').value = c.target;
+            deleteItem('contributions', id);
         }
 
         function editTransfer(id) {
-            const transfer = state.transfers.find(t => t.id === id);
-            if (transfer) {
-                document.getElementById('transferDate').value = transfer.date;
-                document.getElementById('transferAmount').value = transfer.amount;
-                document.getElementById('transferDirection').value = transfer.direction;
-                deleteTransfer(id);
-            }
+            const t = state.transfers.find(item => item.id === id); if (!t) return;
+            document.getElementById('transferDate').value = t.date;
+            document.getElementById('transferAmount').value = t.amount;
+            document.getElementById('transferPeriod').value = t.period;
+            document.getElementById('transferTimes').value = t.period === 'once' ? '' : t.times;
+            document.getElementById('transferDirection').value = t.direction;
+            deleteItem('transfers', id);
         }
 
+        function editCrisis(id) {
+            const c = state.crises.find(item => item.id === id); if (!c) return;
+            document.getElementById('crisisDate').value = c.date;
+            document.getElementById('crisisPercent').value = c.percent;
+            deleteItem('crises', id);
+        }
+        
+        // --- FUNCIONES PARA ACTUALIZAR LAS LISTAS EN LA UI ---
+        function updateLists() {
+            const contribList = document.getElementById('contributionsList');
+            contribList.innerHTML = state.contributions.map(c => `<div class="list-item"><span>${c.date} | €${c.amount} | ${c.period} | ${c.times}x | ${c.target.toUpperCase()}</span><div><button class="edit" onclick="editContribution(${c.id})">✏️</button><button onclick="deleteItem('contributions', ${c.id})">🗑️</button></div></div>`).join('');
+            const transfersList = document.getElementById('transfersList');
+            transfersList.innerHTML = state.transfers.map(t => `<div class="list-item"><span>${t.date} | €${t.amount} | ${t.direction.replace('-', '→').toUpperCase()} | ${t.period==='once'?'Una vez':t.period+', '+t.times+'x'}</span><div><button class="edit" onclick="editTransfer(${t.id})">✏️</button><button onclick="deleteItem('transfers', ${t.id})">🗑️</button></div></div>`).join('');
+            const crisisList = document.getElementById('crisisList');
+            crisisList.innerHTML = state.crises.map(c => `<div class="list-item"><span>${c.date} | Caída ${c.percent}%</span><div><button class="edit" onclick="editCrisis(${c.id})">✏️</button><button onclick="deleteItem('crises', ${c.id})">🗑️</button></div></div>`).join('');
+        }
+        
+        // --- MOTOR DE SIMULACIÓN ---
         function calculateSimulation() {
-            const startDate = new Date();
+            const simulationStartDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
             const months = state.years * 12;
             const monthlyRvReturn = Math.pow(1 + state.rvReturn / 100, 1/12) - 1;
             const monthlyRfReturn = Math.pow(1 + state.rfReturn / 100, 1/12) - 1;
-            
-            let rvValues = [state.initialCapitalRV];
-            let rfValues = [state.initialCapitalRF];
-            let labels = ['Inicio'];
-            let rvContributed = state.initialCapitalRV;
-            let rfContributed = state.initialCapitalRF;
-            
+            let rvValues = [state.initialCapitalRV], rfValues = [state.initialCapitalRF];
+            let rvContributed = state.initialCapitalRV, rfContributed = state.initialCapitalRF;
             for (let month = 1; month <= months; month++) {
-                const currentDate = new Date(startDate);
-                currentDate.setMonth(startDate.getMonth() + month);
-                const dateStr = currentDate.toISOString().slice(0, 7);
-                
+                const currentDate = new Date(simulationStartDate.getFullYear(), simulationStartDate.getMonth() + month, 1);
+                const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
                 let rvValue = rvValues[rvValues.length - 1] * (1 + monthlyRvReturn);
                 let rfValue = rfValues[rfValues.length - 1] * (1 + monthlyRfReturn);
-                
-                // Aplicar aportaciones
-                state.contributions.forEach(contrib => {
-                    const contribDate = new Date(contrib.date);
-                    const monthsDiff = (currentDate.getFullYear() - contribDate.getFullYear()) * 12 + 
-                                      (currentDate.getMonth() - contribDate.getMonth());
-                    
-                    let shouldAdd = false;
-                    if (contrib.period === 'monthly' && monthsDiff >= 0 && monthsDiff < contrib.times) {
-                        shouldAdd = true;
-                    } else if (contrib.period === 'quarterly' && monthsDiff >= 0 && monthsDiff % 3 === 0 && monthsDiff / 3 < contrib.times) {
-                        shouldAdd = true;
-                    } else if (contrib.period === 'yearly' && monthsDiff >= 0 && monthsDiff % 12 === 0 && monthsDiff / 12 < contrib.times) {
-                        shouldAdd = true;
-                    }
-                    
-                    if (shouldAdd) {
-                        if (contrib.target === 'rv') {
-                            rvValue += contrib.amount;
-                            rvContributed += contrib.amount;
-                        } else {
-                            rfValue += contrib.amount;
-                            rfContributed += contrib.amount;
-                        }
-                    }
-                });
-                
-                // Aplicar crisis
-                state.crises.forEach(crisis => {
-                    if (crisis.date === dateStr) {
-                        rvValue *= (1 - crisis.percent / 100);
-                    }
-                });
-                
-                // Aplicar transferencias
-                state.transfers.forEach(transfer => {
-                    if (transfer.date === dateStr) {
-                        if (transfer.direction === 'rv-rf') {
-                            const amount = Math.min(transfer.amount, rvValue);
-                            rvValue -= amount;
-                            rfValue += amount;
-                        } else {
-                            const amount = Math.min(transfer.amount, rfValue);
-                            rfValue -= amount;
-                            rvValue += amount;
-                        }
-                    }
-                });
-                
-                rvValues.push(rvValue);
-                rfValues.push(rfValue);
-                
-                if (month % 12 === 0) {
-                    labels.push(`Año ${month / 12}`);
+                const processPeriodicEvent = (event, action) => {
+                    const [year, month] = event.date.split('-').map(Number);
+                    const eventDate = new Date(year, month - 1, 1);
+                    const monthsDiff = (currentDate.getFullYear() - eventDate.getFullYear()) * 12 + (currentDate.getMonth() - eventDate.getMonth());
+                    let shouldTrigger = false;
+                    const period = event.period;
+                    if (period === 'once' && monthsDiff === 0) shouldTrigger = true;
+                    else if (period === 'monthly' && monthsDiff >= 0 && monthsDiff < event.times) shouldTrigger = true;
+                    else if (period === 'quarterly' && monthsDiff >= 0 && monthsDiff % 3 === 0 && monthsDiff / 3 < event.times) shouldTrigger = true;
+                    else if (period === 'yearly' && monthsDiff >= 0 && monthsDiff % 12 === 0 && monthsDiff / 12 < event.times) shouldTrigger = true;
+                    if (shouldTrigger) action(event);
+                };
+                state.contributions.forEach(c => processPeriodicEvent(c, e => {
+                    if (e.target === 'rv') { rvValue += e.amount; rvContributed += e.amount; }
+                    else { rfValue += e.amount; rfContributed += e.amount; }
+                }));
+                state.crises.forEach(c => { if (c.date === dateStr) rvValue *= (1 - c.percent / 100); });
+                state.transfers.forEach(t => processPeriodicEvent(t, e => {
+                    if (e.direction === 'rv-rf') { const amount = Math.min(e.amount, rvValue); rvValue -= amount; rfValue += amount; } 
+                    else { const amount = Math.min(e.amount, rfValue); rfValue -= amount; rvValue += amount; }
+                }));
+                rvValues.push(rvValue); rfValues.push(rfValue);
+            }
+            return { rvValues, rfValues, rvContributed, rfContributed };
+        }
+
+        // --- PLAN DE ACCIÓN ---
+        function generateActionPlan() {
+            const plan = {};
+            const simulationStartDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+            const months = state.years * 12;
+            const formatCurrency = (value) => value.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+            for (let month = 0; month < months; month++) {
+                const currentDate = new Date(simulationStartDate.getFullYear(), simulationStartDate.getMonth() + month, 1);
+                const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+                let monthActions = [];
+                const processPeriodicEvent = (event, descriptionFn) => {
+                    const [year, month] = event.date.split('-').map(Number);
+                    const eventDate = new Date(year, month - 1, 1);
+                    const monthsDiff = (currentDate.getFullYear() - eventDate.getFullYear()) * 12 + (currentDate.getMonth() - eventDate.getMonth());
+                    let shouldTrigger = false;
+                    const period = event.period;
+                    if (period === 'once' && monthsDiff === 0) shouldTrigger = true;
+                    else if (period === 'monthly' && monthsDiff >= 0 && monthsDiff < event.times) shouldTrigger = true;
+                    else if (period === 'quarterly' && monthsDiff >= 0 && monthsDiff % 3 === 0 && monthsDiff / 3 < event.times) shouldTrigger = true;
+                    else if (period === 'yearly' && monthsDiff >= 0 && monthsDiff % 12 === 0 && monthsDiff / 12 < event.times) shouldTrigger = true;
+                    if (shouldTrigger) monthActions.push(descriptionFn(event));
+                };
+                state.contributions.forEach(c => processPeriodicEvent(c, e => `Aportación a ${e.target.toUpperCase()}: ${formatCurrency(e.amount)}`));
+                state.transfers.forEach(t => processPeriodicEvent(t, e => `Rebalanceo ${e.direction.replace('-', '→').toUpperCase()}: ${formatCurrency(e.amount)}`));
+                if (monthActions.length > 0) {
+                    if (!plan[dateStr]) plan[dateStr] = [];
+                    plan[dateStr].push(...monthActions);
                 }
             }
-            
-            return { rvValues, rfValues, labels, rvContributed, rfContributed };
+            return plan;
         }
 
-        function updateSimulation() {
-            const { rvValues, rfValues, labels, rvContributed, rfContributed } = calculateSimulation();
-            
-            // Actualizar resumen
-            const rvFinal = rvValues[rvValues.length - 1];
-            const rfFinal = rfValues[rfValues.length - 1];
-            const totalFinal = rvFinal + rfFinal;
-            const totalContributed = rvContributed + rfContributed;
-            const totalReturn = totalContributed > 0 ? ((totalFinal - totalContributed) / totalContributed * 100) : 0;
-            
-            document.getElementById('rvFinal').textContent = `€${rvFinal.toFixed(2)}`;
-            document.getElementById('rfFinal').textContent = `€${rfFinal.toFixed(2)}`;
-            document.getElementById('totalFinal').textContent = `€${totalFinal.toFixed(2)}`;
-            document.getElementById('rvContributed').textContent = `€${rvContributed.toFixed(2)}`;
-            document.getElementById('rfContributed').textContent = `€${rfContributed.toFixed(2)}`;
-            document.getElementById('totalContributed').textContent = `€${totalContributed.toFixed(2)}`;
-            document.getElementById('totalReturn').textContent = `${totalReturn.toFixed(2)}%`;
-            
-            // Actualizar gráfico
-            updateChart(rvValues, rfValues, labels);
-        }
+        function updateActionPlanner() {
+            const plan = generateActionPlan();
+            const pendingBody = document.getElementById('actionTableBodyPending');
+            const completedBody = document.getElementById('actionTableBodyCompleted');
+            pendingBody.innerHTML = '';
+            completedBody.innerHTML = '';
 
-        function updateChart(rvValues, rfValues, labels) {
-            const ctx = document.getElementById('investmentChart').getContext('2d');
+            const actionDates = Object.keys(plan);
             
-            // Filtrar valores para mostrar solo puntos anuales en el gráfico
-            const annualRvValues = [];
-            const annualRfValues = [];
-            for (let i = 0; i < rvValues.length; i += 12) {
-                annualRvValues.push(rvValues[i]);
-                annualRfValues.push(rfValues[i]);
-            }
-            if (rvValues.length % 12 !== 0) {
-                annualRvValues.push(rvValues[rvValues.length - 1]);
-                annualRfValues.push(rfValues[rfValues.length - 1]);
-            }
-            
-            if (chart) {
-                chart.destroy();
-            }
-            
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Renta Variable',
-                            data: annualRvValues,
-                            borderColor: '#667eea',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'Renta Fija',
-                            data: annualRfValues,
-                            borderColor: '#764ba2',
-                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            fill: true
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': €' + context.parsed.y.toFixed(2);
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '€' + value.toLocaleString();
-                                }
-                            }
-                        }
+            const calendarOptions = {
+                inline: true,
+                enable: actionDates.map(d => d + '-01'),
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (!selectedDates[0]) return;
+                    const selectedMonth = `${selectedDates[0].getFullYear()}-${String(selectedDates[0].getMonth() + 1).padStart(2, '0')}`;
+                    const row = document.querySelector(`.action-row[data-date="${selectedMonth}"]`);
+                    if (row) {
+                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        row.classList.add('highlight');
+                        setTimeout(() => row.classList.remove('highlight'), 2000);
                     }
+                }
+            };
+            
+            if (calendar) {
+                calendar.set('enable', actionDates.map(d => d + '-01'));
+                calendar.redraw();
+            } else {
+                 calendar = flatpickr("#action-calendar", calendarOptions);
+            }
+
+            const sortedDates = actionDates.sort();
+            sortedDates.forEach(dateStr => {
+                const isCompleted = state.completedActions[dateStr];
+                const actionsHtml = plan[dateStr].map(act => `<div>${act}</div>`).join('');
+                const rowHtml = `
+                    <tr class="action-row ${isCompleted ? 'completed-row' : ''}" data-date="${dateStr}">
+                        <td>${dateStr}</td>
+                        <td>${actionsHtml}</td>
+                        <td><input type="checkbox" onchange="toggleActionCompleted('${dateStr}')" ${isCompleted ? 'checked' : ''}></td>
+                    </tr>`;
+                if (isCompleted) {
+                    completedBody.innerHTML += rowHtml;
+                } else {
+                    pendingBody.innerHTML += rowHtml;
                 }
             });
         }
 
-        function saveObservations() {
-            state.observations = document.getElementById('observations').value;
+        function toggleActionCompleted(dateStr) {
+            state.completedActions[dateStr] = !state.completedActions[dateStr];
+            saveToMemory();
+            updateActionPlanner(); // Redibuja ambas tablas
+        }
+
+
+        // --- ACTUALIZACIÓN DE UI (GRÁFICO Y RESUMEN) ---
+        function updateSimulation() {
+            const { rvValues, rfValues, rvContributed, rfContributed } = calculateSimulation();
+            const rvFinal = rvValues[rvValues.length - 1], rfFinal = rfValues[rfValues.length - 1];
+            const totalFinal = rvFinal + rfFinal, totalContributed = rvContributed + rfContributed;
+            const totalReturn = totalContributed > 0 ? ((totalFinal - totalContributed) / totalContributed * 100) : 0;
+            const formatCurrency = (v) => `€${v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('rvFinal').textContent = formatCurrency(rvFinal);
+            document.getElementById('rfFinal').textContent = formatCurrency(rfFinal);
+            document.getElementById('totalFinal').textContent = formatCurrency(totalFinal);
+            document.getElementById('rvContributed').textContent = formatCurrency(rvContributed);
+            document.getElementById('rfContributed').textContent = formatCurrency(rfContributed);
+            document.getElementById('totalContributed').textContent = formatCurrency(totalContributed);
+            document.getElementById('totalReturn').textContent = `${totalReturn.toFixed(2)}%`;
+            updateChart(rvValues, rfValues);
+            updateActionPlanner();
+        }
+
+        function updateChart(rvValues, rfValues) {
+            const labels = ['Inicio'];
+            for (let i = 1; i <= state.years; i++) labels.push(`Año ${i}`);
+            const annualRvValues = [rvValues[0]];
+            const annualRfValues = [rfValues[0]];
+            for (let i = 1; i <= state.years; i++) {
+                const index = i * 12;
+                if(index < rvValues.length) {
+                    annualRvValues.push(rvValues[index]);
+                    annualRfValues.push(rfValues[index]);
+                }
+            }
+            if (chart) chart.destroy();
+            const ctx = document.getElementById('investmentChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line', data: { labels: labels, datasets: [
+                        { label: 'Renta Variable', data: annualRvValues, borderColor: '#667eea', backgroundColor: 'rgba(102, 126, 234, 0.1)', borderWidth: 3, tension: 0.4, fill: true },
+                        { label: 'Renta Fija', data: annualRfValues, borderColor: '#764ba2', backgroundColor: 'rgba(118, 75, 162, 0.1)', borderWidth: 3, tension: 0.4, fill: true }
+                    ]},
+                options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { mode: 'index', intersect: false, callbacks: { label: c => `${c.dataset.label}: €${c.parsed.y.toFixed(2)}` }}},
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => '€' + v.toLocaleString('es-ES') } } }
+                }
+            });
+        }
+        
+        // --- PERSISTENCIA DE DATOS (LocalStorage y Ficheros) ---
+        function updateAndSave() {
+            updateLists();
+            updateSimulation();
             saveToMemory();
         }
 
         function saveToMemory() {
-            // Guardamos en localStorage real para uso fuera de Claude.ai
-            try {
-                localStorage.setItem('investmentSimulatorState', JSON.stringify(state));
-            } catch (e) {
-                // Si falla localStorage (en Claude.ai), usamos memoria JavaScript
-                window.savedState = JSON.parse(JSON.stringify(state));
-            }
+            state.observations = document.getElementById('observations').value;
+            localStorage.setItem('investmentSimulatorState', JSON.stringify(state));
         }
 
+        function adjustTextareaHeight() {
+            const textarea = document.getElementById('observations');
+            textarea.style.height = 'auto'; // Resetea la altura
+            textarea.style.height = (textarea.scrollHeight) + 'px'; // Ajusta a la altura del contenido
+        }
+
+        // Añade la llamada a la nueva función al final
         function loadFromMemory() {
-            // Intentamos cargar desde localStorage primero
-            try {
-                const saved = localStorage.getItem('investmentSimulatorState');
-                if (saved) {
-                    state = JSON.parse(saved);
-                    
-                    // Actualizar inputs
-                    document.getElementById('initialCapitalRV').value = state.initialCapitalRV;
-                    document.getElementById('initialCapitalRF').value = state.initialCapitalRF;
-                    document.getElementById('years').value = state.years;
-                    document.getElementById('rvReturn').value = state.rvReturn;
-                    document.getElementById('rfReturn').value = state.rfReturn;
-                    
-                    // Actualizar observaciones
-                    if (state.observations) {
-                        document.getElementById('observations').value = state.observations;
-                    }
-                    
-                    // Actualizar listas
-                    updateContributionsList();
-                    updateCrisisList();
-                    updateTransfersList();
-                    return;
-                }
-            } catch (e) {
-                // Si localStorage no está disponible, intentamos memoria JavaScript
-                if (window.savedState) {
-                    state = JSON.parse(JSON.stringify(window.savedState));
-                    
-                    // Actualizar inputs
-                    document.getElementById('initialCapitalRV').value = state.initialCapitalRV;
-                    document.getElementById('initialCapitalRF').value = state.initialCapitalRF;
-                    document.getElementById('years').value = state.years;
-                    document.getElementById('rvReturn').value = state.rvReturn;
-                    document.getElementById('rfReturn').value = state.rfReturn;
-                    
-                    // Actualizar observaciones
-                    if (state.observations) {
-                        document.getElementById('observations').value = state.observations;
-                    }
-                    
-                    // Actualizar listas
-                    updateContributionsList();
-                    updateCrisisList();
-                    updateTransfersList();
-                }
+            const saved = localStorage.getItem('investmentSimulatorState');
+            if (saved) {
+                const loadedState = JSON.parse(saved);
+                state = { ...state, ...loadedState };
+                state.completedActions = loadedState.completedActions || {};
             }
+            document.getElementById('initialCapitalRV').value = state.initialCapitalRV;
+            document.getElementById('initialCapitalRF').value = state.initialCapitalRF;
+            document.getElementById('years').value = state.years;
+            document.getElementById('rvReturn').value = state.rvReturn;
+            document.getElementById('rfReturn').value = state.rfReturn;
+            document.getElementById('observations').value = state.observations || '';
+            updateLists();
+            adjustTextareaHeight(); // <-- AÑADE ESTA LÍNEA
         }
 
         function resetAll() {
             if (confirm('¿Estás seguro de que quieres resetear todo?')) {
                 state = {
-                    initialCapitalRV: 5000,
-                    initialCapitalRF: 5000,
-                    years: 10,
-                    rvReturn: 7,
-                    rfReturn: 3,
-                    contributions: [],
-                    crises: [],
-                    transfers: [],
-                    observations: ''
+                    initialCapitalRV: 5000, initialCapitalRF: 5000, years: 10, rvReturn: 7, rfReturn: 3,
+                    contributions: [], crises: [], transfers: [], observations: '', completedActions: {}
                 };
-                
-                document.getElementById('initialCapitalRV').value = state.initialCapitalRV;
-                document.getElementById('initialCapitalRF').value = state.initialCapitalRF;
-                document.getElementById('years').value = state.years;
-                document.getElementById('rvReturn').value = state.rvReturn;
-                document.getElementById('rfReturn').value = state.rfReturn;
-                document.getElementById('observations').value = '';
-                
-                updateContributionsList();
-                updateCrisisList();
-                updateTransfersList();
+                localStorage.removeItem('investmentSimulatorState');
+                loadFromMemory();
                 updateSimulation();
-                
-                // Limpiar localStorage también
-                try {
-                    localStorage.removeItem('investmentSimulatorState');
-                } catch (e) {
-                    // Si falla, limpiamos memoria JavaScript
-                    window.savedState = null;
-                }
             }
         }
 
@@ -832,38 +550,24 @@
 
         function importData(event) {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        state = JSON.parse(e.target.result);
-                        
-                        // Actualización de los inputs existentes
-                        document.getElementById('initialCapitalRV').value = state.initialCapitalRV;
-                        document.getElementById('initialCapitalRF').value = state.initialCapitalRF;
-                        document.getElementById('years').value = state.years;
-                        document.getElementById('rvReturn').value = state.rvReturn;
-                        document.getElementById('rfReturn').value = state.rfReturn;
-
-                        // --- LÍNEA AÑADIDA ---
-                        // Aquí actualizamos el textarea de las observaciones
-                        document.getElementById('observations').value = state.observations || '';
-                        // ---------------------
-                        
-                        updateContributionsList();
-                        updateCrisisList();
-                        updateTransfersList();
-                        updateSimulation();
-                        saveToMemory();
-                        
-                        alert('Datos importados correctamente');
-                    } catch (error) {
-                        alert('Error al importar el archivo: ' + error.message);
-                    }
-                };
-                reader.readAsText(file);
-            }
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedState = JSON.parse(e.target.result);
+                    state = { ...state, ...importedState };
+                    state.completedActions = importedState.completedActions || {};
+                    loadFromMemory();
+                    updateSimulation();
+                    saveToMemory();
+                    alert('Datos importados correctamente.');
+                } catch (error) {
+                    alert('Error al importar el archivo: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
         }
     </script>
 </body>
 </html>
+
