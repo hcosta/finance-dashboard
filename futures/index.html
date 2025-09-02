@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Futuros Financieros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Panel de Futuros Financieros</h1>
+            <p class="mt-2 text-lg text-gray-600">Análisis comparativo de 4 escenarios laborales vs. 3 escenarios de mercado a 30 años.</p>
+        </header>
+
+        <!-- Controles de Capital Inicial -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 max-w-2xl mx-auto">
+            <h2 class="text-xl font-bold text-center mb-4">Configura tu Simulación</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                <div class="sm:col-span-1">
+                    <label for="globalInitialCapitalRV" class="block text-sm font-medium text-gray-700">Capital Inicial RV (€)</label>
+                    <input type="number" id="globalInitialCapitalRV" value="10000" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                </div>
+                <div class="sm:col-span-1">
+                    <label for="globalInitialCapitalRF" class="block text-sm font-medium text-gray-700">Capital Inicial RF (€)</label>
+                    <input type="number" id="globalInitialCapitalRF" value="6000" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                </div>
+                <div class="sm:col-span-1 sm:mt-5">
+                    <button id="recalculateButton" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+                        Actualizar Gráficos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor de los gráficos -->
+        <div id="charts-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+            <!-- Los gráficos se insertarán aquí dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+    // --- INICIO DE DATOS EMBEBIDOS (ANONIMIZADOS) ---
+    // El capital inicial aquí es 10 veces menor que los valores originales.
+    const simulationData = {
+        "no_work": {
+            "negativo": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756804432539, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}], "crises": [{"id": 1756808622628, "date": "2028-05", "percent": 35}, {"id": 1756808657158, "date": "2040-08", "percent": 25}], "transfers": [{"id": 1756809380513, "date": "2035-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812126677, "date": "2040-10", "amount": 20000, "direction": "rf-rv"}, {"id": 1756813003728, "date": "2028-08", "amount": 35000, "direction": "rf-rv"}] },
+            "promedio": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 7.5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756804432539, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}], "crises": [{"id": 1756808944394, "date": "2038-05", "percent": 35}], "transfers": [{"id": 1756809006966, "date": "2030-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809498749, "date": "2035-11", "amount": 20000, "direction": "rf-rv"}, {"id": 1756813074033, "date": "2038-09", "amount": 35000, "direction": "rf-rv"}, {"id": 1756813081758, "date": "2045-09", "amount": 10000, "direction": "rf-rv"}] },
+            "positivo": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 8.5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756812476567, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}], "crises": [], "transfers": [{"id": 1756809006966, "date": "2030-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812784347, "date": "2035-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756813133626, "date": "2040-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756813136834, "date": "2045-09", "amount": 20000, "direction": "rf-rv"}] }
+        },
+        "work_normal": {
+            "negativo": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756804432539, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}, {"id": 1756804748447, "date": "2029-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rv"}, {"id": 1756804757062, "date": "2029-01", "amount": 250, "period": "quarterly", "times": 40, "target": "rf"}], "crises": [{"id": 1756808622628, "date": "2028-05", "percent": 35}, {"id": 1756808657158, "date": "2040-08", "percent": 25}], "transfers": [{"id": 1756809365083, "date": "2028-08", "amount": 35000, "direction": "rf-rv"}, {"id": 1756809380513, "date": "2035-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809426826, "date": "2040-10", "amount": 30000, "direction": "rf-rv"}] },
+            "promedio": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 7.5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756804432539, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}, {"id": 1756804748447, "date": "2029-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rv"}, {"id": 1756804757062, "date": "2029-01", "amount": 250, "period": "quarterly", "times": 40, "target": "rf"}], "crises": [{"id": 1756808944394, "date": "2038-05", "percent": 35}], "transfers": [{"id": 1756809006966, "date": "2030-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809468030, "date": "2040-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809498749, "date": "2035-11", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809564645, "date": "2038-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809578994, "date": "2045-09", "amount": 20000, "direction": "rf-rv"}] },
+            "positivo": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 8.5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756804432539, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}, {"id": 1756804748447, "date": "2029-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rv"}, {"id": 1756804757062, "date": "2029-01", "amount": 250, "period": "quarterly", "times": 40, "target": "rf"}], "crises": [], "transfers": [{"id": 1756809006966, "date": "2030-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809019241, "date": "2035-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809098675, "date": "2040-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809111075, "date": "2045-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809126489, "date": "2050-09", "amount": 20000, "direction": "rf-rv"}] }
+        },
+        "work_bien": {
+            "negativo": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756804432539, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}, {"id": 1756812080687, "date": "2029-01", "amount": 1500, "period": "quarterly", "times": 40, "target": "rv"}, {"id": 1756812086834, "date": "2029-01", "amount": 500, "period": "quarterly", "times": 40, "target": "rf"}], "crises": [{"id": 1756808622628, "date": "2028-05", "percent": 35}, {"id": 1756808657158, "date": "2040-08", "percent": 25}], "transfers": [{"id": 1756809380513, "date": "2035-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812126677, "date": "2040-10", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812146266, "date": "2028-08", "amount": 40000, "direction": "rf-rv"}, {"id": 1756812170788, "date": "2045-09", "amount": 20000, "direction": "rf-rv"}] },
+            "promedio": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 7.5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756804432539, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}, {"id": 1756812318612, "date": "2029-01", "amount": 1500, "period": "quarterly", "times": 40, "target": "rv"}, {"id": 1756812324131, "date": "2029-01", "amount": 500, "period": "quarterly", "times": 40, "target": "rf"}], "crises": [{"id": 1756808944394, "date": "2038-05", "percent": 35}], "transfers": [{"id": 1756809006966, "date": "2030-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809498749, "date": "2035-11", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809578994, "date": "2045-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812388378, "date": "2038-09", "amount": 50000, "direction": "rf-rv"}] },
+            "positivo": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 8.5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756812476567, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}, {"id": 1756812482874, "date": "2029-01", "amount": 1500, "period": "quarterly", "times": 40, "target": "rv"}, {"id": 1756812493039, "date": "2029-01", "amount": 500, "period": "quarterly", "times": 40, "target": "rf"}], "crises": [], "transfers": [{"id": 1756809006966, "date": "2030-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809019241, "date": "2035-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809098675, "date": "2040-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809111075, "date": "2045-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809126489, "date": "2050-09", "amount": 20000, "direction": "rf-rv"}] }
+        },
+        "work_muy_bien": {
+            "negativo": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756804432539, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}, {"id": 1756812845663, "date": "2029-01", "amount": 2250, "period": "quarterly", "times": 40, "target": "rv"}, {"id": 1756812850830, "date": "2029-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rf"}], "crises": [{"id": 1756808622628, "date": "2028-05", "percent": 35}, {"id": 1756808657158, "date": "2040-08", "percent": 25}], "transfers": [{"id": 1756809380513, "date": "2035-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812126677, "date": "2040-10", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812146266, "date": "2028-08", "amount": 40000, "direction": "rf-rv"}, {"id": 1756812170788, "date": "2045-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812880215, "date": "2050-09", "amount": 20000, "direction": "rf-rv"}] },
+            "promedio": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 7.5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756804432539, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}, {"id": 1756812706380, "date": "2029-01", "amount": 2250, "period": "quarterly", "times": 40, "target": "rv"}, {"id": 1756812712668, "date": "2029-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rf"}], "crises": [{"id": 1756808944394, "date": "2038-05", "percent": 35}], "transfers": [{"id": 1756809006966, "date": "2030-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809498749, "date": "2035-11", "amount": 20000, "direction": "rf-rv"}, {"id": 1756809578994, "date": "2045-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812388378, "date": "2038-09", "amount": 50000, "direction": "rf-rv"}] },
+            "positivo": { "initialCapitalRV": 10000, "initialCapitalRF": 6000, "years": 30, "rvReturn": 8.5, "rfReturn": 2.5, "contributions": [{"id": 1756804417913, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 13, "target": "rv"}, {"id": 1756812476567, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 13, "target": "rf"}, {"id": 1756812754220, "date": "2029-01", "amount": 2250, "period": "quarterly", "times": 40, "target": "rv"}, {"id": 1756812764722, "date": "2029-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rf"}], "crises": [], "transfers": [{"id": 1756809006966, "date": "2030-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812784347, "date": "2035-09", "amount": 20000, "direction": "rf-rv"}, {"id": 1756812797764, "date": "2040-09", "amount": 25000, "direction": "rf-rv"}, {"id": 1756812803770, "date": "2045-09", "amount": 25000, "direction": "rf-rv"}, {"id": 1756812812171, "date": "2050-09", "amount": 25000, "direction": "rf-rv"}] }
+        }
+    };
+    // --- FIN DE DATOS EMBEBIDOS ---
+
+    let chartInstances = {};
+
+    /**
+     * Guarda los valores de capital en localStorage.
+     * @param {number} rv - Capital de Renta Variable.
+     * @param {number} rf - Capital de Renta Fija.
+     */
+    function saveCapitalToStorage(rv, rf) {
+        try {
+            const capitalToSave = { rv, rf };
+            localStorage.setItem('financialDashboardCapital', JSON.stringify(capitalToSave));
+        } catch (e) {
+            console.error("Error saving capital to localStorage", e);
+        }
+    }
+
+    /**
+     * Carga los valores de capital desde localStorage y los pone en los inputs.
+     */
+    function loadCapitalFromStorage() {
+        try {
+            const savedCapital = localStorage.getItem('financialDashboardCapital');
+            if (savedCapital) {
+                const { rv, rf } = JSON.parse(savedCapital);
+                document.getElementById('globalInitialCapitalRV').value = rv;
+                document.getElementById('globalInitialCapitalRF').value = rf;
+            }
+        } catch (e) {
+            console.error("Error loading capital from localStorage", e);
+        }
+    }
+
+    function calculateSimulation(state) {
+        const startDate = new Date();
+        const months = state.years * 12;
+        const monthlyRvReturn = Math.pow(1 + state.rvReturn / 100, 1 / 12) - 1;
+        const monthlyRfReturn = Math.pow(1 + state.rfReturn / 100, 1 / 12) - 1;
+        let rvValue = state.initialCapitalRV;
+        let rfValue = state.initialCapitalRF;
+        let annualTotals = [rvValue + rfValue];
+        let labels = ['Inicio'];
+        for (let month = 1; month <= months; month++) {
+            const currentDate = new Date(startDate);
+            currentDate.setMonth(startDate.getMonth() + month);
+            const dateStr = currentDate.toISOString().slice(0, 7);
+            rvValue *= (1 + monthlyRvReturn);
+            rfValue *= (1 + monthlyRfReturn);
+            (state.contributions || []).forEach(contrib => {
+                const contribDate = new Date(contrib.date);
+                const monthsDiff = (currentDate.getFullYear() - contribDate.getFullYear()) * 12 + (currentDate.getMonth() - contribDate.getMonth());
+                let shouldAdd = false;
+                if (contrib.period === 'monthly' && monthsDiff >= 0 && monthsDiff < contrib.times) shouldAdd = true;
+                else if (contrib.period === 'quarterly' && monthsDiff >= 0 && monthsDiff % 3 === 0 && monthsDiff / 3 < contrib.times) shouldAdd = true;
+                else if (contrib.period === 'yearly' && monthsDiff >= 0 && monthsDiff % 12 === 0 && monthsDiff / 12 < contrib.times) shouldAdd = true;
+                if (shouldAdd) {
+                    if (contrib.target === 'rv') rvValue += contrib.amount;
+                    else rfValue += contrib.amount;
+                }
+            });
+            (state.crises || []).forEach(crisis => {
+                if (crisis.date === dateStr) rvValue *= (1 - crisis.percent / 100);
+            });
+            (state.transfers || []).forEach(transfer => {
+                if (transfer.date === dateStr) {
+                    if (transfer.direction === 'rv-rf') {
+                        const amount = Math.min(transfer.amount, rvValue);
+                        rvValue -= amount;
+                        rfValue += amount;
+                    } else {
+                        const amount = Math.min(transfer.amount, rfValue);
+                        rfValue -= amount;
+                        rvValue += amount;
+                    }
+                }
+            });
+            if (month % 12 === 0) {
+                annualTotals.push(rvValue + rfValue);
+                labels.push(`Año ${month / 12}`);
+            }
+        }
+        if (months % 12 !== 0) {
+            annualTotals.push(rvValue + rfValue);
+            labels.push(`Año ${state.years}`);
+        }
+        return { labels, values: annualTotals };
+    }
+
+    function renderChart(canvasId, title, labels, datasets) {
+        if (chartInstances[canvasId]) {
+            chartInstances[canvasId].destroy();
+        }
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        chartInstances[canvasId] = new Chart(ctx, {
+            type: 'line',
+            data: { labels: labels, datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: { display: true, text: title, font: { size: 18, weight: '600' }, padding: { top: 10, bottom: 20 } },
+                    tooltip: { mode: 'index', intersect: false, callbacks: { label: context => `${context.dataset.label || ''}: ${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(context.parsed.y)}` } },
+                    legend: { position: 'bottom' }
+                },
+                scales: { y: { beginAtZero: true, ticks: { callback: value => { if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M €`; if (value >= 1000) return `${(value / 1000)}k €`; return `${value} €`; } } } },
+                interaction: { mode: 'nearest', axis: 'x', intersect: false }
+            }
+        });
+    }
+
+    function runAllSimulations() {
+        const chartsContainer = document.getElementById('charts-container');
+        chartsContainer.innerHTML = ''; // Limpia los canvas viejos para redibujar
+        
+        const newCapitalRV = parseFloat(document.getElementById('globalInitialCapitalRV').value) || 0;
+        const newCapitalRF = parseFloat(document.getElementById('globalInitialCapitalRF').value) || 0;
+
+        // Guarda los valores actuales en localStorage
+        saveCapitalToStorage(newCapitalRV, newCapitalRF);
+
+        const workScenarios = [
+            { id: 'no_work', title: 'Escenario: Sin Aportaciones Extra' },
+            { id: 'work_normal', title: 'Escenario: Aportaciones Normales' },
+            { id: 'work_bien', title: 'Escenario: Aportaciones Mejoradas' },
+            { id: 'work_muy_bien', title: 'Escenario: Aportaciones Excelentes' }
+        ];
+        const marketScenarioStyles = {
+            negativo: { label: 'Pesimista (Mercado Malo)', borderColor: '#ef4444', backgroundColor: '#ef4444' },
+            promedio: { label: 'Promedio (Mercado Normal)', borderColor: '#3b82f6', backgroundColor: '#3b82f6' },
+            positivo: { label: 'Positivo (Mercado Bueno)', borderColor: '#22c55e', backgroundColor: '#22c55e' }
+        };
+
+        workScenarios.forEach(workScenario => {
+            const canvasId = `chart_${workScenario.id}`;
+            const chartCardHTML = `<div class="bg-white rounded-xl shadow-lg p-4 sm:p-6"><canvas id="${canvasId}"></canvas></div>`;
+            chartsContainer.insertAdjacentHTML('beforeend', chartCardHTML);
+            
+            const datasets = [];
+            let chartLabels = [];
+            Object.keys(marketScenarioStyles).forEach(marketScenarioKey => {
+                // Copia profunda para no modificar el objeto original
+                const state = JSON.parse(JSON.stringify(simulationData[workScenario.id][marketScenarioKey]));
+                
+                // Sobrescribe el capital inicial con los valores de los inputs
+                state.initialCapitalRV = newCapitalRV;
+                state.initialCapitalRF = newCapitalRF;
+
+                const result = calculateSimulation(state);
+                if (result.labels.length > chartLabels.length) chartLabels = result.labels;
+                datasets.push({
+                    label: marketScenarioStyles[marketScenarioKey].label,
+                    data: result.values,
+                    borderColor: marketScenarioStyles[marketScenarioKey].borderColor,
+                    backgroundColor: marketScenarioStyles[marketScenarioKey].backgroundColor + '1a',
+                    borderWidth: 2.5,
+                    tension: 0.1,
+                    fill: true,
+                    pointRadius: 0,
+                    pointHitRadius: 10
+                });
+            });
+            renderChart(canvasId, workScenario.title, chartLabels, datasets);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Carga los valores guardados al iniciar la página
+        loadCapitalFromStorage();
+        // Dibuja los gráficos iniciales con los datos por defecto o los cargados
+        runAllSimulations(); 
+        
+        document.getElementById('recalculateButton').addEventListener('click', runAllSimulations);
+    });
+
+    </script>
+</body>
+</html>
+
