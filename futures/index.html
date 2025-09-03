@@ -18,7 +18,7 @@
     <div class="max-w-7xl mx-auto">
         <header class="text-center mb-8">
             <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Panel de Futuros Financieros</h1>
-            <p class="mt-2 text-lg text-gray-600">Análisis comparativo de 4 escenarios laborales vs. 3 escenarios de mercado a 30 años (Plan Consolidado).</p>
+            <p class="mt-2 text-lg text-gray-600">Análisis comparativo de 4 escenarios laborales vs. 3 escenarios de mercado a 30 años.</p>
         </header>
 
         <!-- Controles de Capital Inicial -->
@@ -48,128 +48,140 @@
     </div>
 
     <script>
-    // --- INICIO DE DATOS EMBEBIDOS (CONSOLIDADOS V2) ---
+    // --- INICIO DE DATOS EMBEBIDOS (PLANES BASE) ---
     const simulationData = {
         "no_work": {
-            "negativo": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"}],"crises":[{"id":1756824547145,"date":"2028-05","percent":35},{"id":1756824575391,"date":"2040-08","percent":25}],"transfers":[{"id":1756833986165,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756834421081,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834423389,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834425045,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]},
-            "promedio": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":7.5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"}],"crises":[{"id":1756831466444,"date":"2038-05","percent":35}],"transfers":[{"id":1756837072616,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756837075234,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837077444,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837106873,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]},
-            "positivo": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":8.5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"}],"crises":[],"transfers":[{"id":1756831575514,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756831567313,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756831599948,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756831838070,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]}
+            "negativo": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }], "crises": [{ "id": 1756824547145, "date": "2028-05", "percent": 35 }, { "id": 1756824575391, "date": "2040-08", "percent": 25 }], "transfers": [{ "id": 1756833986165, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756834421081, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834423389, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834425045, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }] },
+            "promedio": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 7.5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }], "crises": [{ "id": 1756831466444, "date": "2038-05", "percent": 35 }], "transfers": [{ "id": 1756837072616, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756837075234, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837077444, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837106873, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }] },
+            "positivo": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 8.5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }], "crises": [], "transfers": [{ "id": 1756831567313, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756831575514, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756831599948, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756831838070, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }] }
         },
         "work_normal": {
-            "negativo": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"},{"id":1756834514695,"date":"2026-01","amount":750,"period":"quarterly","times":40,"target":"rv"},{"id":1756834536928,"date":"2026-01","amount":250,"period":"quarterly","times":40,"target":"rf"}],"crises":[{"id":1756824547145,"date":"2028-05","percent":35},{"id":1756824575391,"date":"2040-08","percent":25}],"transfers":[{"id":1756833986165,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756834421081,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834423389,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834425045,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756836763591,"date":"2045-10","amount":10000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]},
-            "promedio": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":7.5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"},{"id":1756837150060,"date":"2026-01","amount":750,"period":"quarterly","times":40,"target":"rv"},{"id":1756837159695,"date":"2026-01","amount":250,"period":"quarterly","times":40,"target":"rf"}],"crises":[{"id":1756831466444,"date":"2038-05","percent":35}],"transfers":[{"id":1756837072616,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756837075234,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837077444,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837106873,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837190968,"date":"2045-10","amount":10000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]},
-            "positivo": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":8.5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"},{"id":1756836380842,"date":"2026-01","amount":250,"period":"quarterly","times":40,"target":"rf"},{"id":1756836388914,"date":"2026-01","amount":750,"period":"quarterly","times":40,"target":"rv"}],"crises":[],"transfers":[{"id":1756833986165,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756834421081,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834423389,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756835532703,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756836425808,"date":"2045-10","amount":10000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]}
+            "negativo": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }, { "id": 1756834514695, "date": "2026-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rv" }, { "id": 1756834536928, "date": "2026-01", "amount": 250, "period": "quarterly", "times": 40, "target": "rf" }], "crises": [{ "id": 1756824547145, "date": "2028-05", "percent": 35 }, { "id": 1756824575391, "date": "2040-08", "percent": 25 }], "transfers": [{ "id": 1756833986165, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756834421081, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834423389, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834425045, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756836763591, "date": "2045-10", "amount": 10000, "period": "once", "times": 1, "direction": "rf-rv" }] },
+            "promedio": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 7.5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }, { "id": 1756837150060, "date": "2026-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rv" }, { "id": 1756837159695, "date": "2026-01", "amount": 250, "period": "quarterly", "times": 40, "target": "rf" }], "crises": [{ "id": 1756831466444, "date": "2038-05", "percent": 35 }], "transfers": [{ "id": 1756837072616, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756837075234, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837077444, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837106873, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837190968, "date": "2045-10", "amount": 10000, "period": "once", "times": 1, "direction": "rf-rv" }] },
+            "positivo": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 8.5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }, { "id": 1756836380842, "date": "2026-01", "amount": 250, "period": "quarterly", "times": 40, "target": "rf" }, { "id": 1756836388914, "date": "2026-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rv" }], "crises": [], "transfers": [{ "id": 1756833986165, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756834421081, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834423389, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756835532703, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756836425808, "date": "2045-10", "amount": 10000, "period": "once", "times": 1, "direction": "rf-rv" }] }
         },
         "work_bien": {
-            "negativo": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"},{"id":1756836826733,"date":"2026-01","amount":1500,"period":"quarterly","times":40,"target":"rv"},{"id":1756836830725,"date":"2026-01","amount":500,"period":"quarterly","times":40,"target":"rf"}],"crises":[{"id":1756824547145,"date":"2028-05","percent":35},{"id":1756824575391,"date":"2040-08","percent":25}],"transfers":[{"id":1756833986165,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756834421081,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834423389,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834425045,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756836840167,"date":"2045-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]},
-            "promedio": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":7.5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"},{"id":1756837220215,"date":"2026-01","amount":1500,"period":"quarterly","times":40,"target":"rv"},{"id":1756837224012,"date":"2026-01","amount":500,"period":"quarterly","times":40,"target":"rf"}],"crises":[{"id":1756831466444,"date":"2038-05","percent":35}],"transfers":[{"id":1756837072616,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756837075234,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837077444,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837106873,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837233534,"date":"2045-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]},
-            "positivo": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":8.5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"},{"id":1756836485409,"date":"2026-01","amount":500,"period":"quarterly","times":40,"target":"rf"},{"id":1756836489361,"date":"2026-01","amount":1500,"period":"quarterly","times":40,"target":"rv"}],"crises":[],"transfers":[{"id":1756833986165,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756834421081,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834423389,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756835532703,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756836494978,"date":"2045-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]}
+            "negativo": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }, { "id": 1756836826733, "date": "2026-01", "amount": 1500, "period": "quarterly", "times": 40, "target": "rv" }, { "id": 1756836830725, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 40, "target": "rf" }], "crises": [{ "id": 1756824547145, "date": "2028-05", "percent": 35 }, { "id": 1756824575391, "date": "2040-08", "percent": 25 }], "transfers": [{ "id": 1756833986165, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756834421081, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834423389, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834425045, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756836840167, "date": "2045-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756836860976, "date": "2050-10", "amount": 10000, "period": "once", "times": 1, "direction": "rf-rv" }] },
+            "promedio": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 7.5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }, { "id": 1756837220215, "date": "2026-01", "amount": 1500, "period": "quarterly", "times": 40, "target": "rv" }, { "id": 1756837224012, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 40, "target": "rf" }], "crises": [{ "id": 1756831466444, "date": "2038-05", "percent": 35 }], "transfers": [{ "id": 1756837072616, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756837075234, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837077444, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837106873, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837233534, "date": "2045-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }] },
+            "positivo": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 8.5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }, { "id": 1756836485409, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 40, "target": "rf" }, { "id": 1756836489361, "date": "2026-01", "amount": 1500, "period": "quarterly", "times": 40, "target": "rv" }], "crises": [], "transfers": [{ "id": 1756833986165, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756834421081, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834423389, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756835532703, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756836494978, "date": "2045-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }] }
         },
         "work_muy_bien": {
-            "negativo": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"},{"id":1756836918867,"date":"2026-01","amount":2250,"period":"quarterly","times":40,"target":"rv"},{"id":1756836923998,"date":"2026-01","amount":750,"period":"quarterly","times":40,"target":"rf"}],"crises":[{"id":1756824547145,"date":"2028-05","percent":35},{"id":1756824575391,"date":"2040-08","percent":25}],"transfers":[{"id":1756833986165,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756834421081,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834423389,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834425045,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756836840167,"date":"2045-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]},
-            "promedio": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":7.5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"},{"id":1756837274342,"date":"2026-01","amount":2250,"period":"quarterly","times":40,"target":"rv"},{"id":1756837278036,"date":"2026-01","amount":750,"period":"quarterly","times":40,"target":"rf"}],"crises":[{"id":1756831466444,"date":"2038-05","percent":35}],"transfers":[{"id":1756837072616,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756837075234,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837077444,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837106873,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756837233534,"date":"2045-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]},
-            "positivo": {"initialCapitalRV":100000,"initialCapitalRF":60000,"years":30,"rvReturn":8.5,"rfReturn":2.5,"contributions":[{"id":1756828373070,"date":"2026-01","amount":2000,"period":"quarterly","times":12,"target":"rv"},{"id":1756829821948,"date":"2026-01","amount":500,"period":"quarterly","times":12,"target":"rf"},{"id":1756836076821,"date":"2026-01","amount":750,"period":"quarterly","times":40,"target":"rf"},{"id":1756836080834,"date":"2026-01","amount":2250,"period":"quarterly","times":40,"target":"rv"}],"crises":[],"transfers":[{"id":1756833986165,"date":"2026-01","amount":1000,"period":"quarterly","times":20,"direction":"rf-rv"},{"id":1756834421081,"date":"2030-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756834423389,"date":"2035-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756835532703,"date":"2040-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1756835971357,"date":"2045-10","amount":20000,"period":"once","times":1,"direction":"rf-rv"},{"id":1856840000001,"date":"2047-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000002,"date":"2048-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000003,"date":"2049-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000004,"date":"2050-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000005,"date":"2051-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000006,"date":"2052-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000007,"date":"2053-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000008,"date":"2054-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"},{"id":1856840000009,"date":"2055-01","amount":15000,"period":"once","times":1,"direction":"rv-rf"}]}
+            "negativo": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }, { "id": 1756836918867, "date": "2026-01", "amount": 2250, "period": "quarterly", "times": 40, "target": "rv" }, { "id": 1756836923998, "date": "2026-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rf" }], "crises": [{ "id": 1756824547145, "date": "2028-05", "percent": 35 }, { "id": 1756824575391, "date": "2040-08", "percent": 25 }], "transfers": [{ "id": 1756833986165, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756834421081, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834423389, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834425045, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756836840167, "date": "2045-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756836931375, "date": "2050-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }] },
+            "promedio": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 7.5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }, { "id": 1756837274342, "date": "2026-01", "amount": 2250, "period": "quarterly", "times": 40, "target": "rv" }, { "id": 1756837278036, "date": "2026-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rf" }], "crises": [{ "id": 1756831466444, "date": "2038-05", "percent": 35 }], "transfers": [{ "id": 1756837072616, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756837075234, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837077444, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837106873, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837233534, "date": "2045-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756837307507, "date": "2050-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }] },
+            "positivo": { "initialCapitalRV": 100000, "initialCapitalRF": 60000, "years": 30, "rvReturn": 8.5, "rfReturn": 2.5, "contributions": [{ "id": 1756828373070, "date": "2026-01", "amount": 2000, "period": "quarterly", "times": 12, "target": "rv" }, { "id": 1756829821948, "date": "2026-01", "amount": 500, "period": "quarterly", "times": 12, "target": "rf" }, { "id": 1756836076821, "date": "2026-01", "amount": 750, "period": "quarterly", "times": 40, "target": "rf" }, { "id": 1756836080834, "date": "2026-01", "amount": 2250, "period": "quarterly", "times": 40, "target": "rv" }], "crises": [], "transfers": [{ "id": 1756833986165, "date": "2026-01", "amount": 1000, "period": "quarterly", "times": 20, "direction": "rf-rv" }, { "id": 1756834421081, "date": "2030-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756834423389, "date": "2035-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756835532703, "date": "2040-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756835971357, "date": "2045-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }, { "id": 1756836090001, "date": "2050-10", "amount": 20000, "period": "once", "times": 1, "direction": "rf-rv" }] }
         }
     };
     // --- FIN DE DATOS EMBEBIDOS ---
 
     let chartInstances = {};
 
-    /**
-     * Guarda los valores de capital en localStorage.
-     * @param {number} rv - Capital de Renta Variable.
-     * @param {number} rf - Capital de Renta Fija.
-     */
     function saveCapitalToStorage(rv, rf) {
         try {
-            const capitalToSave = { rv, rf };
-            localStorage.setItem('financialDashboardCapital', JSON.stringify(capitalToSave));
+            localStorage.setItem('financialDashboardCapital', JSON.stringify({ rv, rf }));
         } catch (e) {
-            console.error("Error saving capital to localStorage", e);
+            console.error("Error saving to localStorage", e);
         }
     }
 
-    /**
-     * Carga los valores de capital desde localStorage y los pone en los inputs.
-     */
     function loadCapitalFromStorage() {
         try {
-            const savedCapital = localStorage.getItem('financialDashboardCapital');
-            if (savedCapital) {
-                const { rv, rf } = JSON.parse(savedCapital);
+            const saved = localStorage.getItem('financialDashboardCapital');
+            if (saved) {
+                const { rv, rf } = JSON.parse(saved);
                 document.getElementById('globalInitialCapitalRV').value = rv;
                 document.getElementById('globalInitialCapitalRF').value = rf;
             }
         } catch (e) {
-            console.error("Error loading capital from localStorage", e);
+            console.error("Error loading from localStorage", e);
         }
     }
 
+    // --- NUEVO MOTOR DE SIMULACIÓN AVANZADO ---
     function calculateSimulation(state) {
-        const startDate = new Date();
         const months = state.years * 12;
-        const monthlyRvReturn = Math.pow(1 + state.rvReturn / 100, 1 / 12) - 1;
-        const monthlyRfReturn = Math.pow(1 + state.rfReturn / 100, 1 / 12) - 1;
-        let rvValue = state.initialCapitalRV;
-        let rfValue = state.initialCapitalRF;
-        let annualTotals = [rvValue + rfValue];
-        let labels = ['Inicio'];
-        for (let month = 1; month <= months; month++) {
-            const currentDate = new Date(startDate);
-            currentDate.setMonth(startDate.getMonth() + month);
-            const dateStr = currentDate.toISOString().slice(0, 7);
-            rvValue *= (1 + monthlyRvReturn);
-            rfValue *= (1 + monthlyRfReturn);
-            (state.contributions || []).forEach(contrib => {
-                const contribDate = new Date(contrib.date);
-                const monthsDiff = (currentDate.getFullYear() - contribDate.getFullYear()) * 12 + (currentDate.getMonth() - contribDate.getMonth());
-                let shouldAdd = false;
-                if (contrib.period === 'monthly' && monthsDiff >= 0 && monthsDiff < contrib.times) shouldAdd = true;
-                else if (contrib.period === 'quarterly' && monthsDiff >= 0 && monthsDiff % 3 === 0 && monthsDiff / 3 < contrib.times) shouldAdd = true;
-                else if (contrib.period === 'yearly' && monthsDiff >= 0 && monthsDiff % 12 === 0 && monthsDiff / 12 < contrib.times) shouldAdd = true;
-                if (shouldAdd) {
-                    if (contrib.target === 'rv') rvValue += contrib.amount;
-                    else rfValue += contrib.amount;
-                }
-            });
-            (state.crises || []).forEach(crisis => {
-                if (crisis.date === dateStr) rvValue *= (1 - crisis.percent / 100);
-            });
-            (state.transfers || []).forEach(transfer => {
-                let shouldTransfer = false;
-                if(transfer.period === 'once' && transfer.date === dateStr) {
-                    shouldTransfer = true;
-                } else {
-                     const transferDate = new Date(transfer.date);
-                     const monthsDiff = (currentDate.getFullYear() - transferDate.getFullYear()) * 12 + (currentDate.getMonth() - transferDate.getMonth());
-                     if (transfer.period === 'monthly' && monthsDiff >= 0 && monthsDiff < transfer.times) shouldTransfer = true;
-                     else if (transfer.period === 'quarterly' && monthsDiff >= 0 && monthsDiff % 3 === 0 && monthsDiff / 3 < transfer.times) shouldTransfer = true;
-                     else if (transfer.period === 'yearly' && monthsDiff >= 0 && monthsDiff % 12 === 0 && monthsDiff / 12 < transfer.times) shouldTransfer = true;
-                }
+        const monthlyRvReturn = Math.pow(1 + state.rvReturn / 100, 1/12) - 1;
+        const monthlyRfReturn = Math.pow(1 + state.rfReturn / 100, 1/12) - 1;
+        
+        let rvValues = [state.initialCapitalRV];
+        let rfValues = [state.initialCapitalRF];
+        
+        const SIMULATION_START_DATE = new Date(2025, 0, 1); 
 
-                if (shouldTransfer) {
-                    if (transfer.direction === 'rv-rf') {
-                        const amount = Math.min(transfer.amount, rvValue);
-                        rvValue -= amount;
-                        rfValue += amount;
-                    } else { // rf-rv
-                        const amount = Math.min(transfer.amount, rfValue);
-                        rfValue -= amount;
-                        rvValue += amount;
+        for (let month = 1; month <= months; month++) {
+            const currentDate = new Date(SIMULATION_START_DATE.getFullYear(), SIMULATION_START_DATE.getMonth() + month, 1);
+            const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+            
+            let rvValue = rvValues[month - 1] * (1 + monthlyRvReturn);
+            let rfValue = rfValues[month - 1] * (1 + monthlyRfReturn);
+
+            const processPeriodicEvent = (event, action) => {
+                const [year, monthEvent] = event.date.split('-').map(Number);
+                const eventDate = new Date(year, monthEvent - 1, 1);
+                const monthsDiff = (currentDate.getFullYear() - eventDate.getFullYear()) * 12 + (currentDate.getMonth() - eventDate.getMonth());
+                
+                let shouldTrigger = false;
+                const period = event.period;
+                if (period === 'once' && monthsDiff === 0) shouldTrigger = true;
+                else if (period === 'monthly' && monthsDiff >= 0 && monthsDiff < event.times) shouldTrigger = true;
+                else if (period === 'quarterly' && monthsDiff >= 0 && monthsDiff % 3 === 0 && monthsDiff / 3 < event.times) shouldTrigger = true;
+                else if (period === 'yearly' && monthsDiff >= 0 && monthsDiff % 12 === 0 && monthsDiff / 12 < event.times) shouldTrigger = true;
+                
+                if (shouldTrigger) action(event);
+            };
+
+            (state.contributions || []).forEach(c => processPeriodicEvent(c, e => {
+                if (e.target === 'rv') { rvValue += e.amount; }
+                else { rfValue += e.amount; }
+            }));
+            (state.crises || []).forEach(c => { if (c.date === dateStr) rvValue *= (1 - c.percent / 100); });
+            (state.transfers || []).forEach(t => processPeriodicEvent(t, e => {
+                if (e.direction === 'rv-rf') { const amount = Math.min(e.amount, rvValue); rvValue -= amount; rfValue += amount; } 
+                else { const amount = Math.min(e.amount, rfValue); rfValue -= amount; rvValue += amount; }
+            }));
+            
+            // Lógica de Consolidación Dinámica Avanzada
+            const currentYearInSim = Math.floor((month - 1) / 12);
+            if (currentYearInSim >= 20 && (month % 12 === 0)) {
+                const yearStartIndex = currentYearInSim * 12;
+                const rvValueAtYearStart = rvValues[yearStartIndex];
+                const rfValueAtYearStart = rfValues[yearStartIndex];
+
+                if (rvValue > rvValueAtYearStart) {
+                    const rfInterestGenerated = rfValueAtYearStart * (state.rfReturn / 100);
+                    
+                    if (rfInterestGenerated < 15000) {
+                        const topUpNeeded = 15000 - rfInterestGenerated;
+                        const maxTransferPercent = Math.min(state.rvReturn / 2, 2.5);
+                        const maxTransferFromRv = rvValue * (maxTransferPercent / 100);
+                        const transferAmount = Math.min(topUpNeeded, maxTransferFromRv, 15000);
+                        
+                        if (transferAmount > 0) {
+                            rvValue -= transferAmount;
+                            rfValue += transferAmount;
+                        }
                     }
                 }
-            });
-            if (month % 12 === 0) {
-                annualTotals.push(rvValue + rfValue);
-                labels.push(`Año ${month / 12}`);
+            }
+
+            rvValues.push(rvValue);
+            rfValues.push(rfValue);
+        }
+
+        const labels = ['Inicio'];
+        const annualTotals = [state.initialCapitalRV + state.initialCapitalRF];
+
+        for (let year = 1; year <= state.years; year++) {
+            labels.push(`Año ${year}`);
+            const monthIndex = year * 12;
+            if (monthIndex < rvValues.length) {
+                const totalValue = rvValues[monthIndex] + rfValues[monthIndex];
+                annualTotals.push(totalValue);
             }
         }
-        if (months % 12 !== 0) {
-            annualTotals.push(rvValue + rfValue);
-            labels.push(`Año ${state.years}`);
-        }
+        
         return { labels, values: annualTotals };
     }
+
 
     function renderChart(canvasId, title, labels, datasets) {
         if (chartInstances[canvasId]) {
@@ -195,12 +207,11 @@
 
     function runAllSimulations() {
         const chartsContainer = document.getElementById('charts-container');
-        chartsContainer.innerHTML = ''; // Limpia los canvas viejos para redibujar
+        chartsContainer.innerHTML = '';
         
         const newCapitalRV = parseFloat(document.getElementById('globalInitialCapitalRV').value) || 0;
         const newCapitalRF = parseFloat(document.getElementById('globalInitialCapitalRF').value) || 0;
 
-        // Guarda los valores actuales en localStorage
         saveCapitalToStorage(newCapitalRV, newCapitalRF);
 
         const workScenarios = [
@@ -223,10 +234,8 @@
             const datasets = [];
             let chartLabels = [];
             Object.keys(marketScenarioStyles).forEach(marketScenarioKey => {
-                // Copia profunda para no modificar el objeto original
                 const state = JSON.parse(JSON.stringify(simulationData[workScenario.id][marketScenarioKey]));
                 
-                // Sobrescribe el capital inicial con los valores de los inputs
                 state.initialCapitalRV = newCapitalRV;
                 state.initialCapitalRF = newCapitalRF;
 
@@ -249,9 +258,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Carga los valores guardados al iniciar la página
         loadCapitalFromStorage();
-        // Dibuja los gráficos iniciales con los datos por defecto o los cargados
         runAllSimulations(); 
         
         document.getElementById('recalculateButton').addEventListener('click', runAllSimulations);
@@ -260,4 +267,3 @@
     </script>
 </body>
 </html>
-
