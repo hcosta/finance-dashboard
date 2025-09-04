@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Inversiones Avanzado</title>
+    <title>Planificador Financiero Automatizado</title>
     <!-- Librerías de terceros -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -11,65 +11,109 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 
     <style>
-        /* Estilos generales y diseño visual del simulador */
+        /* Estilos generales y diseño visual del planificador */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
             min-height: 100vh;
             padding: 20px;
         }
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
         }
-        h1, h2 { text-align: center; color: #333; }
-        h1 { margin-bottom: 30px; font-size: 2em; }
-        h2 { margin-bottom: 20px; font-size: 1.5em; margin-top: 40px; }
+        h1, h2, h3 { text-align: center; color: #333; }
+        h1 { margin-bottom: 30px; font-size: 2.2em; }
+        h2 { margin-bottom: 20px; font-size: 1.6em; margin-top: 40px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        h3 { font-size: 1.3em; margin-bottom: 15px; }
 
-        .main-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; }
-        .control-group { display: flex; flex-direction: column; }
-        label { font-weight: 600; color: #555; margin-bottom: 5px; font-size: 0.9em; }
-        input, select, textarea { padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s; font-family: inherit; }
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .control-group { 
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        label { font-weight: 600; color: #555; font-size: 0.9em; flex-shrink: 0; }
+        input, select, textarea { 
+            padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; 
+            transition: all 0.3s; font-family: inherit; background-color: #fff; color: #333;
+        }
+        .control-group input[type="number"], .control-group select {
+            max-width: 130px;
+        }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
-        .chart-container { position: relative; height: 400px; margin-bottom: 30px; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .actions-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .action-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        .action-card h3 { color: #333; margin-bottom: 15px; font-size: 1.2em; }
-        .action-inputs { display: grid; gap: 10px; margin-bottom: 15px; }
-        .action-inputs input, .action-inputs select { width: 100%; }
-        button { padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        
+        #chartsContainer { 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-wrapper {
+            background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .chart-wrapper h4 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .chart-container { position: relative; height: 350px; }
+        
+        .action-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .action-inputs { display: grid; gap: 12px; margin-bottom: 15px; }
+        .action-inputs .control-group {
+             flex-direction: column;
+             align-items: stretch;
+        }
+        .action-inputs .control-group input { max-width: none; }
+        .date-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+
+        button { padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
         button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3); }
         button:disabled { background: #adb5bd; transform: none; box-shadow: none; cursor: not-allowed; }
+        button.remove-scenario-btn { background: #dc3545; padding: 8px 10px; font-size: 0.8em; }
+        
         .list-container { flex-grow: 1; max-height: 200px; overflow-y: auto; margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; }
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; margin-bottom: 8px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 0.9em; }
         .list-item span { flex-grow: 1; margin-right: 10px; }
         .list-item div { display: flex; }
         .list-item button { padding: 5px 10px; font-size: 0.85em; background: #dc3545; }
         .list-item button.edit { background: #28a745; margin-right: 5px; }
-        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; margin-bottom: 30px; }
+        
+        #summariesContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; }
         .summary-item { text-align: center; }
         .summary-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 5px; }
         .summary-value { font-size: 1.5em; font-weight: bold; }
+        
         .file-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
-        .file-actions button.auto-consolidate { background: #17a2b8; }
         .file-actions button.import { background: #28a745; }
         .file-actions button.reset { background: #dc3545; }
         .file-actions button.export { background: #ffc107; color: #212529; }
         #fileInput { display: none; }
-        #consolidation-status { text-align: center; margin-top: 15px; font-weight: 600; color: #17a2b8; }
-
-        /* Estilos para el Plan de Acción */
+        
         #action-planner { background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 30px;}
         .action-planner-content { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
-        .flatpickr-calendar { box-shadow: none !important; width: 100%; }
         .action-tables-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .action-table-wrapper { display: flex; flex-direction: column; }
-        .action-table-wrapper h3 { text-align: center; margin-bottom: 10px; font-size: 1.1em; color: #333; }
         .action-table-container { max-height: 400px; overflow-y: auto; }
         .action-table { width: 100%; border-collapse: collapse; }
         .action-table th, .action-table td { padding: 10px; text-align: left; border-bottom: 1px solid #dee2e6; font-size: 0.9em; }
@@ -78,70 +122,128 @@
         .action-table .highlight { background-color: #d1c4e9 !important; transition: background-color 0.3s ease-in-out; }
         .action-table input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer;}
         .completed-row td { text-decoration: line-through; color: #6c757d; }
-        .flatpickr-day.action-day { background: #667eea; color: white; border-radius: 50%; }
+        
+        /* Tooltip Styles */
+        .tooltip-container { position: relative; display: inline-block; cursor: help; }
+        .tooltip-container .tooltip-text {
+            visibility: hidden; width: 280px; background-color: #333; color: #fff; text-align: left;
+            border-radius: 6px; padding: 10px; position: absolute; z-index: 1; bottom: 125%; left: 50%;
+            margin-left: -140px; opacity: 0; transition: opacity 0.3s; font-size: 0.85em;
+            line-height: 1.5; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .tooltip-container .tooltip-text::after {
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px; border-style: solid; border-color: #333 transparent transparent transparent;
+        }
+        .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+        
+        /* New Scenario Grid Styles */
+        .scenarios-grid {
+            display: grid;
+            gap: 10px 15px;
+            align-items: center;
+        }
+        .scenarios-grid-header {
+            font-weight: bold;
+            text-align: center;
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+        .scenarios-grid-label {
+            font-weight: 600;
+            font-size: 0.9em;
+            text-align: right;
+        }
+        .scenarios-grid input {
+            width: 100%;
+            max-width: none;
+        }
+        .scenarios-grid button {
+            width: 100%;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📈 Simulador de Inversiones Avanzado</h1>
+        <h1>🚀 Planificador Financiero Automatizado</h1>
         
-        <div class="main-controls">
-            <div class="control-group"><label>Capital Inicial RV (€)</label><input type="number" id="initialCapitalRV" value="5000" min="0"></div>
-            <div class="control-group"><label>Capital Inicial RF (€)</label><input type="number" id="initialCapitalRF" value="5000" min="0"></div>
-            <div class="control-group"><label>Años de Inversión</label><input type="number" id="years" value="10" min="1" max="50"></div>
-            <div class="control-group"><label>Rentabilidad RV (%)</label><input type="number" id="rvReturn" value="7" step="0.1"></div>
-            <div class="control-group"><label>Rentabilidad RF (%)</label><input type="number" id="rfReturn" value="3" step="0.1"></div>
-        </div>
-        <div class="summary" id="summary">
-            <!-- Summary items will be populated by JS -->
-        </div>
-        <div class="chart-container"><canvas id="investmentChart"></canvas></div>
-
-        <div class="actions-section">
+        <div class="grid-layout">
             <div class="action-card">
-                <h3>💰 Aportaciones</h3>
-                <div class="action-inputs">
-                    <input type="month" id="contribDate"><input type="number" id="contribAmount" placeholder="Cantidad (€)" min="0">
-                    <select id="contribPeriod">
-                        <option value="monthly">Mensual</option>
-                        <option value="quarterly">Trimestral</option>
-                        <option value="yearly">Anual</option>
-                        <option value="bienal">Bienal</option>
-                        <option value="trienal">Trienal</option>
-                        <option value="cuatrienal">Cuatrienal</option>
-                        <option value="quinquenal">Quinquenal</option>
-                    </select>
-                    <input type="number" id="contribTimes" placeholder="Número de veces" min="1">
-                    <select id="contribTarget"><option value="rv">Renta Variable</option><option value="rf">Renta Fija</option></select>
+                 <h3>🌍 Parámetros de Simulación</h3>
+                <div class="action-inputs" id="scenarios-and-global-params">
+                     <div id="initialScenariosContainer"></div>
+                     <button onclick="addScenario()" id="addScenarioBtn">+ Añadir Escenario</button>
+                    <hr>
+                    <div class="control-group"><label>Años de Inversión</label><input type="number" id="years" value="30" min="1" max="50"></div>
+                    <div class="control-group"><label>Rentabilidad RV (%)</label><input type="number" id="rvReturn" value="7" step="0.1"></div>
+                    <div class="control-group"><label>Rentabilidad RF (%)</label><input type="number" id="rfReturn" value="3" step="0.1"></div>
                 </div>
-                <button onclick="addContribution()">Añadir Aportación</button>
-                <div class="list-container" id="contributionsList"></div>
             </div>
             <div class="action-card">
-                <h3>🔄 Rebalanceos</h3>
+                <h3>🎯 Parámetros de Automatización</h3>
+                 <div class="action-inputs">
+                    <div class="control-group"><label>Suelo RF (€)</label><input type="number" id="rfFloor" value="40000" min="0"></div>
+                    <div class="control-group"><label>Techo RF (Objetivo) (€)</label><input type="number" id="rfCeiling" value="150000" min="0"></div>
+                    <hr>
+                    <div class="control-group"><label>Rebalanceo Objetivo (€)</label><input type="number" id="rebalanceTargetAmount" value="30000" min="0"></div>
+                    <div class="control-group"><label>Frecuencia Rebalanceo (Años)</label><input type="number" id="rebalanceTargetFrequencyYears" value="5" min="1"></div>
+                    <div class="control-group"><label>Agresividad Rebalanceo (1-10)</label><input type="number" id="rebalanceAggressiveness" value="5" min="1" max="10"></div>
+                </div>
+            </div>
+            <div class="action-card">
+                <h3>📈 Consolidación de Objetivos</h3>
                 <div class="action-inputs">
-                    <input type="month" id="transferDate">
-                    <input type="number" id="transferAmount" placeholder="Cantidad (€)" min="0">
-                    <select id="transferPeriod">
+                    <div class="control-group"><label>Iniciar X años antes del final</label><input type="number" id="consolidationStartYear" value="10" min="0"></div>
+                    <div class="control-group"><label>Agresividad Consolidación (1-10)</label><input type="number" id="consolidationAggressiveness" value="5" min="1" max="10"></div>
+                    <div class="control-group"><label>Límite Anual (€)</label><input type="number" id="consolidationAnnualLimit" value="15000" min="0"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="summariesContainer"></div>
+        <div id="chartsContainer"></div>
+
+        <div class="grid-layout">
+            <div class="action-card">
+                 <h3 class="tooltip-container">💸 Flujos de Ingresos
+                    <span class="tooltip-text">
+                        <strong>Distribución Automática de Ingresos:</strong><br>
+                        - Años 1-5: &nbsp; &nbsp; 70% RV / 30% RF<br>
+                        - Años 6-10: &nbsp;  60% RV / 40% RF<br>
+                        - Años 11-15:   50% RV / 50% RF<br>
+                        - Años 16-24: 40% RV / 60% RF<br>
+                        - Años 25+: &nbsp;  30% RV / 70% RF
+                    </span>
+                </h3>
+                <div class="action-inputs">
+                    <div class="date-input-group">
+                        <select id="incomeMonth">
+                            <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                        </select>
+                        <input type="number" id="incomeYear" placeholder="Año (0+)" min="0">
+                    </div>
+                    <input type="number" id="incomeAmount" placeholder="Cantidad (€)" min="0">
+                    <select id="incomePeriod">
                         <option value="once">Una vez</option>
                         <option value="monthly">Mensual</option>
                         <option value="quarterly">Trimestral</option>
                         <option value="yearly">Anual</option>
-                        <option value="bienal">Bienal</option>
-                        <option value="trienal">Trienal</option>
-                        <option value="cuatrienal">Cuatrienal</option>
-                        <option value="quinquenal">Quinquenal</option>
                     </select>
-                    <input type="number" id="transferTimes" placeholder="Número de veces (si es periódico)" min="1">
-                    <select id="transferDirection"><option value="rv-rf">RV → RF</option><option value="rf-rv">RF → RV</option></select>
+                    <input type="number" id="incomeTimes" placeholder="Número de veces" min="1">
                 </div>
-                <button onclick="addTransfer()">Añadir Transferencia</button>
-                <div class="list-container" id="transfersList"></div>
+                <button onclick="addIncomeStream()">Añadir Ingreso</button>
+                <div class="list-container" id="incomeStreamsList"></div>
             </div>
             <div class="action-card">
                 <h3>📉 Correcciones/Crisis (RV)</h3>
                 <div class="action-inputs">
-                    <input type="month" id="crisisDate">
+                     <div class="date-input-group">
+                        <select id="crisisMonth">
+                            <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                        </select>
+                        <input type="number" id="crisisYear" placeholder="Año (0+)" min="0">
+                    </div>
                     <input type="number" id="crisisPercent" placeholder="Caída (%)" min="0" max="100">
                 </div>
                 <button onclick="addCrisis()">Añadir Crisis</button>
@@ -149,33 +251,27 @@
             </div>
              <div class="action-card">
                 <h3>📝 Observaciones</h3>
-                <textarea id="observations" placeholder="Escribe aquí tus notas sobre la simulación..." style="min-height: 200px; resize: vertical;"></textarea>
+                <textarea id="observations" placeholder="Escribe aquí tus notas..." style="min-height: 200px; resize: vertical;"></textarea>
             </div>
         </div>
         
         <div class="file-actions">
-            <button id="autoConsolidateButton" class="auto-consolidate">⚡ Consolidación Automática</button>
             <button onclick="document.getElementById('fileInput').click()" class="import">📂 Importar JSON</button>
             <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
             <button onclick="exportData()" class="export">💾 Exportar JSON</button>
             <button onclick="resetAll()" class="reset">🔄 Resetear Todo</button>
         </div>
-        <p id="consolidation-status"></p>
 
         <div id="action-planner">
-             <h2>🗓️ Plan de Acción Mensual</h2>
+             <h2>🗓️ Plan de Acción Mensual Automatizado</h2>
             <div class="action-planner-content">
-                <!-- Calendario Flatpickr -->
-                <div class="calendar-wrapper">
-                    <input type="text" id="action-calendar" style="display:none;">
-                </div>
-                <!-- Tablas de Acciones -->
+                <div class="calendar-wrapper"><input type="text" id="action-calendar" style="display:none;"></div>
                 <div class="action-tables-container">
                     <div class="action-table-wrapper">
                         <h3>Acciones por Realizar</h3>
                         <div class="action-table-container">
                              <table class="action-table">
-                                <thead><tr><th>Fecha</th><th>Acción</th><th></th></tr></thead>
+                                <thead><tr><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th><th>Acción</th><th></th></tr></thead>
                                 <tbody id="actionTableBodyPending"></tbody>
                             </table>
                         </div>
@@ -184,7 +280,7 @@
                         <h3>Acciones Realizadas</h3>
                         <div class="action-table-container">
                             <table class="action-table">
-                                <thead><tr><th>Fecha</th><th>Acción</th><th></th></tr></thead>
+                                <thead><tr><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th><th>Acción</th><th></th></tr></thead>
                                 <tbody id="actionTableBodyCompleted"></tbody>
                             </table>
                         </div>
@@ -196,10 +292,9 @@
 
     <script>
         let state = {};
-        let chart = null;
+        let charts = [];
         let calendar = null;
-        const SIMULATION_START_DATE = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-
+        
         document.addEventListener('DOMContentLoaded', () => {
             flatpickr.localize(flatpickr.l10ns.es);
             loadFromMemory();
@@ -209,74 +304,153 @@
 
         function getDefaultState() {
             return {
-                initialCapitalRV: 5000, initialCapitalRF: 5000, years: 30,
-                rvReturn: 7, rfReturn: 3, contributions: [], crises: [],
-                transfers: [], observations: '', completedActions: {},
-                autoConsolidationEnabled: false
+                initialScenarios: [{ rv: 60000, rf: 120000 }],
+                years: 30, rvReturn: 7, rfReturn: 3, 
+                rfFloor: 40000, rfCeiling: 150000, 
+                rebalanceTargetAmount: 30000, rebalanceTargetFrequencyYears: 5, rebalanceAggressiveness: 5,
+                consolidationStartYear: 10, consolidationAggressiveness: 5, consolidationAnnualLimit: 15000,
+                incomeStreams: [], crises: [], observations: '', completedActions: {}
             };
         }
-
+        
         function setupEventListeners() {
-            ['initialCapitalRV', 'initialCapitalRF', 'years', 'rvReturn', 'rfReturn'].forEach(id => {
+            const globalParamIds = ['years', 'rvReturn', 'rfReturn', 'rfFloor', 'rfCeiling', 'rebalanceTargetAmount', 'rebalanceTargetFrequencyYears', 'rebalanceAggressiveness', 'consolidationStartYear', 'consolidationAggressiveness', 'consolidationAnnualLimit'];
+            globalParamIds.forEach(id => {
                 document.getElementById(id).addEventListener('input', () => {
-                    updateStateFromInputs();
+                    updateStateFromUI();
                     saveToMemory();
                     updateSimulation();
                 });
             });
-            document.getElementById('autoConsolidateButton').addEventListener('click', applyAutoConsolidation);
-            
-            // Centralized listener for observations
-            document.getElementById('observations').addEventListener('input', (event) => {
-                state.observations = event.target.value;
+             document.getElementById('observations').addEventListener('input', () => {
+                state.observations = document.getElementById('observations').value;
                 saveToMemory();
             });
         }
         
-        function updateStateFromInputs() {
-            state.initialCapitalRV = parseFloat(document.getElementById('initialCapitalRV').value) || 0;
-            state.initialCapitalRF = parseFloat(document.getElementById('initialCapitalRF').value) || 0;
-            state.years = parseInt(document.getElementById('years').value) || 1;
-            state.rvReturn = parseFloat(document.getElementById('rvReturn').value) || 0;
-            state.rfReturn = parseFloat(document.getElementById('rfReturn').value) || 0;
-        }
-
-        function addContribution() {
-            const date = document.getElementById('contribDate').value;
-            const amount = parseFloat(document.getElementById('contribAmount').value);
-            const period = document.getElementById('contribPeriod').value;
-            const times = parseInt(document.getElementById('contribTimes').value);
-            const target = document.getElementById('contribTarget').value;
-            if (!date || !amount || !times) return;
-            state.contributions.push({ id: Date.now(), date, amount, period, times, target });
-            updateAndSave();
-            document.getElementById('contribDate').value = '';
-            document.getElementById('contribAmount').value = '';
-            document.getElementById('contribTimes').value = '';
-        }
-
-        function addTransfer() {
-            const date = document.getElementById('transferDate').value;
-            const amount = parseFloat(document.getElementById('transferAmount').value);
-            const period = document.getElementById('transferPeriod').value;
-            const timesInput = document.getElementById('transferTimes');
-            const times = period === 'once' ? 1 : parseInt(timesInput.value);
-            const direction = document.getElementById('transferDirection').value;
-            if (!date || !amount || (period !== 'once' && !times)) return;
-            state.transfers.push({ id: Date.now(), date, amount, period, times, direction });
-            updateAndSave();
-            document.getElementById('transferDate').value = '';
-            document.getElementById('transferAmount').value = '';
-            timesInput.value = '';
+        function updateStateFromUI() {
+            for (const key in state) {
+                const element = document.getElementById(key);
+                if (element && key !== 'initialScenarios' && key !== 'incomeStreams' && key !== 'crises' && key !== 'completedActions' && key !== 'observations') {
+                     state[key] = (typeof getDefaultState()[key] === 'number') ? parseFloat(element.value) || 0 : element.value;
+                }
+            }
+             state.initialScenarios.forEach((_, index) => {
+                state.initialScenarios[index].rv = parseFloat(document.getElementById(`scenarioRv_${index}`).value) || 0;
+                state.initialScenarios[index].rf = parseFloat(document.getElementById(`scenarioRf_${index}`).value) || 0;
+            });
         }
         
+        function updateUIFromState() {
+            for (const key in state) {
+                const element = document.getElementById(key);
+                if (element && key !== 'initialScenarios') {
+                    element.value = state[key];
+                }
+            }
+            renderScenariosUI();
+            updateLists();
+        }
+
+        function renderScenariosUI() {
+            const container = document.getElementById('initialScenariosContainer');
+            container.innerHTML = ''; // Clear previous content
+
+            const grid = document.createElement('div');
+            grid.className = 'scenarios-grid';
+            grid.style.gridTemplateColumns = `auto repeat(${state.initialScenarios.length}, 1fr)`;
+
+            // --- Header Row ---
+            grid.insertAdjacentHTML('beforeend', '<div></div>'); // Empty top-left cell
+            state.initialScenarios.forEach((_, index) => {
+                grid.insertAdjacentHTML('beforeend', `<div class="scenarios-grid-header">Escenario ${index + 1}</div>`);
+            });
+
+            // --- RV Row ---
+            grid.insertAdjacentHTML('beforeend', `<label class="scenarios-grid-label">Capital Inicial RV (€)</label>`);
+            state.initialScenarios.forEach((scenario, index) => {
+                grid.insertAdjacentHTML('beforeend', `<div><input type="number" id="scenarioRv_${index}" value="${scenario.rv}" min="0"></div>`);
+            });
+            
+            // --- RF Row ---
+            grid.insertAdjacentHTML('beforeend', `<label class="scenarios-grid-label">Capital Inicial RF (€)</label>`);
+            state.initialScenarios.forEach((scenario, index) => {
+                grid.insertAdjacentHTML('beforeend', `<div><input type="number" id="scenarioRf_${index}" value="${scenario.rf}" min="0"></div>`);
+            });
+
+            // --- Remove Button Row ---
+            grid.insertAdjacentHTML('beforeend', '<div></div>'); // Empty bottom-left cell
+            state.initialScenarios.forEach((_, index) => {
+                 grid.insertAdjacentHTML('beforeend', `<div><button class="remove-scenario-btn" onclick="removeScenario(${index})">Eliminar</button></div>`);
+            });
+
+            container.appendChild(grid);
+
+            // Re-attach event listeners
+            state.initialScenarios.forEach((_, index) => {
+                document.getElementById(`scenarioRv_${index}`).addEventListener('input', () => { updateStateFromUI(); saveToMemory(); updateSimulation(); });
+                document.getElementById(`scenarioRf_${index}`).addEventListener('input', () => { updateStateFromUI(); saveToMemory(); updateSimulation(); });
+            });
+            document.getElementById('addScenarioBtn').disabled = state.initialScenarios.length >= 3;
+        }
+
+        function addScenario() {
+            if (state.initialScenarios.length < 3) {
+                state.initialScenarios.push({ rv: 90000, rf: 90000 });
+                updateAndSave();
+            }
+        }
+
+        function removeScenario(index) {
+            if (state.initialScenarios.length > 1) {
+                state.initialScenarios.splice(index, 1);
+                updateAndSave();
+            }
+        }
+
+        function getAbsoluteDate(relativeYear, month) {
+            const absoluteYear = new Date().getFullYear() + relativeYear;
+            return `${absoluteYear}-${String(month).padStart(2, '0')}`;
+        }
+
+        function getRelativeDate(absoluteDateStr) {
+            const [year, month] = absoluteDateStr.split('-').map(Number);
+            const simStartYear = new Date().getFullYear();
+            const relativeYear = year - simStartYear;
+            return { relativeYear, month };
+        }
+        
+        function formatDateForDisplay(dateStr) {
+            if (!dateStr) return '';
+            const { relativeYear, month } = getRelativeDate(dateStr);
+            const monthName = new Date(2000, month - 1, 1).toLocaleString('es-ES', { month: 'long' });
+            return `Año ${relativeYear} - ${monthName.charAt(0).toUpperCase() + monthName.slice(1)}`;
+        }
+
+        function addIncomeStream() {
+            const month = document.getElementById('incomeMonth').value;
+            const year = parseInt(document.getElementById('incomeYear').value);
+            const amount = parseFloat(document.getElementById('incomeAmount').value);
+            const period = document.getElementById('incomePeriod').value;
+            const times = parseInt(document.getElementById('incomeTimes').value);
+            if (!month || isNaN(year) || year < 0 || !amount || !times) return;
+            const date = getAbsoluteDate(year, month);
+            state.incomeStreams.push({ id: Date.now(), date, amount, period, times });
+            updateAndSave();
+            document.getElementById('incomeYear').value = '';
+            document.getElementById('incomeAmount').value = '';
+            document.getElementById('incomeTimes').value = '';
+        }
+
         function addCrisis() {
-            const date = document.getElementById('crisisDate').value;
+            const month = document.getElementById('crisisMonth').value;
+            const year = parseInt(document.getElementById('crisisYear').value);
             const percent = parseFloat(document.getElementById('crisisPercent').value);
-            if (!date || !percent) return;
+            if (!month || isNaN(year) || year < 0 || !percent) return;
+            const date = getAbsoluteDate(year, month);
             state.crises.push({ id: Date.now(), date, percent });
             updateAndSave();
-            document.getElementById('crisisDate').value = '';
+            document.getElementById('crisisYear').value = '';
             document.getElementById('crisisPercent').value = '';
         }
 
@@ -285,249 +459,229 @@
             updateAndSave();
         }
 
-        function editItem(type, id, setupFn) {
-            const item = state[type].find(i => i.id === id);
+        function editIncomeStream(id) {
+            const item = state.incomeStreams.find(i => i.id === id);
             if(item) {
-                setupFn(item);
-                deleteItem(type, id);
+                const { relativeYear, month } = getRelativeDate(item.date);
+                document.getElementById('incomeMonth').value = month;
+                document.getElementById('incomeYear').value = relativeYear;
+                document.getElementById('incomeAmount').value = item.amount;
+                document.getElementById('incomePeriod').value = item.period;
+                document.getElementById('incomeTimes').value = item.times;
+                deleteItem('incomeStreams', id);
             }
-        }
-
-        function editContribution(id) {
-            editItem('contributions', id, c => {
-                document.getElementById('contribDate').value = c.date;
-                document.getElementById('contribAmount').value = c.amount;
-                document.getElementById('contribPeriod').value = c.period;
-                document.getElementById('contribTimes').value = c.times;
-                document.getElementById('contribTarget').value = c.target;
-            });
-        }
-
-        function editTransfer(id) {
-            editItem('transfers', id, t => {
-                document.getElementById('transferDate').value = t.date;
-                document.getElementById('transferAmount').value = t.amount;
-                document.getElementById('transferPeriod').value = t.period;
-                document.getElementById('transferTimes').value = t.period === 'once' ? '' : t.times;
-                document.getElementById('transferDirection').value = t.direction;
-            });
         }
 
         function editCrisis(id) {
-            editItem('crises', id, c => {
-                document.getElementById('crisisDate').value = c.date;
-                document.getElementById('crisisPercent').value = c.percent;
-            });
+            const item = state.crises.find(i => i.id === id);
+            if(item) {
+                const { relativeYear, month } = getRelativeDate(item.date);
+                document.getElementById('crisisMonth').value = month;
+                document.getElementById('crisisYear').value = relativeYear;
+                document.getElementById('crisisPercent').value = item.percent;
+                deleteItem('crises', id);
+            }
         }
         
         function updateLists() {
-            const createListItem = (singularType, pluralType, item, text) => `
+            const createListItem = (type, item, text, editFn) => `
                 <div class="list-item">
                     <span>${text}</span>
-                    <div>
-                        <button class="edit" onclick="edit${singularType}(${item.id})">✏️</button>
-                        <button onclick="deleteItem('${pluralType}', ${item.id})">🗑️</button>
-                    </div>
+                    <div><button class="edit" onclick="${editFn}(${item.id})">✏️</button><button onclick="deleteItem('${type}', ${item.id})">🗑️</button></div>
                 </div>`;
             
-            document.getElementById('contributionsList').innerHTML = state.contributions.map(c => createListItem('Contribution', 'contributions', c, `${c.date} | €${c.amount} | ${c.period} | ${c.times}x | ${c.target.toUpperCase()}`)).join('');
-            document.getElementById('transfersList').innerHTML = state.transfers.map(t => createListItem('Transfer', 'transfers', t, `${t.date} | €${t.amount} | ${t.direction.replace('-', '→').toUpperCase()} | ${t.period==='once'?'Una vez':t.period+', '+t.times+'x'}`)).join('');
-            document.getElementById('crisisList').innerHTML = state.crises.map(c => createListItem('Crisis', 'crises', c, `${c.date} | Caída ${c.percent}%`)).join('');
+            document.getElementById('incomeStreamsList').innerHTML = (state.incomeStreams || []).map(c => createListItem('incomeStreams', c, `${formatDateForDisplay(c.date)} | €${c.amount} | ${c.period} | ${c.times}x`, 'editIncomeStream')).join('');
+            document.getElementById('crisisList').innerHTML = (state.crises || []).map(c => createListItem('crises', c, `${formatDateForDisplay(c.date)} | Caída ${c.percent}%`, 'editCrisis')).join('');
         }
-        
-        
-        function calculateSimulation() {
-            const months = state.years * 12;
-            const monthlyRvReturn = Math.pow(1 + state.rvReturn / 100, 1/12) - 1;
-            const monthlyRfReturn = Math.pow(1 + state.rfReturn / 100, 1/12) - 1;
-            
-            let rvValues = [state.initialCapitalRV];
-            let rfValues = [state.initialCapitalRF];
-            let rvContributed = state.initialCapitalRV;
-            let rfContributed = state.initialCapitalRF;
-            let autoConsolidationLog = [];
 
-            for (let month = 1; month <= months; month++) {
-                const currentDate = new Date(SIMULATION_START_DATE.getFullYear(), SIMULATION_START_DATE.getMonth() + month, 1);
+        function calculateSimulation(initialCapitalRV, initialCapitalRF) {
+            const totalMonths = state.years * 12;
+            const monthlyRvReturn = Math.pow(1 + state.rvReturn / 100, 1 / 12) - 1;
+            const monthlyRfReturn = Math.pow(1 + state.rfReturn / 100, 1 / 12) - 1;
+            const simulationStartDate = new Date(new Date().getFullYear(), 0, 1);
+            
+            let rvValues = [initialCapitalRV];
+            let rfValues = [initialCapitalRF];
+            let totalContributed = initialCapitalRV + initialCapitalRF;
+            let actionLog = {};
+            let rvContributionsInPeriod = 0;
+            let consolidatedThisYear = 0;
+
+            const logAction = (date, text) => {
+                if (!actionLog[date]) actionLog[date] = [];
+                actionLog[date].push({ text });
+            };
+
+            for (let month = 1; month <= totalMonths; month++) {
+                const currentDate = new Date(simulationStartDate.getTime());
+                currentDate.setMonth(simulationStartDate.getMonth() + month);
                 const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
                 
+                if (month > 1 && (month - 1) % 12 === 0) { consolidatedThisYear = 0; }
+
                 let rvValue = rvValues[month - 1] * (1 + monthlyRvReturn);
                 let rfValue = rfValues[month - 1] * (1 + monthlyRfReturn);
+                let unallocatedCash = 0;
 
-                const processPeriodicEvent = (event, action) => {
-                    const [year, monthEvent] = event.date.split('-').map(Number);
+                (state.incomeStreams || []).forEach(stream => {
+                    const [year, monthEvent] = stream.date.split('-').map(Number);
                     const eventDate = new Date(year, monthEvent - 1, 1);
-                    const monthsDiff = (currentDate.getFullYear() - eventDate.getFullYear()) * 12 + (currentDate.getMonth() - eventDate.getMonth());
-                    
-                    let shouldTrigger = false;
-                    const period = event.period;
-                    if (period === 'once' && monthsDiff === 0) shouldTrigger = true;
-                    else if (period === 'monthly' && monthsDiff >= 0 && monthsDiff < event.times) shouldTrigger = true;
-                    else if (period === 'quarterly' && monthsDiff >= 0 && monthsDiff % 3 === 0 && monthsDiff / 3 < event.times) shouldTrigger = true;
-                    else if (period === 'yearly' && monthsDiff >= 0 && monthsDiff % 12 === 0 && monthsDiff / 12 < event.times) shouldTrigger = true;
-                    else if (period === 'bienal' && monthsDiff >= 0 && monthsDiff % 24 === 0 && monthsDiff / 24 < event.times) shouldTrigger = true;
-                    else if (period === 'trienal' && monthsDiff >= 0 && monthsDiff % 36 === 0 && monthsDiff / 36 < event.times) shouldTrigger = true;
-                    else if (period === 'cuatrienal' && monthsDiff >= 0 && monthsDiff % 48 === 0 && monthsDiff / 48 < event.times) shouldTrigger = true;
-                    else if (period === 'quinquenal' && monthsDiff >= 0 && monthsDiff % 60 === 0 && monthsDiff / 60 < event.times) shouldTrigger = true;
-                    
-                    if (shouldTrigger) action(event);
-                };
-
-                (state.contributions || []).forEach(c => processPeriodicEvent(c, e => {
-                    if (e.target === 'rv') { rvValue += e.amount; rvContributed += e.amount; }
-                    else { rfValue += e.amount; rfContributed += e.amount; }
-                }));
-                (state.crises || []).forEach(c => { if (c.date === dateStr) rvValue *= (1 - c.percent / 100); });
-                (state.transfers || []).forEach(t => processPeriodicEvent(t, e => {
-                    if (e.direction === 'rv-rf') { const amount = Math.min(e.amount, rvValue); rvValue -= amount; rfValue += amount; } 
-                    else { const amount = Math.min(e.amount, rfValue); rfValue -= amount; rvValue += amount; }
-                }));
-                
-                // Advanced Dynamic Consolidation Logic
-                const currentYearInSim = Math.floor((month - 1) / 12);
-                if (state.autoConsolidationEnabled && currentYearInSim >= 20 && (month % 12 === 0)) {
-                    const yearStartIndex = currentYearInSim * 12;
-                    const rvValueAtYearStart = rvValues[yearStartIndex];
-                    const rfValueAtYearStart = rfValues[yearStartIndex];
-
-                    if (rvValue > rvValueAtYearStart) {
-                        const rfInterestGenerated = rfValueAtYearStart * (state.rfReturn / 100);
-                        if (rfInterestGenerated < 15000) {
-                            const topUpNeeded = 15000 - rfInterestGenerated;
-                            const maxTransferPercent = Math.min(state.rvReturn / 2, 2.5);
-                            const maxTransferFromRv = rvValue * (maxTransferPercent / 100);
-                            const transferAmount = Math.min(topUpNeeded, maxTransferFromRv, 15000);
-                            
-                            if (transferAmount > 0) {
-                                rvValue -= transferAmount;
-                                rfValue += transferAmount;
-                                autoConsolidationLog.push({ date: dateStr, amount: transferAmount });
-                            }
+                    if (currentDate.getFullYear() === eventDate.getFullYear() && currentDate.getMonth() === eventDate.getMonth() && stream.period === 'once') {
+                        unallocatedCash += stream.amount; totalContributed += stream.amount;
+                    }
+                    if (stream.period !== 'once' && currentDate >= eventDate) {
+                        const monthsDiff = (currentDate.getFullYear() - eventDate.getFullYear()) * 12 + (currentDate.getMonth() - eventDate.getMonth());
+                        const p = stream.period;
+                        const periodMonths = { monthly: 1, quarterly: 3, yearly: 12 }[p];
+                        if (periodMonths > 0 && monthsDiff >= 0 && monthsDiff % periodMonths === 0 && monthsDiff / periodMonths < stream.times) {
+                            unallocatedCash += stream.amount; totalContributed += stream.amount;
                         }
+                    }
+                });
+
+                (state.crises || []).forEach(c => { if (c.date === dateStr) rvValue *= (1 - c.percent / 100); });
+                
+                if (unallocatedCash > 0) {
+                    const currentYearInSim = Math.floor((month - 1) / 12);
+                    let rvRatio = (currentYearInSim < 5) ? 0.7 : (currentYearInSim < 10) ? 0.6 : (currentYearInSim < 15) ? 0.5 : (currentYearInSim < 25) ? 0.4 : 0.3;
+                    const toRv = unallocatedCash * rvRatio;
+                    const toRf = unallocatedCash * (1 - rvRatio);
+                    rvValue += toRv; rfValue += toRf; rvContributionsInPeriod += toRv;
+                    const rvRatioPercent = rvRatio * 100;
+                    const rfRatioPercent = 100 - rvRatioPercent;
+                    logAction(dateStr, `Ingreso de €${unallocatedCash.toFixed(0)} (${rvRatioPercent}%/${rfRatioPercent}%): €${toRv.toFixed(0)} a RV, €${toRf.toFixed(0)} a RF.`);
+                }
+
+                if (month % 3 === 0) {
+                    if (rfValue < state.rfFloor) {
+                        const amount = Math.min(rvValue, state.rfFloor - rfValue);
+                        if (amount > 0) { rvValue -= amount; rfValue += amount; logAction(dateStr, `Rebalanceo (Suelo): Mover €${amount.toFixed(0)} de RV a RF.`); }
+                    } else if (rfValue > state.rfCeiling) {
+                        const amount = rfValue - state.rfCeiling;
+                        if (amount > 0) { rfValue -= amount; rvValue += amount; logAction(dateStr, `Rebalanceo (Techo): Mover €${amount.toFixed(0)} de RF a RV.`); }
                     }
                 }
 
-                rvValues.push(rvValue);
-                rfValues.push(rfValue);
+                if (state.rebalanceTargetFrequencyYears > 0 && month > 1 && (month - 1) % (state.rebalanceTargetFrequencyYears * 12) === 0) {
+                    const aggFactor = (state.rebalanceAggressiveness - 1) / 9; const floorModifier = 1.5 - aggFactor;
+                    const effectiveRfFloor = state.rfFloor * floorModifier;
+                    const isFirstRebalanceEvent = ((month - 1) / (state.rebalanceTargetFrequencyYears * 12)) === 1;
+                    const targetAmountToMove = isFirstRebalanceEvent ? state.rebalanceTargetAmount : Math.max(0, state.rebalanceTargetAmount - rvContributionsInPeriod);
+                    const maxTransferFromRf = Math.max(0, rfValue - effectiveRfFloor);
+                    const actualTransferAmount = Math.min(targetAmountToMove, maxTransferFromRf);
+
+                    if (actualTransferAmount > 1) {
+                        rfValue -= actualTransferAmount; rvValue += actualTransferAmount;
+                        let logMsg = `Rebalanceo Objetivo (${state.rebalanceTargetFrequencyYears}a): Mover €${actualTransferAmount.toFixed(0)} de RF a RV.`;
+                        if (isFirstRebalanceEvent) { logMsg = `Rebalanceo Objetivo (1er periodo): Mover €${actualTransferAmount.toFixed(0)} de RF a RV (ignora aportaciones).` }
+                        logAction(dateStr, logMsg);
+                    } else if (targetAmountToMove > 0) {
+                        logAction(dateStr, `Rebalanceo Objetivo (${state.rebalanceTargetFrequencyYears}a): No se puede realizar por límites de suelo.`);
+                    }
+                    rvContributionsInPeriod = 0;
+                }
+
+                const yearsRemaining = state.years - Math.floor(month / 12);
+                if (yearsRemaining <= state.consolidationStartYear && rfValue < state.rfCeiling) {
+                    const remainingAnnualBudget = state.consolidationAnnualLimit - consolidatedThisYear;
+                    if (remainingAnnualBudget > 0) {
+                        const yearsIntoConsolidation = state.consolidationStartYear - yearsRemaining;
+                        const progressFactor = Math.pow(1 + (state.consolidationAggressiveness / 10), yearsIntoConsolidation / state.consolidationStartYear) - 1;
+                        let transferAmount = rvValue * (0.01 + progressFactor * 0.1);
+                        transferAmount = Math.min(transferAmount, remainingAnnualBudget, state.rfCeiling - rfValue, rvValue);
+                        if (transferAmount > 1) {
+                            rvValue -= transferAmount; rfValue += transferAmount; consolidatedThisYear += transferAmount;
+                            logAction(dateStr, `Consolidación: Mover €${transferAmount.toFixed(0)} de RV a RF.`);
+                        }
+                    }
+                }
+                rvValues.push(rvValue); rfValues.push(rfValue);
             }
-            return { rvValues, rfValues, rvContributed, rfContributed, autoConsolidationLog };
-        }
-        
-        function applyAutoConsolidation() {
-            const thresholdYear = SIMULATION_START_DATE.getFullYear() + 20;
-            const originalCount = state.transfers.length;
-
-            state.transfers = state.transfers.filter(t => {
-                const transferYear = parseInt(t.date.substring(0, 4));
-                return transferYear < thresholdYear;
-            });
-            const removedCount = originalCount - state.transfers.length;
-            
-            state.autoConsolidationEnabled = true;
-
-            const statusEl = document.getElementById('consolidation-status');
-            statusEl.textContent = `¡Consolidación Automática Aplicada! Se han eliminado ${removedCount} rebalanceos manuales a partir del año ${thresholdYear}.`;
-            
-            updateAndSave();
-        }
-
-        function updateConsolidationStatus() {
-            const button = document.getElementById('autoConsolidateButton');
-            const statusEl = document.getElementById('consolidation-status');
-            if (state.autoConsolidationEnabled) {
-                button.disabled = true;
-                button.textContent = '✅ Consolidación Automática ACTIVA';
-                statusEl.textContent = `La consolidación se aplicará automáticamente a partir del año ${SIMULATION_START_DATE.getFullYear() + 20}.`;
-            } else {
-                button.disabled = false;
-                button.textContent = '⚡ Consolidación Automática';
-                statusEl.textContent = '';
-            }
+            return { rvValues, rfValues, totalContributed, actionLog };
         }
 
         function updateSimulation() {
-            const { rvValues, rfValues, rvContributed, rfContributed, autoConsolidationLog } = calculateSimulation();
-            updateSummary(rvValues.at(-1), rfValues.at(-1), rvContributed, rfContributed);
-            updateChart(rvValues, rfValues);
-            updateActionPlanner(autoConsolidationLog);
+            const summariesContainer = document.getElementById('summariesContainer');
+            const chartsContainer = document.getElementById('chartsContainer');
+            summariesContainer.innerHTML = '';
+            chartsContainer.innerHTML = '';
+            charts.forEach(chart => chart.destroy());
+            charts = [];
+
+            let firstActionLog = null;
+
+            state.initialScenarios.forEach((scenario, index) => {
+                const { rvValues, rfValues, totalContributed, actionLog } = calculateSimulation(scenario.rv, scenario.rf);
+                if (index === 0) firstActionLog = actionLog;
+
+                // Create and append summary
+                const summaryDiv = document.createElement('div');
+                summariesContainer.appendChild(summaryDiv);
+                updateSummary(rvValues.at(-1), rfValues.at(-1), totalContributed, summaryDiv, index);
+
+                // Create and append chart
+                const chartWrapper = document.createElement('div');
+                chartWrapper.className = 'chart-wrapper';
+                const canvasId = `investmentChart_${index}`;
+                chartWrapper.innerHTML = `<h4>Escenario ${index + 1}: ${scenario.rv/1000}k RV / ${scenario.rf/1000}k RF</h4><div class="chart-container"><canvas id="${canvasId}"></canvas></div>`;
+                chartsContainer.appendChild(chartWrapper);
+                updateChart(rvValues, rfValues, canvasId);
+            });
+
+            if (firstActionLog) {
+                updateActionPlanner(firstActionLog);
+            }
         }
 
-        function updateSummary(rvFinal, rfFinal, rvContributed, rfContributed) {
+        function updateSummary(rvFinal, rfFinal, totalContributed, targetElement, index) {
              const totalFinal = rvFinal + rfFinal;
-             const totalContributed = rvContributed + rfContributed;
              const totalReturn = totalContributed > 0 ? ((totalFinal - totalContributed) / totalContributed * 100) : 0;
              const formatCurrency = (v) => `€${v.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
              
-             document.getElementById('summary').innerHTML = `
+             targetElement.innerHTML = `<div class="summary">
                 <div class="summary-item"><div class="summary-label">Valor Final RV</div><div class="summary-value">${formatCurrency(rvFinal)}</div></div>
                 <div class="summary-item"><div class="summary-label">Valor Final RF</div><div class="summary-value">${formatCurrency(rfFinal)}</div></div>
                 <div class="summary-item"><div class="summary-label">Valor Final Total</div><div class="summary-value" style="color: #FFD700;">${formatCurrency(totalFinal)}</div></div>
-                <div class="summary-item"><div class="summary-label">Aportado RV</div><div class="summary-value">${formatCurrency(rvContributed)}</div></div>
-                <div class="summary-item"><div class="summary-label">Aportado RF</div><div class="summary-value">${formatCurrency(rfContributed)}</div></div>
                 <div class="summary-item"><div class="summary-label">Total Aportado</div><div class="summary-value">${formatCurrency(totalContributed)}</div></div>
+                <div class="summary-item"><div class="summary-label">Ganancia Neta</div><div class="summary-value">${formatCurrency(totalFinal - totalContributed)}</div></div>
                 <div class="summary-item"><div class="summary-label">Rentabilidad Total</div><div class="summary-value">${totalReturn.toFixed(2)}%</div></div>
-             `;
+             </div>`;
         }
 
-        function updateChart(rvValues, rfValues) {
+        function updateChart(rvValues, rfValues, canvasId) {
             const labels = Array.from({ length: state.years + 1 }, (_, i) => i === 0 ? 'Inicio' : `Año ${i}`);
             const annualRv = Array.from({ length: state.years + 1 }, (_, i) => rvValues[i * 12]);
             const annualRf = Array.from({ length: state.years + 1 }, (_, i) => rfValues[i * 12]);
             
-            if (chart) chart.destroy();
-            chart = new Chart(document.getElementById('investmentChart').getContext('2d'), {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const newChart = new Chart(ctx, {
                 type: 'line', data: { labels, datasets: [
                     { label: 'Renta Variable', data: annualRv, borderColor: '#667eea', backgroundColor: 'rgba(102, 126, 234, 0.1)', borderWidth: 3, tension: 0.4, fill: true },
                     { label: 'Renta Fija', data: annualRf, borderColor: '#764ba2', backgroundColor: 'rgba(118, 75, 162, 0.1)', borderWidth: 3, tension: 0.4, fill: true }
                 ]},
-                options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { mode: 'index', intersect: false, callbacks: { label: c => `${c.dataset.label}: €${c.parsed.y.toFixed(2)}` }}},
-                    scales: { y: { beginAtZero: true, ticks: { callback: v => '€' + v.toLocaleString('es-ES') } } }
+                options: { responsive: true, maintainAspectRatio: false, 
+                    plugins: { tooltip: { mode: 'index', intersect: false, callbacks: { label: c => `${c.dataset.label}: €${c.parsed.y.toFixed(0)}` }}},
+                    scales: { 
+                        y: { beginAtZero: true, ticks: { callback: v => '€' + v.toLocaleString('es-ES'), color: '#555' }, grid: { color: '#e0e0e0' } },
+                        x: { ticks: { color: '#555' }, grid: { color: '#e0e0e0' } }
+                    }
                 }
             });
+            charts.push(newChart);
         }
         
-        function generateActionPlan(autoConsolidationLog = []) {
-            const plan = {};
-            const formatCurrency = (value) => value.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
-            
-            const processManualEvent = (event, descriptionFn) => {
-                const intervalMap = {monthly: 1, quarterly: 3, yearly: 12, bienal: 24, trienal: 36, cuatrienal: 48, quinquenal: 60};
-                const interval = intervalMap[event.period] || 0;
-
-                for (let i = 0; i < (event.period === 'once' ? 1 : event.times); i++) {
-                    const [year, month] = event.date.split('-').map(Number);
-                    const eventDate = new Date(year, month - 1 + (i * interval), 1);
-                    const dateStr = `${eventDate.getFullYear()}-${String(eventDate.getMonth() + 1).padStart(2, '0')}`;
-                    if (!plan[dateStr]) plan[dateStr] = [];
-                    plan[dateStr].push({ text: descriptionFn(event), isAuto: false });
-                }
-            };
-            
-            (state.contributions || []).forEach(c => processManualEvent(c, e => `Aportación a ${e.target.toUpperCase()}: ${formatCurrency(e.amount)}`));
-            (state.transfers || []).forEach(t => processManualEvent(t, e => `Rebalanceo ${e.direction.replace('-', '→').toUpperCase()}: ${formatCurrency(e.amount)}`));
-            
-            if (state.autoConsolidationEnabled) {
-                autoConsolidationLog.forEach(log => {
-                    if (!plan[log.date]) plan[log.date] = [];
-                    plan[log.date].push({ text: `Consolidación Auto: ${formatCurrency(log.amount)}`, isAuto: true });
-                });
-            }
-            return plan;
-        }
-
-        function updateActionPlanner(autoConsolidationLog = []) {
-            const plan = generateActionPlan(autoConsolidationLog);
+        function updateActionPlanner(actionLog) {
             const pendingBody = document.getElementById('actionTableBodyPending');
             const completedBody = document.getElementById('actionTableBodyCompleted');
-            pendingBody.innerHTML = '';
-            completedBody.innerHTML = '';
+            pendingBody.innerHTML = ''; completedBody.innerHTML = '';
 
-            const actionDates = Object.keys(plan);
+            const sortedDates = Object.keys(actionLog).sort();
             
-            const calendarOptions = {
+            if (calendar) calendar.destroy();
+            calendar = flatpickr("#action-calendar", {
                 inline: true,
-                enable: actionDates.map(d => d + '-01'),
-                onChange: function(selectedDates, dateStr, instance) {
+                enable: sortedDates.map(d => d + '-01'),
+                onChange: (selectedDates, dateStr) => {
                     if (!selectedDates[0]) return;
                     const selectedMonth = `${selectedDates[0].getFullYear()}-${String(selectedDates[0].getMonth() + 1).padStart(2, '0')}`;
                     const row = document.querySelector(`.action-row[data-date="${selectedMonth}"]`);
@@ -537,37 +691,18 @@
                         setTimeout(() => row.classList.remove('highlight'), 2000);
                     }
                 }
-            };
-            
-            if (calendar) {
-                calendar.set('enable', actionDates.map(d => d + '-01'));
-                calendar.redraw();
-            } else {
-                 calendar = flatpickr("#action-calendar", calendarOptions);
-            }
+            });
 
-            const sortedDates = Object.keys(plan).sort();
             sortedDates.forEach(dateStr => {
                 const isCompleted = state.completedActions[dateStr];
-                const actionsHtml = plan[dateStr].map(act => `<div>${act.text}</div>`).join('');
+                const actionsHtml = actionLog[dateStr].map(act => `<div>${act.text}</div>`).join('');
                 
-                const hasManualActions = plan[dateStr].some(act => !act.isAuto);
-                const checkboxCell = hasManualActions ? 
-                    `<td><input type="checkbox" onchange="toggleActionCompleted('${dateStr}')" ${isCompleted ? 'checked' : ''}></td>` : 
-                    '<td>🤖</td>';
-
-                const rowHtml = `
-                    <tr class="action-row ${isCompleted ? 'completed-row' : ''}" data-date="${dateStr}">
+                const rowHtml = `<tr class="action-row ${isCompleted ? 'completed-row' : ''}" data-date="${dateStr}">
                         <td>${dateStr}</td>
                         <td>${actionsHtml}</td>
-                        ${checkboxCell}
+                        <td><input type="checkbox" onchange="toggleActionCompleted('${dateStr}')" ${isCompleted ? 'checked' : ''}></td>
                     </tr>`;
-
-                if (isCompleted && hasManualActions) {
-                     completedBody.insertAdjacentHTML('beforeend', rowHtml);
-                } else {
-                     pendingBody.insertAdjacentHTML('beforeend', rowHtml);
-                }
+                (isCompleted ? completedBody : pendingBody).insertAdjacentHTML('beforeend', rowHtml);
             });
         }
 
@@ -577,36 +712,31 @@
         }
 
         function updateAndSave() {
+            renderScenariosUI();
             updateLists();
             updateSimulation();
             saveToMemory();
         }
 
         function saveToMemory() {
-            localStorage.setItem('investmentSimulatorState', JSON.stringify(state));
+            localStorage.setItem('investmentPlannerState', JSON.stringify(state));
         }
 
         function loadFromMemory() {
-            const saved = localStorage.getItem('investmentSimulatorState');
-            state = saved ? JSON.parse(saved) : getDefaultState();
-            
-            state.autoConsolidationEnabled = state.autoConsolidationEnabled || false;
+            const saved = localStorage.getItem('investmentPlannerState');
+            const defaultState = getDefaultState();
+            state = saved ? { ...defaultState, ...JSON.parse(saved) } : defaultState;
+            if (!state.initialScenarios || state.initialScenarios.length === 0) {
+                state.initialScenarios = defaultState.initialScenarios;
+            }
             state.completedActions = state.completedActions || {};
-
-            document.getElementById('initialCapitalRV').value = state.initialCapitalRV;
-            document.getElementById('initialCapitalRF').value = state.initialCapitalRF;
-            document.getElementById('years').value = state.years;
-            document.getElementById('rvReturn').value = state.rvReturn;
-            document.getElementById('rfReturn').value = state.rfReturn;
-            document.getElementById('observations').value = state.observations || '';
-            updateLists();
-            updateConsolidationStatus();
+            updateUIFromState();
         }
 
         function resetAll() {
-            if (confirm('¿Estás seguro de que quieres resetear toda la simulación? Se perderán todos los datos.')) {
+            if (confirm('¿Estás seguro de que quieres resetear toda la planificación?')) {
                 state = getDefaultState();
-                localStorage.removeItem('investmentSimulatorState');
+                localStorage.removeItem('investmentPlannerState');
                 loadFromMemory();
                 updateSimulation();
             }
@@ -617,7 +747,7 @@
             const blob = new Blob([dataStr], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `simulacion_${new Date().toISOString().slice(0, 10)}.json`;
+            a.download = `plan_financiero_${new Date().toISOString().slice(0, 10)}.json`;
             a.click();
             URL.revokeObjectURL(a.href);
         }
@@ -629,30 +759,13 @@
             reader.onload = e => {
                 try {
                     const importedData = JSON.parse(e.target.result);
-                    const newState = getDefaultState();
-                    for (const key in newState) {
-                        if (importedData.hasOwnProperty(key)) {
-                            newState[key] = importedData[key];
-                        }
-                    }
-                    state = newState;
-                    
-                    // Update UI from the new state
-                    document.getElementById('initialCapitalRV').value = state.initialCapitalRV;
-                    document.getElementById('initialCapitalRF').value = state.initialCapitalRF;
-                    document.getElementById('years').value = state.years;
-                    document.getElementById('rvReturn').value = state.rvReturn;
-                    document.getElementById('rfReturn').value = state.rfReturn;
-                    document.getElementById('observations').value = state.observations || '';
-                    
-                    // Refresh everything else
-                    updateLists();
-                    updateConsolidationStatus();
+                    state = { ...getDefaultState(), ...importedData };
                     saveToMemory();
+                    loadFromMemory();
                     updateSimulation();
                 } catch (error) {
-                    alert('Error al importar el archivo. Asegúrate de que es un JSON válido generado por el simulador.');
-                    console.error('Error al importar el archivo: ', error);
+                    alert('Error al importar el archivo JSON.');
+                    console.error('Error importing:', error);
                 }
             };
             reader.readAsText(file);
