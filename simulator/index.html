@@ -102,7 +102,15 @@
                 <h3>💰 Aportaciones</h3>
                 <div class="action-inputs">
                     <input type="month" id="contribDate"><input type="number" id="contribAmount" placeholder="Cantidad (€)" min="0">
-                    <select id="contribPeriod"><option value="monthly">Mensual</option><option value="quarterly">Trimestral</option><option value="yearly">Anual</option></select>
+                    <select id="contribPeriod">
+                        <option value="monthly">Mensual</option>
+                        <option value="quarterly">Trimestral</option>
+                        <option value="yearly">Anual</option>
+                        <option value="bienal">Bienal</option>
+                        <option value="trienal">Trienal</option>
+                        <option value="cuatrienal">Cuatrienal</option>
+                        <option value="quinquenal">Quinquenal</option>
+                    </select>
                     <input type="number" id="contribTimes" placeholder="Número de veces" min="1">
                     <select id="contribTarget"><option value="rv">Renta Variable</option><option value="rf">Renta Fija</option></select>
                 </div>
@@ -114,7 +122,16 @@
                 <div class="action-inputs">
                     <input type="month" id="transferDate">
                     <input type="number" id="transferAmount" placeholder="Cantidad (€)" min="0">
-                    <select id="transferPeriod"><option value="once">Una vez</option><option value="monthly">Mensual</option><option value="quarterly">Trimestral</option><option value="yearly">Anual</option></select>
+                    <select id="transferPeriod">
+                        <option value="once">Una vez</option>
+                        <option value="monthly">Mensual</option>
+                        <option value="quarterly">Trimestral</option>
+                        <option value="yearly">Anual</option>
+                        <option value="bienal">Bienal</option>
+                        <option value="trienal">Trienal</option>
+                        <option value="cuatrienal">Cuatrienal</option>
+                        <option value="quinquenal">Quinquenal</option>
+                    </select>
                     <input type="number" id="transferTimes" placeholder="Número de veces (si es periódico)" min="1">
                     <select id="transferDirection"><option value="rv-rf">RV → RF</option><option value="rf-rv">RF → RV</option></select>
                 </div>
@@ -348,6 +365,10 @@
                     else if (period === 'monthly' && monthsDiff >= 0 && monthsDiff < event.times) shouldTrigger = true;
                     else if (period === 'quarterly' && monthsDiff >= 0 && monthsDiff % 3 === 0 && monthsDiff / 3 < event.times) shouldTrigger = true;
                     else if (period === 'yearly' && monthsDiff >= 0 && monthsDiff % 12 === 0 && monthsDiff / 12 < event.times) shouldTrigger = true;
+                    else if (period === 'bienal' && monthsDiff >= 0 && monthsDiff % 24 === 0 && monthsDiff / 24 < event.times) shouldTrigger = true;
+                    else if (period === 'trienal' && monthsDiff >= 0 && monthsDiff % 36 === 0 && monthsDiff / 36 < event.times) shouldTrigger = true;
+                    else if (period === 'cuatrienal' && monthsDiff >= 0 && monthsDiff % 48 === 0 && monthsDiff / 48 < event.times) shouldTrigger = true;
+                    else if (period === 'quinquenal' && monthsDiff >= 0 && monthsDiff % 60 === 0 && monthsDiff / 60 < event.times) shouldTrigger = true;
                     
                     if (shouldTrigger) action(event);
                 };
@@ -470,8 +491,8 @@
             const formatCurrency = (value) => value.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
             
             const processManualEvent = (event, descriptionFn) => {
-                const months = event.period === 'once' ? 1 : event.times * {monthly: 1, quarterly: 3, yearly: 12}[event.period];
-                const interval = {monthly: 1, quarterly: 3, yearly: 12}[event.period] || 0;
+                const intervalMap = {monthly: 1, quarterly: 3, yearly: 12, bienal: 24, trienal: 36, cuatrienal: 48, quinquenal: 60};
+                const interval = intervalMap[event.period] || 0;
 
                 for (let i = 0; i < (event.period === 'once' ? 1 : event.times); i++) {
                     const [year, month] = event.date.split('-').map(Number);
@@ -639,3 +660,4 @@
     </script>
 </body>
 </html>
+
