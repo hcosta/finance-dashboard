@@ -132,7 +132,7 @@
             </div>
              <div class="action-card">
                 <h3>📝 Observaciones</h3>
-                <textarea id="observations" placeholder="Escribe aquí tus notas sobre la simulación..." style="min-height: 200px; resize: vertical;" oninput="saveToMemory()"></textarea>
+                <textarea id="observations" placeholder="Escribe aquí tus notas sobre la simulación..." style="min-height: 200px; resize: vertical;"></textarea>
             </div>
         </div>
         
@@ -208,6 +208,12 @@
                 });
             });
             document.getElementById('autoConsolidateButton').addEventListener('click', applyAutoConsolidation);
+            
+            // Centralized listener for observations
+            document.getElementById('observations').addEventListener('input', (event) => {
+                state.observations = event.target.value;
+                saveToMemory();
+            });
         }
         
         function updateStateFromInputs() {
@@ -556,7 +562,6 @@
         }
 
         function saveToMemory() {
-            state.observations = document.getElementById('observations').value;
             localStorage.setItem('investmentSimulatorState', JSON.stringify(state));
         }
 
@@ -578,10 +583,12 @@
         }
 
         function resetAll() {
-            state = getDefaultState();
-            localStorage.removeItem('investmentSimulatorState');
-            loadFromMemory();
-            updateSimulation();
+            if (confirm('¿Estás seguro de que quieres resetear toda la simulación? Se perderán todos los datos.')) {
+                state = getDefaultState();
+                localStorage.removeItem('investmentSimulatorState');
+                loadFromMemory();
+                updateSimulation();
+            }
         }
 
         function exportData() {
@@ -607,9 +614,20 @@
                             newState[key] = importedData[key];
                         }
                     }
-                    state = newState; 
+                    state = newState;
+                    
+                    // Update UI from the new state
+                    document.getElementById('initialCapitalRV').value = state.initialCapitalRV;
+                    document.getElementById('initialCapitalRF').value = state.initialCapitalRF;
+                    document.getElementById('years').value = state.years;
+                    document.getElementById('rvReturn').value = state.rvReturn;
+                    document.getElementById('rfReturn').value = state.rfReturn;
+                    document.getElementById('observations').value = state.observations || '';
+                    
+                    // Refresh everything else
+                    updateLists();
+                    updateConsolidationStatus();
                     saveToMemory();
-                    loadFromMemory();
                     updateSimulation();
                 } catch (error) {
                     alert('Error al importar el archivo. Asegúrate de que es un JSON válido generado por el simulador.');
@@ -621,4 +639,3 @@
     </script>
 </body>
 </html>
-
