@@ -21,7 +21,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
@@ -33,7 +33,12 @@
         h2 { margin-bottom: 20px; font-size: 1.6em; margin-top: 40px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
         h3 { font-size: 1.3em; margin-bottom: 15px; }
 
-        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .grid-layout { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 30px; 
+        }
         .control-group { 
             display: flex;
             flex-direction: row;
@@ -45,9 +50,13 @@
         input, select, textarea { 
             padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; 
             transition: all 0.3s; font-family: inherit; background-color: #fff; color: #333;
+            width: 100%; /* Asegura que los inputs llenen el espacio */
         }
         .control-group input[type="number"], .control-group select {
             max-width: 130px;
+        }
+        .control-group input[type="checkbox"] {
+            width: 20px; height: 20px; accent-color: #667eea;
         }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
         
@@ -73,13 +82,14 @@
              flex-direction: column;
              align-items: stretch;
         }
+        .action-inputs .control-group label { text-align: left; margin-bottom: 5px; }
+        .action-inputs .control-group > div { display: flex; align-items: center; justify-content: space-between;}
         .action-inputs .control-group input { max-width: none; }
         .date-input-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
-
 
         button { padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
         button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3); }
@@ -99,7 +109,7 @@
             gap: 20px;
             margin-bottom: 30px;
         }
-        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; }
         .summary-item { text-align: center; }
         .summary-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 5px; }
         .summary-value { font-size: 1.5em; font-weight: bold; }
@@ -123,8 +133,8 @@
         .action-table input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer;}
         .completed-row td { text-decoration: line-through; color: #6c757d; }
         
-        /* Tooltip Styles */
-        .tooltip-container { position: relative; display: inline-block; cursor: help; }
+        .tooltip-container { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted #333;}
+        .summary .tooltip-container { border-bottom: none; } /* No dotted line in summary */
         .tooltip-container .tooltip-text {
             visibility: hidden; width: 280px; background-color: #333; color: #fff; text-align: left;
             border-radius: 6px; padding: 10px; position: absolute; z-index: 1; bottom: 125%; left: 50%;
@@ -137,31 +147,11 @@
         }
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
         
-        /* New Scenario Grid Styles */
-        .scenarios-grid {
-            display: grid;
-            gap: 10px 15px;
-            align-items: center;
-        }
-        .scenarios-grid-header {
-            font-weight: bold;
-            text-align: center;
-            font-size: 1em;
-            margin-bottom: 5px;
-        }
-        .scenarios-grid-label {
-            font-weight: 600;
-            font-size: 0.9em;
-            text-align: right;
-        }
-        .scenarios-grid input {
-            width: 100%;
-            max-width: none;
-        }
-        .scenarios-grid button {
-            width: 100%;
-        }
-
+        .scenarios-grid { display: grid; gap: 10px 15px; align-items: center; }
+        .scenarios-grid-header { font-weight: bold; text-align: center; font-size: 1em; margin-bottom: 5px; }
+        .scenarios-grid-label { font-weight: 600; font-size: 0.9em; text-align: right; }
+        .scenarios-grid input { width: 100%; max-width: none; }
+        .scenarios-grid button { width: 100%; }
     </style>
 </head>
 <body>
@@ -175,20 +165,36 @@
                      <div id="initialScenariosContainer"></div>
                      <button onclick="addScenario()" id="addScenarioBtn">+ Añadir Escenario</button>
                     <hr>
-                    <div class="control-group"><label>Edad Inicial</label><input type="number" id="initialAge" value="36" min="18"></div>
-                    <div class="control-group"><label>Años de Inversión</label><input type="number" id="years" value="30" min="1" max="50"></div>
-                    <div class="control-group"><label>Rentabilidad RV (%)</label><input type="number" id="rvReturn" value="7" step="0.1"></div>
-                    <div class="control-group"><label>Rentabilidad RF (%)</label><input type="number" id="rfReturn" value="3" step="0.1"></div>
+                    <div class="control-group"><div><label>Edad Inicial</label><input type="number" id="initialAge" value="36" min="18"></div></div>
+                    <div class="control-group"><div><label>Años de Inversión</label><input type="number" id="years" value="30" min="1" max="50"></div></div>
+                    <div class="control-group"><div><label>Rentabilidad RV (%)</label><input type="number" id="rvReturn" value="7" step="0.1"></div></div>
+                    <div class="control-group"><div><label>Rentabilidad RF (%)</label><input type="number" id="rfReturn" value="3" step="0.1"></div></div>
                 </div>
             </div>
             <div class="action-card">
-                <h3>🎯 Estrategia de Asignación por Edad</h3>
+                <h3>🛡️ Bandas de Seguridad (RF)</h3>
                  <div class="action-inputs">
-                    <div class="control-group"><label>Límite Superior RV (%)</label><input type="number" id="maxRvPercentage" value="85" min="0" max="100"></div>
-                    <div class="control-group"><label>Límite Inferior RV (%)</label><input type="number" id="minRvPercentage" value="15" min="0" max="100"></div>
-                    <div class="control-group"><label>Banda de Tolerancia (%)</label><input type="number" id="toleranceBand" value="5" min="0" max="25"></div>
-                    <div class="control-group"><label>Límite Rebalanceo Anual (€)</label><input type="number" id="maxAnnualRebalance" value="30000" min="0"></div>
-                </div>
+                    <div class="control-group"><div><label>Suelo RF Inicial (€)</label><input type="number" id="rfFloor" value="50000" min="0"></div></div>
+                     <div class="control-group">
+                        <div>
+                            <label class="tooltip-container">Habilitar Techo de RF
+                                <span class="tooltip-text">Si se activa, el simulador moverá el excedente de RF a RV si se supera este límite, acelerando el crecimiento.</span>
+                            </label>
+                            <input type="checkbox" id="enableRfCeiling" checked>
+                        </div>
+                    </div>
+                    <div class="control-group"><div><label>Techo RF Inicial (€)</label><input type="number" id="rfCeiling" value="100000" min="0"></div></div>
+                    <hr>
+                    <div class="control-group">
+                        <div>
+                            <label class="tooltip-container">Ajustar Bandas a Inflación
+                                <span class="tooltip-text">Si se activa, el suelo y el techo de RF crecerán cada año según la inflación estimada para mantener su poder de compra real.</span>
+                            </label>
+                            <input type="checkbox" id="adjustBandsForInflation" checked>
+                        </div>
+                    </div>
+                    <div class="control-group"><div><label>Inflación Media Anual (%)</label><input type="number" id="estimatedInflation" value="2.5" step="0.1" min="0"></div></div>
+                 </div>
             </div>
             <div class="action-card">
                  <h3 class="tooltip-container">💸 Flujos de Ingresos
@@ -232,8 +238,55 @@
                 <div class="list-container" id="crisisList"></div>
             </div>
              <div class="action-card">
-                <h3>📝 Observaciones</h3>
-                <textarea id="observations" placeholder="Escribe aquí tus notas..." style="min-height: 200px; resize: vertical;"></textarea>
+                <h3>📝 Estrategia y Notas</h3>
+                 <div class="action-inputs">
+                    <div class="control-group"><div><label>Límite Superior RV (%)</label><input type="number" id="maxRvPercentage" value="85" min="0" max="100"></div></div>
+                    <div class="control-group"><div><label>Límite Inferior RV (%)</label><input type="number" id="minRvPercentage" value="15" min="0" max="100"></div></div>
+                    <div class="control-group"><div><label>Banda Tolerancia (%)</label><input type="number" id="toleranceBand" value="5" min="0" max="25"></div></div>
+                    <div class="control-group"><div><label>Límite Rebalanceo Anual (€)</label><input type="number" id="maxAnnualRebalance" value="30000" min="0"></div></div>
+                    <hr>
+                    <div class="control-group">
+                        <div>
+                            <label class="tooltip-container">Habilitar Consolidación Inteligente
+                                <span class="tooltip-text"><b>Regla Mejorada:</b> El sistema solo consolida beneficios de RV a RF si, tras el movimiento, el valor de la RV sigue siendo mayor que el de la RF. Esto protege el motor de crecimiento.</span>
+                            </label>
+                            <input type="checkbox" id="enableSmartConsolidation" checked>
+                        </div>
+                    </div>
+                    <textarea id="observations" placeholder="Escribe aquí tus notas..." style="min-height: 100px; resize: vertical; width: 100%; margin-top: 10px;"></textarea>
+                </div>
+            </div>
+             <div class="action-card">
+                <h3 class="tooltip-container">🕊️ Fase de Retirada
+                    <span class="tooltip-text">
+                        Define cómo y cuándo empezar a vivir de tus inversiones. Puedes combinar una retirada fija sostenible con una retirada por porcentaje para la jubilación.
+                    </span>
+                </h3>
+                 <div class="action-inputs">
+                     <div class="control-group">
+                        <div>
+                            <label class="tooltip-container">Retirar Gastos Sostenibles
+                                <span class="tooltip-text"><b>Lógica Mejorada:</b> Retira la cantidad anual deseada (crece con la inflación) pero la limita a las ganancias totales de la cartera en el último año. Así, solo se retiran beneficios y nunca el capital principal.</span>
+                            </label>
+                            <input type="checkbox" id="withdrawSustainableExpenses" checked>
+                        </div>
+                    </div>
+                     <div class="control-group"><div><label>Gastos Anuales Deseados (€)</label><input type="number" id="annualExpensesAmount" value="4000" min="0"></div></div>
+                     <hr>
+                    <div class="control-group">
+                        <div>
+                            <label class="tooltip-container">Habilitar Retirada por %
+                                <span class="tooltip-text">Si se activa, el sistema cambiará a un modo de retirada porcentual a partir de la edad indicada, ignorando los gastos fijos anteriores.</span>
+                            </label>
+                            <input type="checkbox" id="enableSustainableWithdrawal" checked>
+                        </div>
+                    </div>
+                    <div class="control-group"><div><label>Edad de Inicio</label><input type="number" id="withdrawalStartAge" value="65" min="0"></div></div>
+                    <div class="control-group"><div><label>Tasa de Retirada Anual (%)</label><input type="number" id="withdrawalRate" value="4" step="0.1" min="0"></div></div>
+                    <div class="control-group"><div><label class="tooltip-container">Distribución Retiro RV (%)
+                        <span class="tooltip-text">Define qué porcentaje de cada retiro anual debe provenir de la Renta Variable. El resto se retirará de la Renta Fija, siempre que sea posible.</span>
+                    </label><input type="number" id="withdrawalRvRatio" value="50" step="1" min="0" max="100"></div></div>
+                 </div>
             </div>
         </div>
 
@@ -289,17 +342,44 @@
 
         function getDefaultState() {
             return {
-                initialScenarios: [{ rv: 60000, rf: 120000 }],
+                initialScenarios: [{ rv: 500, rf: 1000 }],
                 initialAge: 36, years: 30, rvReturn: 7, rfReturn: 3, 
-                maxRvPercentage: 85, minRvPercentage: 15, toleranceBand: 5, maxAnnualRebalance: 30000,
-                incomeStreams: [], crises: [], observations: '', completedActions: {}
+                maxRvPercentage: 85, minRvPercentage: 15, toleranceBand: 5, maxAnnualRebalance: 3000,
+                incomeStreams: [], crises: [], observations: '', completedActions: {},
+                rfFloor: 50000,
+                adjustBandsForInflation: true,
+                estimatedInflation: 2.5,
+                withdrawSustainableExpenses: true,
+                annualExpensesAmount: 4000,
+                enableRfCeiling: true,
+                rfCeiling: 100000,
+                enableSmartConsolidation: true,
+                enableSustainableWithdrawal: true,
+                withdrawalStartAge: 65,
+                withdrawalRate: 4,
+                withdrawalRvRatio: 50
             };
         }
         
         function setupEventListeners() {
-            const globalParamIds = ['initialAge', 'years', 'rvReturn', 'rfReturn', 'maxRvPercentage', 'minRvPercentage', 'toleranceBand', 'maxAnnualRebalance'];
+            const globalParamIds = [
+                'initialAge', 'years', 'rvReturn', 'rfReturn', 
+                'maxRvPercentage', 'minRvPercentage', 'toleranceBand', 'maxAnnualRebalance',
+                'rfFloor', 'estimatedInflation', 'annualExpensesAmount', 'rfCeiling',
+                'withdrawalStartAge', 'withdrawalRate', 'withdrawalRvRatio'
+            ];
             globalParamIds.forEach(id => {
-                document.getElementById(id).addEventListener('input', () => {
+                const element = document.getElementById(id);
+                if(element) element.addEventListener('input', () => {
+                    updateStateFromUI();
+                    saveToMemory();
+                    updateSimulation();
+                });
+            });
+            // Event listeners para los checkboxes
+            ['adjustBandsForInflation', 'withdrawSustainableExpenses', 'enableRfCeiling', 'enableSmartConsolidation', 'enableSustainableWithdrawal'].forEach(id => {
+                 const element = document.getElementById(id);
+                 if(element) element.addEventListener('change', () => {
                     updateStateFromUI();
                     saveToMemory();
                     updateSimulation();
@@ -315,7 +395,13 @@
             for (const key in state) {
                 const element = document.getElementById(key);
                 if (element && key !== 'initialScenarios' && key !== 'incomeStreams' && key !== 'crises' && key !== 'completedActions' && key !== 'observations') {
-                     state[key] = (typeof getDefaultState()[key] === 'number') ? parseFloat(element.value) || 0 : element.value;
+                     if (element.type === 'checkbox') {
+                        state[key] = element.checked;
+                     } else if (typeof getDefaultState()[key] === 'number') {
+                        state[key] = parseFloat(element.value) || 0;
+                     } else {
+                        state[key] = element.value;
+                     }
                 }
             }
              state.initialScenarios.forEach((_, index) => {
@@ -328,7 +414,11 @@
             for (const key in state) {
                 const element = document.getElementById(key);
                 if (element && key !== 'initialScenarios') {
-                    element.value = state[key];
+                     if (element.type === 'checkbox') {
+                        element.checked = state[key];
+                    } else {
+                        element.value = state[key];
+                    }
                 }
             }
             renderScenariosUI();
@@ -487,6 +577,10 @@
             let rfValues = [initialCapitalRF];
             let totalContributed = initialCapitalRV + initialCapitalRF;
             let actionLog = {};
+            let currentRfFloor = state.rfFloor;
+            let currentRfCeiling = state.rfCeiling;
+            let currentAnnualExpense = state.annualExpensesAmount;
+            let totalWithdrawn = 0;
 
             const logAction = (date, text) => {
                 if (!actionLog[date]) actionLog[date] = [];
@@ -494,6 +588,8 @@
             };
 
             for (let month = 1; month <= totalMonths; month++) {
+                const currentYearInSim = Math.floor((month - 1) / 12);
+                const currentUserAge = state.initialAge + currentYearInSim;
                 const currentDate = new Date(simulationStartDate.getTime());
                 currentDate.setMonth(simulationStartDate.getMonth() + month);
                 const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
@@ -521,9 +617,6 @@
                 (state.crises || []).forEach(c => { if (c.date === dateStr) rvValue *= (1 - c.percent / 100); });
                 
                 if (unallocatedCash > 0) {
-                    const currentYearInSim = Math.floor((month - 1) / 12);
-                    const currentUserAge = state.initialAge + currentYearInSim;
-                    
                     let rvPercent = 120 - currentUserAge;
                     rvPercent = Math.max(state.minRvPercentage, Math.min(state.maxRvPercentage, rvPercent));
                     const rvRatio = rvPercent / 100;
@@ -537,43 +630,136 @@
                     logAction(dateStr, `Ingreso de €${unallocatedCash.toFixed(0)} (${rvRatioPercent}%/${rfRatioPercent}%): €${toRv.toFixed(0)} a RV, €${toRf.toFixed(0)} a RF.`);
                 }
                 
-                // --- Age-based Rebalancing (Annual Check) ---
-                if (month > 1 && (month - 1) % 12 === 0) {
-                    const currentYearInSim = Math.floor((month - 1) / 12);
-                    const currentUserAge = state.initialAge + currentYearInSim;
+                // --- Rebalanceo Anual (Chequeo a final de año) ---
+                if (month > 1 && month % 12 === 0) {
+                    
+                    // --- FASE DE RETIRADA (Lógica unificada) ---
+                    if (state.enableSustainableWithdrawal && currentUserAge >= state.withdrawalStartAge) {
+                        const totalPortfolioValue = rvValue + rfValue;
+                        const withdrawalAmount = totalPortfolioValue * (state.withdrawalRate / 100);
+                        
+                        const withdrawalRvRatio = state.withdrawalRvRatio / 100;
+                        const withdrawnFromRv = Math.min(withdrawalAmount * withdrawalRvRatio, rvValue);
+                        let remainingToWithdraw = withdrawalAmount - withdrawnFromRv;
+                        const withdrawnFromRf = Math.min(remainingToWithdraw, rfValue);
+                        
+                        rvValue -= withdrawnFromRv;
+                        rfValue -= withdrawnFromRf;
+
+                        const totalWithdrawalThisYear = withdrawnFromRv + withdrawnFromRf;
+                        totalWithdrawn += totalWithdrawalThisYear;
+                        logAction(dateStr, `Retirada Sostenible (${state.withdrawalRate}%): €${totalWithdrawalThisYear.toFixed(0)} (€${withdrawnFromRv.toFixed(0)} de RV, €${withdrawnFromRf.toFixed(0)} de RF).`);
+
+                    } else if (state.withdrawSustainableExpenses && state.annualExpensesAmount > 0) { 
+                        // LÓGICA MEJORADA: Solo retira de ganancias
+                        const lastYearTotalValue = rvValues[month - 12] + rfValues[month - 12];
+                        const currentTotalValueBeforeWithdrawal = rvValue + rfValue;
+                        const totalGrowthLastYear = Math.max(0, currentTotalValueBeforeWithdrawal - lastYearTotalValue);
+
+                        let desiredWithdrawal = currentAnnualExpense;
+                        const maxSafeWithdrawal = totalGrowthLastYear;
+                        const actualWithdrawalAmount = Math.min(desiredWithdrawal, maxSafeWithdrawal);
+                        
+                        let withdrawnFromRv = 0;
+                        let withdrawnFromRf = 0;
+
+                        if (actualWithdrawalAmount > 0) {
+                            const availableFromRf = Math.max(0, rfValue - currentRfFloor);
+                            withdrawnFromRf = Math.min(actualWithdrawalAmount, availableFromRf);
+                            rfValue -= withdrawnFromRf;
+
+                            const remainingToWithdraw = actualWithdrawalAmount - withdrawnFromRf;
+                            withdrawnFromRv = Math.min(remainingToWithdraw, rvValue);
+                            rvValue -= withdrawnFromRv;
+                        }
+
+                        const totalWithdrawalThisYear = withdrawnFromRf + withdrawnFromRv;
+                        totalWithdrawn += totalWithdrawalThisYear;
+
+                        if (totalWithdrawalThisYear < desiredWithdrawal * 0.99 && totalGrowthLastYear < desiredWithdrawal) {
+                             logAction(dateStr, `Retirada Sostenible Limitada por Ganancias: Se retiran €${totalWithdrawalThisYear.toFixed(0)}. Deseado: €${desiredWithdrawal.toFixed(0)}.`);
+                        } else if (totalWithdrawalThisYear > 0) {
+                            logAction(dateStr, `Retirada Sostenible: €${totalWithdrawalThisYear.toFixed(0)} de las ganancias del año.`);
+                        } else {
+                            logAction(dateStr, `Retirada Omitida: El portfolio no generó ganancias este año.`);
+                        }
+                        
+                        currentAnnualExpense *= (1 + state.estimatedInflation / 100);
+                    }
+                    
+                    if (state.adjustBandsForInflation) {
+                        currentRfFloor *= (1 + state.estimatedInflation / 100);
+                        currentRfCeiling *= (1 + state.estimatedInflation / 100);
+                        logAction(dateStr, `Bandas RF actualizadas por inflación. Suelo: €${currentRfFloor.toFixed(0)}, Techo: €${currentRfCeiling.toFixed(0)}.`);
+                    }
                     
                     let targetRvPercent = 120 - currentUserAge;
                     targetRvPercent = Math.max(state.minRvPercentage, Math.min(state.maxRvPercentage, targetRvPercent));
                     const targetRvRatio = targetRvPercent / 100;
                     
                     const currentTotalValue = rvValue + rfValue;
-                    const actualRvRatio = rvValue / currentTotalValue;
+                    const actualRvRatio = currentTotalValue > 0 ? rvValue / currentTotalValue : 0;
                     
                     const deviation = Math.abs(actualRvRatio - targetRvRatio);
+                    const needsRebalance = deviation > (state.toleranceBand / 100);
+                    const floorDeficit = currentRfFloor - rfValue;
+                    const ceilingSurplus = state.enableRfCeiling ? rfValue - currentRfCeiling : 0;
 
-                    if (deviation > (state.toleranceBand / 100)) {
-                        const targetRvValue = currentTotalValue * targetRvRatio;
+                    if (needsRebalance || floorDeficit > 0 || ceilingSurplus > 0) {
+                        let targetRvValue = currentTotalValue * targetRvRatio;
+                        let targetRfValue = currentTotalValue * (1 - targetRvRatio);
+
+                        if (targetRfValue < currentRfFloor) {
+                            targetRfValue = currentRfFloor;
+                            targetRvValue = currentTotalValue - targetRfValue;
+                            logAction(dateStr, `¡Prioridad Suelo! Objetivo RF ajustado al suelo de €${currentRfFloor.toFixed(0)}.`);
+                        } else if (state.enableRfCeiling && targetRfValue > currentRfCeiling) {
+                             targetRfValue = currentRfCeiling;
+                             targetRvValue = currentTotalValue - targetRfValue;
+                             logAction(dateStr, `¡Prioridad Techo! Objetivo RF ajustado al techo de €${currentRfCeiling.toFixed(0)}.`);
+                        }
+
                         let amountToMove = targetRvValue - rvValue;
-                        
                         amountToMove = Math.sign(amountToMove) * Math.min(Math.abs(amountToMove), state.maxAnnualRebalance);
 
-                        if (amountToMove > 1) { // Move from RF to RV
-                            const transferAmount = Math.min(amountToMove, rfValue);
-                            rfValue -= transferAmount;
-                            rvValue += transferAmount;
-                            logAction(dateStr, `Rebalanceo por Edad: Mover €${transferAmount.toFixed(0)} de RF a RV.`);
-                        } else if (amountToMove < -1) { // Move from RV to RF
-                            const transferAmount = Math.min(Math.abs(amountToMove), rvValue);
-                            rvValue -= transferAmount;
-                            rfValue += transferAmount;
-                            logAction(dateStr, `Rebalanceo por Edad: Mover €${transferAmount.toFixed(0)} de RV a RF.`);
+                        if (amountToMove > 1) { // Mover de RF a RV
+                            const availableFromRf = Math.max(0, rfValue - currentRfFloor);
+                            const transferAmount = Math.min(amountToMove, availableFromRf);
+                            if (transferAmount > 1) {
+                                rfValue -= transferAmount;
+                                rvValue += transferAmount;
+                                logAction(dateStr, `Rebalanceo: Mover €${transferAmount.toFixed(0)} de RF a RV.`);
+                            }
+                        } else if (amountToMove < -1) { // Mover de RV a RF
+                            let transferAmount = Math.min(Math.abs(amountToMove), rvValue);
+                            
+                            if (state.enableSmartConsolidation) {
+                                const potentialNewRv = rvValue - transferAmount;
+                                const potentialNewRf = rfValue + transferAmount;
+                                if (potentialNewRv < potentialNewRf) {
+                                     logAction(dateStr, `Consolidación pausada para primar crecimiento de RV (RV no puede ser < RF).`);
+                                     transferAmount = 0;
+                                } else {
+                                     const rvGainLastYear = Math.max(0, rvValue - rvValues[month - 12]);
+                                     if (transferAmount > rvGainLastYear) {
+                                        logAction(dateStr, `Consolidación limitada a las ganancias del año (€${rvGainLastYear.toFixed(0)}).`);
+                                        transferAmount = rvGainLastYear;
+                                    }
+                                }
+                            }
+                            
+                            if (transferAmount > 1) {
+                                rvValue -= transferAmount;
+                                rfValue += transferAmount;
+                                logAction(dateStr, `Rebalanceo: Mover €${transferAmount.toFixed(0)} de RV a RF.`);
+                            }
                         }
                     }
                 }
 
                 rvValues.push(rvValue); rfValues.push(rfValue);
             }
-            return { rvValues, rfValues, totalContributed, actionLog };
+            return { rvValues, rfValues, totalContributed, actionLog, totalWithdrawn };
         }
 
         function updateSimulation() {
@@ -587,15 +773,13 @@
             let firstActionLog = null;
 
             state.initialScenarios.forEach((scenario, index) => {
-                const { rvValues, rfValues, totalContributed, actionLog } = calculateSimulation(scenario.rv, scenario.rf);
+                const { rvValues, rfValues, totalContributed, actionLog, totalWithdrawn } = calculateSimulation(scenario.rv, scenario.rf);
                 if (index === 0) firstActionLog = actionLog;
 
-                // Create and append summary
                 const summaryDiv = document.createElement('div');
                 summariesContainer.appendChild(summaryDiv);
-                updateSummary(rvValues.at(-1), rfValues.at(-1), totalContributed, summaryDiv, index);
+                updateSummary(rvValues.at(-1), rfValues.at(-1), totalContributed, totalWithdrawn, summaryDiv, index);
 
-                // Create and append chart
                 const chartWrapper = document.createElement('div');
                 chartWrapper.className = 'chart-wrapper';
                 const canvasId = `investmentChart_${index}`;
@@ -609,9 +793,11 @@
             }
         }
 
-        function updateSummary(rvFinal, rfFinal, totalContributed, targetElement, index) {
+        function updateSummary(rvFinal, rfFinal, totalContributed, totalWithdrawn, targetElement, index) {
              const totalFinal = rvFinal + rfFinal;
-             const totalReturn = totalContributed > 0 ? ((totalFinal - totalContributed) / totalContributed * 100) : 0;
+             const totalReturnWithWithdrawals = totalContributed > 0 ? ((totalFinal - totalContributed + totalWithdrawn) / totalContributed * 100) : 0;
+             const totalReturnWithoutWithdrawals = totalContributed > 0 ? ((totalFinal - totalContributed) / totalContributed * 100) : 0;
+             const finalPatrimony = totalFinal + totalWithdrawn;
              const formatCurrency = (v) => `€${v.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
              
              targetElement.innerHTML = `<div class="summary">
@@ -619,8 +805,27 @@
                 <div class="summary-item"><div class="summary-label">Valor Final RF</div><div class="summary-value">${formatCurrency(rfFinal)}</div></div>
                 <div class="summary-item"><div class="summary-label">Valor Final Total</div><div class="summary-value" style="color: #FFD700;">${formatCurrency(totalFinal)}</div></div>
                 <div class="summary-item"><div class="summary-label">Total Aportado</div><div class="summary-value">${formatCurrency(totalContributed)}</div></div>
-                <div class="summary-item"><div class="summary-label">Ganancia Neta</div><div class="summary-value">${formatCurrency(totalFinal - totalContributed)}</div></div>
-                <div class="summary-item"><div class="summary-label">Rentabilidad Total</div><div class="summary-value">${totalReturn.toFixed(2)}%</div></div>
+                <div class="summary-item"><div class="summary-label">Ganancia Neta</div><div class="summary-value">${formatCurrency(totalFinal - totalContributed + totalWithdrawn)}</div></div>
+                <div class="summary-item">
+                    <div class="summary-label">Retiros Totales</div>
+                    <div class="summary-value">${formatCurrency(totalWithdrawn)}</div>
+                </div>
+                <div class="summary-item tooltip-container">
+                    <div class="summary-label">Patrimonio Generado</div>
+                    <div class="summary-value">${formatCurrency(finalPatrimony)}</div>
+                    <span class="tooltip-text" style="width: 240px; margin-left: -120px; text-align: center;">
+                        Cálculo: (Valor Final + Retiros)<br>
+                        <strong>${formatCurrency(totalFinal)} + ${formatCurrency(totalWithdrawn)}</strong>
+                    </span>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Rentabilidad c/ Retiros</div>
+                    <div class="summary-value">${totalReturnWithWithdrawals.toFixed(2)}%</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Rentabilidad s/ Retiros</div>
+                    <div class="summary-value">${totalReturnWithoutWithdrawals.toFixed(2)}%</div>
+                </div>
              </div>`;
         }
 
