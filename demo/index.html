@@ -180,6 +180,10 @@
                             <label for="rebalance-band" class="block text-sm font-medium text-gray-300">Banda de Tolerancia (+/- %)</label>
                             <input type="number" id="rebalance-band" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="5">
                         </div>
+                        <div>
+                            <label for="rebalance-start-year" class="block text-sm font-medium text-gray-300">Iniciar a partir del año</label>
+                            <input type="number" id="rebalance-start-year" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="1" min="1" max="30">
+                        </div>
                     </div>
                 </div>
                 
@@ -224,6 +228,7 @@
                     <div class="flex flex-wrap gap-2 mb-4">
                         <button id="scenario-calma" class="flex-1 bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition">La Gran Calma</button>
                         <button id="scenario-despertar" class="flex-1 bg-purple-600 text-white py-2 px-3 rounded-lg hover:bg-purple-700 transition">El Despertar (???)%</button>
+                        <button id="scenario-benner" class="flex-1 bg-yellow-500 text-gray-900 py-2 px-3 rounded-lg hover:bg-yellow-400 transition">Ciclo de Benner</button>
                     </div>
                     <div id="sp500-inputs" class="grid grid-cols-5 md:grid-cols-10 gap-2">
                         <!-- Inputs generados por JS -->
@@ -281,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rebalanceOptions: document.getElementById('rebalance-options'),
         rebalanceTarget: document.getElementById('rebalance-target'),
         rebalanceBand: document.getElementById('rebalance-band'),
+        rebalanceStartYear: document.getElementById('rebalance-start-year'),
         liquiditySweepEnabled: document.getElementById('liquidity-sweep-enabled'),
         liquiditySweepOptions: document.getElementById('liquidity-sweep-options'),
         liquidityFloor: document.getElementById('liquidity-floor'),
@@ -297,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
         importFile: document.getElementById('import-file'),
         scenarioCalma: document.getElementById('scenario-calma'),
         scenarioDespertar: document.getElementById('scenario-despertar'),
+        scenarioBenner: document.getElementById('scenario-benner'),
     };
 
     let chartInstance = null;
@@ -304,7 +311,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const scenarios = {
         calma: [12.5, 8.2, 15.1, -5.4, 11.8, 9.3, 22.4, -10.1, 7.5, 14.6, 6.2, 18.9, 11.2, -3.7, 9.8, 13.5, 20.1, 7.8, 10.4, -8.2, 12.1, 15.6, 8.5, 6.7, 11.9, -4.1, 14.2, 9.5, 16.3, 7.1],
-        despertar: [8.5, 10.2, -40.0, -15.0, 25.0, 18.0, 12.5, -9.1, 6.4, 11.3, 8.2, -15.7, 14.9, 22.1, 7.6, 10.8, -5.2, 9.3, 11.7, -12.4, 18.2, 9.1, 7.5, 8.8, -6.3, 13.4, 10.2, 9.9, 12.1, 8.7]
+        despertar: [8.5, 10.2, -40.0, -15.0, 25.0, 18.0, 12.5, -9.1, 6.4, 11.3, 8.2, -15.7, 14.9, 22.1, 7.6, 10.8, -5.2, 9.3, 11.7, -12.4, 18.2, 9.1, 7.5, 8.8, -6.3, 13.4, 10.2, 9.9, 12.1, 8.7],
+        benner: [18.0, -10.0, -5.0, 2.0, 8.0, 15.0, 25.0, -35.0, 15.0, 10.0, -8.0, 5.0, 12.0, 20.0, 30.0, -20.0, -15.0, 10.0, 18.0, -5.0, 22.0, 12.0, 8.0, -12.0, 15.0, 28.0, -25.0, 12.0, 10.0, 5.0]
     };
     
     // --- Lógica de la Simulación ---
@@ -394,8 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
 
-            // 3. Rebalanceo Automático (si está activado)
-            if (config.rebalanceEnabled) {
+            // 3. Rebalanceo Automático (si está activado y el año es correcto)
+            if (config.rebalanceEnabled && year >= config.rebalanceStartYear) {
                 const investedTotal = rv + rf;
                 if (investedTotal > 0) {
                     const currentRvRatio = rv / investedTotal;
@@ -468,6 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.rebalanceEnabled.checked = config.rebalanceEnabled;
         elements.rebalanceTarget.value = config.rebalanceTarget;
         elements.rebalanceBand.value = config.rebalanceBand;
+        elements.rebalanceStartYear.value = config.rebalanceStartYear;
         elements.liquiditySweepEnabled.checked = config.liquiditySweepEnabled;
         elements.liquidityFloor.value = config.liquidityFloor;
         
@@ -765,6 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rebalanceEnabled: elements.rebalanceEnabled.checked,
             rebalanceTarget: parseFloat(elements.rebalanceTarget.value) || 0,
             rebalanceBand: parseFloat(elements.rebalanceBand.value) || 0,
+            rebalanceStartYear: parseInt(elements.rebalanceStartYear.value) || 1,
             liquiditySweepEnabled: elements.liquiditySweepEnabled.checked,
             liquidityFloor: parseFloat(elements.liquidityFloor.value) || 0,
             extraordinaryIncomes: extraordinaryIncomes,
@@ -784,12 +794,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function getDefaultConfig() {
         const baseConfig = {
-            initialRv: 60000, initialRf: 100000, initialCash: 15000,
-            futureSavings: 40000, futureSavingsYears: 5,
+            initialRv: 6000, initialRf: 10000, initialCash: 1500,
+            futureSavings: 4000, futureSavingsYears: 5,
             dcaDrop: 20, dcaRise: 15,
             rfReturn: 2.5, cashReturn: 0.70,
-            rebalanceEnabled: true, rebalanceTarget: 60, rebalanceBand: 5,
-            liquiditySweepEnabled: true, liquidityFloor: 15000,
+            rebalanceEnabled: true, rebalanceTarget: 60, rebalanceBand: 5, rebalanceStartYear: 1,
+            liquiditySweepEnabled: true, liquidityFloor: 1500,
             extraordinaryIncomes: [],
             extraordinaryRebalances: [],
             sp500Scenario: scenarios.calma,
@@ -816,7 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.initialRv, elements.initialRf, elements.initialCash,
         elements.futureSavings, elements.futureSavingsYears,
         elements.dcaDrop, elements.dcaRise, elements.rfReturn, elements.cashReturn,
-        elements.rebalanceEnabled, elements.rebalanceTarget, elements.rebalanceBand,
+        elements.rebalanceEnabled, elements.rebalanceTarget, elements.rebalanceBand, elements.rebalanceStartYear,
         elements.liquiditySweepEnabled, elements.liquidityFloor
     ];
     inputsToWatch.forEach(input => input.addEventListener('input', liveUpdate));
@@ -894,25 +904,28 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.importFile.value = '';
     });
     
-    elements.scenarioCalma.addEventListener('click', () => {
-        const config = getConfigFromUI();
-        config.sp500Scenario = scenarios.calma;
-        config.extraordinaryIncomes = []; 
-        config.extraordinaryRebalances = [];
-        updateUI(config);
-        liveUpdate();
-    });
-    
-    elements.scenarioDespertar.addEventListener('click', () => {
-        const config = getConfigFromUI();
-        config.sp500Scenario = scenarios.despertar;
-        config.extraordinaryIncomes = [];
-        config.extraordinaryRebalances = [
-            { amount: 40000, year: 3, direction: 'rf-to-rv' },
-            { amount: 40000, year: 4, direction: 'rf-to-rv' }
-        ];
-        updateUI(config);
-        liveUpdate();
+    [elements.scenarioCalma, elements.scenarioDespertar, elements.scenarioBenner].forEach(btn => {
+        btn.addEventListener('click', () => {
+            const scenarioType = btn.id.split('-')[1];
+            const config = getConfigFromUI();
+            config.sp500Scenario = scenarios[scenarioType];
+            config.extraordinaryIncomes = []; 
+            config.extraordinaryRebalances = [];
+            
+            if (scenarioType === 'despertar') {
+                 config.extraordinaryRebalances = [
+                    { amount: 40000, year: 3, direction: 'rf-to-rv' },
+                    { amount: 40000, year: 4, direction: 'rf-to-rv' }
+                ];
+            } else if (scenarioType === 'benner') {
+                 config.extraordinaryRebalances = [
+                    { amount: 80000, year: 8, direction: 'rf-to-rv' } // Deploy during the Panic of 2032 (year 8 of simulation)
+                ];
+            }
+
+            updateUI(config);
+            liveUpdate();
+        });
     });
     
     function setupCollapsible(checkbox, optionsDiv) {
@@ -936,5 +949,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
 
