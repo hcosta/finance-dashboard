@@ -230,9 +230,18 @@
                     <h2 class="text-2xl font-bold mb-4 text-white">Escenario del Mercado (S&P 500)</h2>
                     <p class="text-sm text-gray-400 mb-4">Selecciona un escenario predefinido o introduce tus propias rentabilidades anuales para los próximos 30 años.</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <button id="scenario-calma" class="flex-1 bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition">La Gran Calma</button>
-                        <button id="scenario-despertar" class="flex-1 bg-purple-600 text-white py-2 px-3 rounded-lg hover:bg-purple-700 transition">El Despertar (???)%</button>
-                        <button id="scenario-benner" class="flex-1 bg-yellow-500 text-gray-900 py-2 px-3 rounded-lg hover:bg-yellow-400 transition">Ciclo de Benner</button>
+                        <div class="tooltip flex-1">
+                            <button id="scenario-calma" class="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition">La Gran Calma</button>
+                            <span id="tooltip-calma" class="tooltiptext"></span>
+                        </div>
+                         <div class="tooltip flex-1">
+                            <button id="scenario-despertar" class="w-full bg-purple-600 text-white py-2 px-3 rounded-lg hover:bg-purple-700 transition">El Despertar (???)%</button>
+                            <span id="tooltip-despertar" class="tooltiptext"></span>
+                        </div>
+                        <div class="tooltip flex-1">
+                            <button id="scenario-benner" class="w-full bg-yellow-500 text-gray-900 py-2 px-3 rounded-lg hover:bg-yellow-400 transition">Ciclo de Benner</button>
+                            <span id="tooltip-benner" class="tooltiptext"></span>
+                        </div>
                     </div>
                     <div id="sp500-inputs" class="grid grid-cols-5 md:grid-cols-10 gap-2">
                         <!-- Inputs generados por JS -->
@@ -836,6 +845,16 @@ document.addEventListener('DOMContentLoaded', () => {
         renderLogTable(simResults.history);
     }
 
+    function calculateAndDisplayScenarioAverages() {
+        const avgCalma = scenarios.calma.reduce((a, b) => a + b, 0) / YEARS;
+        const avgDespertar = scenarios.despertar.reduce((a, b) => a + b, 0) / YEARS;
+        const avgBenner = scenarios.benner.reduce((a, b) => a + b, 0) / YEARS;
+
+        document.getElementById('tooltip-calma').textContent = `Media Anual: ${avgCalma.toFixed(2)}%`;
+        document.getElementById('tooltip-despertar').textContent = `Media Anual: ${avgDespertar.toFixed(2)}%`;
+        document.getElementById('tooltip-benner').textContent = `Media Anual: ${avgBenner.toFixed(2)}%`;
+    }
+
     const inputsToWatch = [
         elements.initialRv, elements.initialRf, elements.initialCash,
         elements.futureSavings, elements.futureSavingsYears,
@@ -952,6 +971,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupCollapsible(elements.liquiditySweepEnabled, elements.liquiditySweepOptions);
     
     function init() {
+        calculateAndDisplayScenarioAverages();
         const config = loadConfigFromLocalStorage();
         updateUI(config);
         liveUpdate();
