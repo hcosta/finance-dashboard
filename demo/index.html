@@ -352,42 +352,52 @@ document.addEventListener('DOMContentLoaded', () => {
                     cash += income.amount;
                 }
             });
-
-            // 1. Aportaciones (DCA)
-            let regularMonthlyDca = 0;
+            
+            // 1. Aportaciones (DCA) - Tratado como DINERO NUEVO
+            let baseYearlyDca = 0;
             if (year <= config.futureSavingsYears && config.futureSavingsYears > 0) {
-                regularMonthlyDca = (config.futureSavings / config.futureSavingsYears) / 12;
+                 baseYearlyDca += (config.futureSavings / config.futureSavingsYears);
             }
-
-            let extraMonthlyDca = config.extraordinaryIncomes
+            config.extraordinaryIncomes
                 .filter(income => year >= income.receptionYear && year < income.receptionYear + income.dcaPeriod)
-                .reduce((total, income) => total + (income.amount / (income.dcaPeriod * 12)), 0);
+                .forEach(income => {
+                    baseYearlyDca += (income.amount / income.dcaPeriod);
+                });
 
-            let totalMonthlyDca = regularMonthlyDca + extraMonthlyDca;
-
-            if (totalMonthlyDca > 0) {
+            if (baseYearlyDca > 0) {
                 const sp500Return = config.sp500Scenario[year - 1] / 100;
                 let dcaMultiplier = 1;
                 
                 if (sp500Return <= -(config.dcaDrop / 100)) dcaMultiplier = 2;
                 else if (sp500Return >= (config.dcaRise / 100)) dcaMultiplier = 0.5;
 
-                let yearlyDca = totalMonthlyDca * 12 * dcaMultiplier;
-                let dcaFromCash = Math.min(cash, yearlyDca);
-                
-                if (dcaMultiplier === 2 && dcaFromCash < yearlyDca) {
-                   const needed = yearlyDca - dcaFromCash;
-                   const fromOpportunityFund = Math.min(opportunityFund, needed);
-                   dcaFromCash += fromOpportunityFund;
-                   opportunityFund -= fromOpportunityFund;
-                }
-                
-                cash -= dcaFromCash;
-                rv += dcaFromCash;
-                yearlyDcaApplied = dcaFromCash;
-
                 if (dcaMultiplier === 0.5) {
-                    opportunityFund += (totalMonthlyDca * 12 * 0.5);
+                    const amountToInvest = baseYearlyDca * 0.5;
+                    rv += amountToInvest;
+                    opportunityFund += amountToInvest; // La otra mitad a la reserva
+                    yearlyDcaApplied = amountToInvest;
+                } else if (dcaMultiplier === 1) {
+                    rv += baseYearlyDca;
+                    yearlyDcaApplied = baseYearlyDca;
+                } else if (dcaMultiplier === 2) {
+                    // Invertir la aportación base
+                    rv += baseYearlyDca;
+                    yearlyDcaApplied = baseYearlyDca;
+
+                    // E intentar igualarla desde la liquidez
+                    const extraToInvest = baseYearlyDca;
+                    const fromOpportunityFund = Math.min(opportunityFund, extraToInvest);
+                    opportunityFund -= fromOpportunityFund;
+                    rv += fromOpportunityFund;
+                    yearlyDcaApplied += fromOpportunityFund;
+
+                    const remainingNeeded = extraToInvest - fromOpportunityFund;
+                    if (remainingNeeded > 0) {
+                        const fromCash = Math.min(cash, remainingNeeded);
+                        cash -= fromCash;
+                        rv += fromCash;
+                        yearlyDcaApplied += fromCash;
+                    }
                 }
             }
             
@@ -446,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let currentLiquidity = cash + opportunityFund;
             if (config.liquiditySweepEnabled && currentLiquidity > config.liquidityFloor) {
                 const excessCash = currentLiquidity - config.liquidityFloor;
-                
+                 // Prioritize taking from opportunity fund first if it exists, as it's tactical cash
                 const fromOpportunityFund = Math.min(opportunityFund, excessCash);
                 opportunityFund -= fromOpportunityFund;
                 
@@ -821,7 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
             futureSavings: 4000, futureSavingsYears: 5,
             dcaDrop: 20, dcaRise: 15,
             rfReturn: 2.5, cashReturn: 0.70,
-            rebalanceEnabled: true, rebalanceTarget: 60, rebalanceBand: 5, rebalanceStartYear: 1, rebalanceMaxAmount: 2000,
+            rebalanceEnabled: true, rebalanceTarget: 60, rebalanceBand: 5, rebalanceStartYear: 20, rebalanceMaxAmount: 2000,
             liquiditySweepEnabled: true, liquidityFloor: 1500,
             extraordinaryIncomes: [],
             extraordinaryRebalances: [],
