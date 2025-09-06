@@ -50,7 +50,7 @@
             opacity: 0;
         }
         .collapsible-options.active {
-            max-height: 300px; /* A large enough value */
+            max-height: 400px; /* A large enough value */
             opacity: 1;
         }
         #log-table-container {
@@ -184,6 +184,10 @@
                             <label for="rebalance-start-year" class="block text-sm font-medium text-gray-300">Iniciar a partir del año</label>
                             <input type="number" id="rebalance-start-year" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="1" min="1" max="30">
                         </div>
+                        <div>
+                            <label for="rebalance-max-amount" class="block text-sm font-medium text-gray-300">Máximo Rebalanceo Anual (€)</label>
+                            <input type="number" id="rebalance-max-amount" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="20000" min="0">
+                        </div>
                     </div>
                 </div>
                 
@@ -287,6 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rebalanceTarget: document.getElementById('rebalance-target'),
         rebalanceBand: document.getElementById('rebalance-band'),
         rebalanceStartYear: document.getElementById('rebalance-start-year'),
+        rebalanceMaxAmount: document.getElementById('rebalance-max-amount'),
         liquiditySweepEnabled: document.getElementById('liquidity-sweep-enabled'),
         liquiditySweepOptions: document.getElementById('liquidity-sweep-options'),
         liquidityFloor: document.getElementById('liquidity-floor'),
@@ -413,7 +418,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const lowerBand = targetRatio - band;
 
                     if (currentRvRatio > upperBand || currentRvRatio < lowerBand) {
-                        const amountToMove = (rv - investedTotal * targetRatio);
+                        let amountToMove = (rv - investedTotal * targetRatio);
+                        
+                        // Apply the cap if it's enabled (> 0)
+                        if (config.rebalanceMaxAmount > 0) {
+                            const cappedAmount = Math.min(Math.abs(amountToMove), config.rebalanceMaxAmount);
+                            amountToMove = cappedAmount * Math.sign(amountToMove);
+                        }
+                        
                         rv -= amountToMove;
                         rf += amountToMove;
                         amountRebalanced = amountToMove;
@@ -477,6 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.rebalanceTarget.value = config.rebalanceTarget;
         elements.rebalanceBand.value = config.rebalanceBand;
         elements.rebalanceStartYear.value = config.rebalanceStartYear;
+        elements.rebalanceMaxAmount.value = config.rebalanceMaxAmount;
         elements.liquiditySweepEnabled.checked = config.liquiditySweepEnabled;
         elements.liquidityFloor.value = config.liquidityFloor;
         
@@ -775,6 +788,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rebalanceTarget: parseFloat(elements.rebalanceTarget.value) || 0,
             rebalanceBand: parseFloat(elements.rebalanceBand.value) || 0,
             rebalanceStartYear: parseInt(elements.rebalanceStartYear.value) || 1,
+            rebalanceMaxAmount: parseFloat(elements.rebalanceMaxAmount.value) || 0,
             liquiditySweepEnabled: elements.liquiditySweepEnabled.checked,
             liquidityFloor: parseFloat(elements.liquidityFloor.value) || 0,
             extraordinaryIncomes: extraordinaryIncomes,
@@ -798,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
             futureSavings: 4000, futureSavingsYears: 5,
             dcaDrop: 20, dcaRise: 15,
             rfReturn: 2.5, cashReturn: 0.70,
-            rebalanceEnabled: true, rebalanceTarget: 60, rebalanceBand: 5, rebalanceStartYear: 1,
+            rebalanceEnabled: true, rebalanceTarget: 60, rebalanceBand: 5, rebalanceStartYear: 1, rebalanceMaxAmount: 2000,
             liquiditySweepEnabled: true, liquidityFloor: 1500,
             extraordinaryIncomes: [],
             extraordinaryRebalances: [],
@@ -826,7 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.initialRv, elements.initialRf, elements.initialCash,
         elements.futureSavings, elements.futureSavingsYears,
         elements.dcaDrop, elements.dcaRise, elements.rfReturn, elements.cashReturn,
-        elements.rebalanceEnabled, elements.rebalanceTarget, elements.rebalanceBand, elements.rebalanceStartYear,
+        elements.rebalanceEnabled, elements.rebalanceTarget, elements.rebalanceBand, elements.rebalanceStartYear, elements.rebalanceMaxAmount,
         elements.liquiditySweepEnabled, elements.liquidityFloor
     ];
     inputsToWatch.forEach(input => input.addEventListener('input', liveUpdate));
