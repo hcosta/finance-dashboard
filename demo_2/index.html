@@ -18,7 +18,7 @@
         .tooltip .tooltiptext {
             visibility: hidden;
             width: 220px;
-            background-color: #374151; /* gray-700 */
+            background-color: #555;
             color: #fff;
             text-align: center;
             border-radius: 6px;
@@ -59,28 +59,23 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-200">
+<body class="bg-gray-100 text-gray-800">
 
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-white">Simulador de Inversión a 30 Años</h1>
-            <p class="text-gray-400 mt-2">Planifica tu futuro financiero con una estrategia de DCA Oportunista.</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Simulador de Inversión a 30 Años</h1>
+            <p class="text-gray-600 mt-2">Planifica tu futuro financiero con una estrategia de DCA Oportunista.</p>
         </header>
-
-        <div class="mb-8 text-center p-4 border border-yellow-500/30 bg-yellow-400/10 rounded-lg mx-auto max-w-4xl">
-            <p class="text-lg italic text-yellow-300">"Sé temeroso cuando los demás son codiciosos, y codicioso cuando los demás son temerosos."</p>
-            <p class="text-sm text-yellow-500 mt-1">- Warren Buffett</p>
-        </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
 
             <!-- Columna de Controles y Parámetros -->
-            <div class="lg:w-1/3 bg-gray-800 p-6 rounded-2xl shadow-lg">
-                <h2 class="text-2xl font-bold mb-6 border-b border-gray-700 pb-4 text-white">Configuración de la Simulación</h2>
+            <div class="lg:w-1/3 bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-4">Configuración de la Simulación</h2>
                 
                 <!-- Importar / Exportar -->
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Gestión de Escenarios</h3>
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Gestión de Escenarios</h3>
                      <div class="flex gap-2">
                         <button id="import-btn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-2"><i class="fas fa-upload"></i> Importar</button>
                         <button id="export-btn" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300 flex items-center justify-center gap-2"><i class="fas fa-download"></i> Exportar</button>
@@ -90,62 +85,53 @@
 
                 <!-- Cartera Inicial -->
                 <div class="mb-6">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Cartera Inicial</h3>
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Cartera Inicial</h3>
                     <div class="space-y-3">
                         <div>
-                            <label for="initial-rv" class="block text-sm font-medium text-gray-300">Renta Variable (RV)</label>
-                            <input type="number" id="initial-rv" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white">
+                            <label for="initial-rv" class="block text-sm font-medium text-gray-700">Renta Variable (RV)</label>
+                            <input type="number" id="initial-rv" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="53000">
                         </div>
                         <div>
-                            <label for="initial-rf" class="block text-sm font-medium text-gray-300">Renta Fija (RF)</label>
-                            <input type="number" id="initial-rf" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white">
+                            <label for="initial-rf" class="block text-sm font-medium text-gray-700">Renta Fija (RF)</label>
+                            <input type="number" id="initial-rf" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="31000">
                         </div>
                         <div>
-                            <label for="initial-cash" class="block text-sm font-medium text-gray-300">Liquidez / Ahorro</label>
-                            <input type="number" id="initial-cash" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white">
+                            <label for="initial-cash" class="block text-sm font-medium text-gray-700">Liquidez / Ahorro</label>
+                            <input type="number" id="initial-cash" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="91000">
                         </div>
                     </div>
                 </div>
 
                 <!-- Plan de Aportaciones -->
-                 <div class="mb-6 p-4 bg-gray-900/50 rounded-lg">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Plan de Aportaciones (DCA)</h3>
+                 <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Plan de Aportaciones (DCA)</h3>
                      <div class="space-y-3">
                         <div class="flex gap-2">
                              <div class="w-1/2">
-                                <label for="future-savings" class="block text-sm font-medium text-gray-300">Ahorro extra total (€)</label>
-                                <input type="number" id="future-savings" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="40000">
+                                <label for="future-savings" class="block text-sm font-medium text-gray-700">Ahorro extra total (€)</label>
+                                <input type="number" id="future-savings" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="20000">
                             </div>
                             <div class="w-1/2">
-                                <label for="future-savings-years" class="block text-sm font-medium text-gray-300">Duración (años)</label>
-                                <input type="number" id="future-savings-years" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="5" min="1">
+                                <label for="future-savings-years" class="block text-sm font-medium text-gray-700">Duración (años)</label>
+                                <input type="number" id="future-savings-years" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="5" min="1">
                             </div>
                         </div>
-                        <p class="text-sm text-center text-gray-400">Aportación mensual a RV: <strong id="monthly-dca-display" class="text-white"></strong></p>
+                        <p class="text-sm text-center text-gray-600">Aportación mensual a RV: <strong id="monthly-dca-display"></strong></p>
                     </div>
                 </div>
                 
                  <!-- Ingresos Extraordinarios -->
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Ingresos Extraordinarios</h3>
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Ingresos Extraordinarios</h3>
                     <div id="extra-income-container" class="space-y-4"></div>
-                    <button id="add-extra-income-btn" class="mt-3 w-full bg-gray-700 text-gray-200 py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300 flex items-center justify-center gap-2">
+                    <button id="add-extra-income-btn" class="mt-3 w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300 flex items-center justify-center gap-2">
                         <i class="fas fa-plus-circle"></i> Añadir Ingreso Extra
-                    </button>
-                </div>
-
-                 <!-- Rebalanceos Extraordinarios -->
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Rebalanceos Extraordinarios</h3>
-                    <div id="extra-rebalance-container" class="space-y-4"></div>
-                    <button id="add-extra-rebalance-btn" class="mt-3 w-full bg-gray-700 text-gray-200 py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300 flex items-center justify-center gap-2">
-                        <i class="fas fa-exchange-alt"></i> Añadir Rebalanceo Extra
                     </button>
                 </div>
 
                 <!-- DCA Oportunista -->
                 <div class="mb-6">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-100 flex items-center gap-2">DCA Oportunista 
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800 flex items-center gap-2">DCA Oportunista 
                         <div class="tooltip">
                             <i class="fas fa-info-circle text-gray-400"></i>
                             <span class="tooltiptext">Ajusta tu aportación a RV basado en la caída/subida del S&P 500.</span>
@@ -153,47 +139,47 @@
                     </h3>
                     <div class="space-y-3">
                         <div>
-                            <label for="dca-drop" class="block text-sm font-medium text-gray-300">Invertir 2x si S&P 500 cae un (%)</label>
-                            <input type="number" id="dca-drop" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="20">
+                            <label for="dca-drop" class="block text-sm font-medium text-gray-700">Invertir 2x si S&P 500 cae un (%)</label>
+                            <input type="number" id="dca-drop" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="20">
                         </div>
                         <div>
-                            <label for="dca-rise" class="block text-sm font-medium text-gray-300">Invertir 0.5x si S&P 500 sube un (%)</label>
-                            <input type="number" id="dca-rise" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="15">
+                            <label for="dca-rise" class="block text-sm font-medium text-gray-700">Invertir 0.5x si S&P 500 sube un (%)</label>
+                            <input type="number" id="dca-rise" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="15">
                         </div>
-                         <p class="text-sm text-center text-gray-400">El dinero no invertido en subidas se guarda para las caídas.</p>
+                         <p class="text-sm text-center text-gray-600">El dinero no invertido en subidas se guarda para las caídas.</p>
                     </div>
                 </div>
 
                 <!-- Rebalanceo Automático -->
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Rebalanceo Automático (RV/RF)</h3>
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Rebalanceo Automático (RV/RF)</h3>
                     <div class="flex items-center mb-3">
-                        <input type="checkbox" id="rebalance-enabled" class="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-600 focus:ring-indigo-500">
-                        <label for="rebalance-enabled" class="ml-2 block text-sm font-medium text-gray-100">Activar Rebalanceo Anual</label>
+                        <input type="checkbox" id="rebalance-enabled" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <label for="rebalance-enabled" class="ml-2 block text-sm font-medium text-gray-900">Activar Rebalanceo Anual</label>
                     </div>
                     <div id="rebalance-options" class="collapsible-options space-y-3">
                         <div>
-                            <label for="rebalance-target" class="block text-sm font-medium text-gray-300">Objetivo RV (%)</label>
-                            <input type="number" id="rebalance-target" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="60">
+                            <label for="rebalance-target" class="block text-sm font-medium text-gray-700">Objetivo RV (%)</label>
+                            <input type="number" id="rebalance-target" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="60">
                         </div>
                         <div>
-                            <label for="rebalance-band" class="block text-sm font-medium text-gray-300">Banda de Tolerancia (+/- %)</label>
-                            <input type="number" id="rebalance-band" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="5">
+                            <label for="rebalance-band" class="block text-sm font-medium text-gray-700">Banda de Tolerancia (+/- %)</label>
+                            <input type="number" id="rebalance-band" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="5">
                         </div>
                     </div>
                 </div>
                 
                 <!-- Inversión Automática de Liquidez -->
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Inversión Automática de Liquidez</h3>
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Inversión Automática de Liquidez</h3>
                     <div class="flex items-center mb-3">
-                        <input type="checkbox" id="liquidity-sweep-enabled" class="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-600 focus:ring-indigo-500">
-                        <label for="liquidity-sweep-enabled" class="ml-2 block text-sm font-medium text-gray-100">Activar Inversión del Exceso</label>
+                        <input type="checkbox" id="liquidity-sweep-enabled" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <label for="liquidity-sweep-enabled" class="ml-2 block text-sm font-medium text-gray-900">Activar Inversión del Exceso</label>
                     </div>
                     <div id="liquidity-sweep-options" class="collapsible-options space-y-3">
                         <div>
-                            <label for="liquidity-floor" class="block text-sm font-medium text-gray-300">Suelo de Liquidez (€)</label>
-                            <input type="number" id="liquidity-floor" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="15000">
+                            <label for="liquidity-floor" class="block text-sm font-medium text-gray-700">Suelo de Liquidez (€)</label>
+                            <input type="number" id="liquidity-floor" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="10000">
                         </div>
                     </div>
                 </div>
@@ -201,48 +187,49 @@
 
                 <!-- Rentabilidades -->
                 <div class="mb-6">
-                     <h3 class="text-lg font-semibold mb-3 text-gray-100">Rentabilidades Anuales Promedio</h3>
+                     <h3 class="text-lg font-semibold mb-3 text-gray-800">Rentabilidades Anuales Promedio</h3>
                      <div class="space-y-3">
                          <div>
-                            <label for="rf-return" class="block text-sm font-medium text-gray-300">Renta Fija (%)</label>
-                            <input type="number" id="rf-return" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="2.5">
+                            <label for="rf-return" class="block text-sm font-medium text-gray-700">Renta Fija (%)</label>
+                            <input type="number" id="rf-return" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="2.5">
                         </div>
                         <div>
-                            <label for="cash-return" class="block text-sm font-medium text-gray-300">Cuenta Ahorro (%)</label>
-                            <input type="number" id="cash-return" class="mt-1 block w-full p-2 border border-gray-600 rounded-md shadow-sm bg-gray-700 text-white" value="0.70">
+                            <label for="cash-return" class="block text-sm font-medium text-gray-700">Cuenta Ahorro (%)</label>
+                            <input type="number" id="cash-return" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" value="0.70">
                         </div>
-                         <p class="text-sm text-gray-400">Nota: La rentabilidad de la RV se basa en el escenario del S&P 500 seleccionado.</p>
+                         <p class="text-sm text-gray-500">Nota: La rentabilidad de la RV se basa en el escenario del S&P 500 seleccionado.</p>
                      </div>
                 </div>
             </div>
 
             <!-- Columna de Resultados y Gráfico -->
-            <div class="lg:w-2/3 bg-gray-800 p-6 rounded-2xl shadow-lg">
+            <div class="lg:w-2/3 bg-white p-6 rounded-2xl shadow-lg">
                 <div class="mb-6">
-                    <h2 class="text-2xl font-bold mb-4 text-white">Escenario del Mercado (S&P 500)</h2>
-                    <p class="text-sm text-gray-400 mb-4">Selecciona un escenario predefinido o introduce tus propias rentabilidades anuales para los próximos 30 años.</p>
+                    <h2 class="text-2xl font-bold mb-4">Escenario del Mercado (S&P 500)</h2>
+                    <p class="text-sm text-gray-600 mb-4">Selecciona un escenario predefinido o introduce tus propias rentabilidades anuales para los próximos 30 años.</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <button id="scenario-calma" class="flex-1 bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition">La Gran Calma</button>
-                        <button id="scenario-despertar" class="flex-1 bg-purple-600 text-white py-2 px-3 rounded-lg hover:bg-purple-700 transition">El Despertar (???)%</button>
+                        <button id="scenario-pessimistic" class="flex-1 bg-red-500 text-white py-2 px-3 rounded-lg hover:bg-red-600 transition">Pesimista</button>
+                        <button id="scenario-neutral" class="flex-1 bg-yellow-500 text-white py-2 px-3 rounded-lg hover:bg-yellow-600 transition">Neutral</button>
+                        <button id="scenario-optimistic" class="flex-1 bg-green-500 text-white py-2 px-3 rounded-lg hover:bg-green-600 transition">Optimista</button>
                     </div>
                     <div id="sp500-inputs" class="grid grid-cols-5 md:grid-cols-10 gap-2">
                         <!-- Inputs generados por JS -->
                     </div>
                 </div>
 
-                <div class="border-t border-gray-700 pt-6">
-                    <h2 class="text-2xl font-bold mb-4 text-white">Resultados de la Simulación</h2>
+                <div class="border-t pt-6">
+                    <h2 class="text-2xl font-bold mb-4">Resultados de la Simulación</h2>
                     <canvas id="simulation-chart"></canvas>
                     <div id="results-summary" class="mt-6 text-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                         <!-- Resumen generado por JS -->
                     </div>
                 </div>
                 
-                <div class="border-t border-gray-700 pt-6 mt-8">
-                    <h2 class="text-2xl font-bold mb-4 text-white">Registro de Movimientos Anuales</h2>
+                <div class="border-t pt-6 mt-8">
+                    <h2 class="text-2xl font-bold mb-4">Registro de Movimientos Anuales</h2>
                     <div id="log-table-container" class="w-full">
-                        <table class="w-full text-sm text-left text-gray-400">
-                            <thead class="text-xs text-gray-300 uppercase bg-gray-700">
+                        <table class="w-full text-sm text-left text-gray-500">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
                                     <th scope="col" class="px-4 py-3">Año</th>
                                     <th scope="col" class="px-4 py-3">Patrimonio Inicial</th>
@@ -286,8 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
         liquidityFloor: document.getElementById('liquidity-floor'),
         extraIncomeContainer: document.getElementById('extra-income-container'),
         addExtraIncomeBtn: document.getElementById('add-extra-income-btn'),
-        extraRebalanceContainer: document.getElementById('extra-rebalance-container'),
-        addExtraRebalanceBtn: document.getElementById('add-extra-rebalance-btn'),
         sp500InputsContainer: document.getElementById('sp500-inputs'),
         chartCanvas: document.getElementById('simulation-chart'),
         resultsSummary: document.getElementById('results-summary'),
@@ -295,18 +280,14 @@ document.addEventListener('DOMContentLoaded', () => {
         importBtn: document.getElementById('import-btn'),
         exportBtn: document.getElementById('export-btn'),
         importFile: document.getElementById('import-file'),
-        scenarioCalma: document.getElementById('scenario-calma'),
-        scenarioDespertar: document.getElementById('scenario-despertar'),
+        scenarioPessimistic: document.getElementById('scenario-pessimistic'),
+        scenarioNeutral: document.getElementById('scenario-neutral'),
+        scenarioOptimistic: document.getElementById('scenario-optimistic'),
     };
 
     let chartInstance = null;
     const YEARS = 30;
 
-    const scenarios = {
-        calma: [12.5, 8.2, 15.1, -5.4, 11.8, 9.3, 22.4, -10.1, 7.5, 14.6, 6.2, 18.9, 11.2, -3.7, 9.8, 13.5, 20.1, 7.8, 10.4, -8.2, 12.1, 15.6, 8.5, 6.7, 11.9, -4.1, 14.2, 9.5, 16.3, 7.1],
-        despertar: [8.5, 10.2, -40.0, -15.0, 25.0, 18.0, 12.5, -9.1, 6.4, 11.3, 8.2, -15.7, 14.9, 22.1, 7.6, 10.8, -5.2, 9.3, 11.7, -12.4, 18.2, 9.1, 7.5, 8.8, -6.3, 13.4, 10.2, 9.9, 12.1, 8.7]
-    };
-    
     // --- Lógica de la Simulación ---
     function runSimulation(config) {
         let rv = config.initialRv;
@@ -321,7 +302,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let yearlyDcaApplied = 0;
             let amountRebalanced = 0;
-            let amountExtraRebalanced = 0;
             let amountSwept = 0;
 
             // Recibir ingresos extraordinarios
@@ -368,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     opportunityFund += (totalMonthlyDca * 12 * 0.5);
                 }
             }
-            
+
             // 2. Crecimiento de las inversiones
             const currentYearSp500Return = config.sp500Scenario[year - 1] / 100;
             rv *= (1 + currentYearSp500Return); 
@@ -376,25 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cash *= (1 + config.cashReturn / 100);
             opportunityFund *= (1 + config.cashReturn / 100);
 
-            // Rebalanceos Extraordinarios (DESPUÉS del crecimiento)
-            config.extraordinaryRebalances.forEach(reb => {
-                if(reb.year === year) {
-                    if (reb.direction === 'rf-to-rv') {
-                        const amountToMove = Math.min(rf, reb.amount);
-                        rf -= amountToMove;
-                        rv += amountToMove;
-                        amountExtraRebalanced += amountToMove;
-                    } else { // rv-to-rf
-                        const amountToMove = Math.min(rv, reb.amount);
-                        rv -= amountToMove;
-                        rf += amountToMove;
-                        amountExtraRebalanced -= amountToMove; 
-                    }
-                }
-            });
-
-
-            // 3. Rebalanceo Automático (si está activado)
+            // 3. Rebalanceo (si está activado)
             if (config.rebalanceEnabled) {
                 const investedTotal = rv + rf;
                 if (investedTotal > 0) {
@@ -441,7 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 liquidity: cash + opportunityFund,
                 dcaContribution: yearlyDcaApplied,
                 rebalancedAmount: amountRebalanced,
-                extraRebalancedAmount: amountExtraRebalanced,
                 sweptAmount: amountSwept,
                 growth: growth
             });
@@ -449,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const totalExtraIncomes = config.extraordinaryIncomes.reduce((sum, income) => sum + income.amount, 0);
         const totalInvested = config.initialRv + config.initialRf + config.initialCash + config.futureSavings + totalExtraIncomes;
-        
+
         return { history, totalInvested };
     }
 
@@ -480,17 +441,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if(config.extraordinaryIncomes) {
             config.extraordinaryIncomes.forEach(income => addExtraordinaryIncomeRow(income));
         }
-        
-        elements.extraRebalanceContainer.innerHTML = '';
-        if(config.extraordinaryRebalances) {
-            config.extraordinaryRebalances.forEach(reb => addExtraordinaryRebalanceRow(reb));
-        }
 
         elements.sp500InputsContainer.innerHTML = '';
         config.sp500Scenario.forEach((value, index) => {
             const input = document.createElement('input');
             input.type = 'number';
-            input.className = 'w-full p-1 border border-gray-600 rounded-md text-center bg-gray-700 text-white';
+            input.className = 'w-full p-1 border border-gray-300 rounded-md text-center';
             input.value = value;
             input.dataset.year = index;
             elements.sp500InputsContainer.appendChild(input);
@@ -501,24 +457,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const rowId = `income-${Date.now()}`;
         const row = document.createElement('div');
         row.id = rowId;
-        row.className = 'p-3 border border-gray-700 rounded-lg bg-gray-800 space-y-2';
+        row.className = 'p-3 border rounded-lg bg-white space-y-2';
         row.innerHTML = `
             <div class="flex justify-between items-center">
-                <p class="text-sm font-semibold text-gray-100">Ingreso Extra</p>
+                <p class="text-sm font-semibold">Ingreso Extra</p>
                 <button data-row-id="${rowId}" class="text-red-500 hover:text-red-700 delete-income-btn">&times;</button>
             </div>
             <div>
-                <label class="text-xs text-gray-300">Cantidad (€)</label>
-                <input type="number" class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="amount" value="${income.amount}">
+                <label class="text-xs">Cantidad (€)</label>
+                <input type="number" class="w-full p-1 border rounded" data-field="amount" value="${income.amount}">
             </div>
             <div class="flex gap-2">
                 <div class="w-1/2">
-                    <label class="text-xs text-gray-300">Año Recepción</label>
-                    <input type="number" class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="receptionYear" value="${income.receptionYear}" min="1" max="30">
+                    <label class="text-xs">Año Recepción</label>
+                    <input type="number" class="w-full p-1 border rounded" data-field="receptionYear" value="${income.receptionYear}" min="1" max="30">
                 </div>
                 <div class="w-1/2">
-                    <label class="text-xs text-gray-300">Invertir en</label>
-                    <select class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="dcaPeriod">
+                    <label class="text-xs">Invertir en</label>
+                    <select class="w-full p-1 border rounded" data-field="dcaPeriod">
                         <option value="1" ${income.dcaPeriod == 1 ? 'selected' : ''}>1 año</option>
                         <option value="1.5" ${income.dcaPeriod == 1.5 ? 'selected' : ''}>1.5 años</option>
                         <option value="2" ${income.dcaPeriod == 2 ? 'selected' : ''}>2 años</option>
@@ -527,37 +483,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         elements.extraIncomeContainer.appendChild(row);
-    }
-    
-    function addExtraordinaryRebalanceRow(rebalance = { amount: 10000, year: 5, direction: 'rf-to-rv' }) {
-        const rowId = `rebalance-${Date.now()}`;
-        const row = document.createElement('div');
-        row.id = rowId;
-        row.className = 'p-3 border border-gray-700 rounded-lg bg-gray-800 space-y-2';
-        row.innerHTML = `
-             <div class="flex justify-between items-center">
-                <p class="text-sm font-semibold text-gray-100">Rebalanceo Extra</p>
-                <button data-row-id="${rowId}" class="text-red-500 hover:text-red-700 delete-rebalance-btn">&times;</button>
-            </div>
-            <div>
-                <label class="text-xs text-gray-300">Cantidad (€)</label>
-                <input type="number" class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="amount" value="${rebalance.amount}">
-            </div>
-            <div class="flex gap-2">
-                <div class="w-1/2">
-                    <label class="text-xs text-gray-300">Año</label>
-                    <input type="number" class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="year" value="${rebalance.year}" min="1" max="30">
-                </div>
-                <div class="w-1/2">
-                    <label class="text-xs text-gray-300">Dirección</label>
-                    <select class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="direction">
-                        <option value="rf-to-rv" ${rebalance.direction === 'rf-to-rv' ? 'selected' : ''}>RF &rarr; RV</option>
-                        <option value="rv-to-rf" ${rebalance.direction === 'rv-to-rf' ? 'selected' : ''}>RV &rarr; RF</option>
-                    </select>
-                </div>
-            </div>
-        `;
-        elements.extraRebalanceContainer.appendChild(row);
     }
 
 
@@ -576,8 +501,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     label: 'Patrimonio Total',
                     data: history.map(h => h.total),
-                    borderColor: 'rgba(129, 140, 248, 1)', // indigo-400
-                    backgroundColor: 'rgba(129, 140, 248, 0.1)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
                     fill: true,
                     tension: 0.1,
                     borderWidth: 3
@@ -585,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     label: 'Renta Variable (RV)',
                     data: history.map(h => h.rv),
-                    borderColor: 'rgba(52, 211, 153, 1)', // emerald-400
+                    borderColor: 'rgba(5, 150, 105, 1)',
                     fill: false,
                     tension: 0.1,
                     borderWidth: 1.5,
@@ -593,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     label: 'Renta Fija (RF)',
                     data: history.map(h => h.rf),
-                    borderColor: 'rgba(251, 191, 36, 1)', // amber-400
+                    borderColor: 'rgba(217, 119, 6, 1)',
                     fill: false,
                     tension: 0.1,
                     borderWidth: 1.5,
@@ -601,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  {
                     label: 'Liquidez',
                     data: history.map(h => h.liquidity),
-                    borderColor: 'rgba(156, 163, 175, 1)', // gray-400
+                    borderColor: 'rgba(107, 114, 128, 1)',
                     fill: false,
                     tension: 0.1,
                     borderDash: [5, 5],
@@ -612,16 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
             options: {
                 responsive: true,
                 plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgb(209, 213, 219)' // text-gray-300
-                        }
-                    },
                     tooltip: {
-                        backgroundColor: '#1F2937', // gray-800
-                        titleColor: '#E5E7EB', // gray-200
-                        bodyColor: '#D1D5DB', // gray-300
-                        footerColor: '#9CA3AF', // gray-400
                         callbacks: {
                             title: (tooltipItems) => tooltipItems[0].label,
                             label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
@@ -635,19 +551,15 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (yearData.dcaContribution > 0) {
                                     lines.push(`Aportación DCA: ${formatCurrency(yearData.dcaContribution)}`);
                                 }
-                                
-                                if (Math.abs(yearData.extraRebalancedAmount) > 0.01) {
-                                    const direction = yearData.extraRebalancedAmount > 0 ? '(RF \u2192 RV)' : '(RV \u2192 RF)';
-                                    lines.push(`Reb. Extra: ${formatCurrency(Math.abs(yearData.extraRebalancedAmount))} ${direction}`);
-                                }
 
                                 if (Math.abs(yearData.rebalancedAmount) > 0.01) {
-                                    const direction = yearData.rebalancedAmount > 0 ? '(RV \u2192 RF)' : '(RF \u2192 RV)';
-                                    lines.push(`Reb. Auto: ${formatCurrency(Math.abs(yearData.rebalancedAmount))} ${direction}`);
+                                    const direction = yearData.rebalancedAmount > 0 ? 'hacia RF' : 'hacia RV';
+                                    const rebalanceText = `Rebalanceo: ${formatCurrency(Math.abs(yearData.rebalancedAmount))} ${direction}`;
+                                    lines.push(rebalanceText);
                                 }
                                 
                                 if (yearData.sweptAmount > 0) {
-                                    lines.push(`Inv. Liquidez: ${formatCurrency(yearData.sweptAmount)} hacia RF`);
+                                    lines.push(`Inversión Liquidez: ${formatCurrency(yearData.sweptAmount)} hacia RF`);
                                 }
                                 
                                 return lines;
@@ -658,14 +570,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 scales: {
                     y: {
                         ticks: {
-                            callback: (value) => formatCurrency(value),
-                            color: 'rgb(156, 163, 175)' // text-gray-400
-                        },
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                    },
-                    x: {
-                        ticks: { color: 'rgb(156, 163, 175)' }, // text-gray-400
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            callback: (value) => formatCurrency(value)
+                        }
                     }
                 }
             }
@@ -674,26 +580,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const returnPercentage = totalInvested > 0 ? ((finalPortfolio.total - totalInvested) / totalInvested) * 100 : 0;
         
         elements.resultsSummary.innerHTML = `
-            <div class="tooltip bg-indigo-500/10 p-4 rounded-lg">
-                <p class="text-sm text-indigo-300 font-semibold">Patrimonio Total</p>
-                <p class="text-2xl font-bold text-white">${formatCurrency(finalPortfolio.total)}</p>
+            <div class="tooltip bg-indigo-50 p-4 rounded-lg">
+                <p class="text-sm text-indigo-800 font-semibold">Patrimonio Total</p>
+                <p class="text-2xl font-bold text-indigo-900">${formatCurrency(finalPortfolio.total)}</p>
                 <span class="tooltiptext">Retorno Total: ${returnPercentage.toFixed(2)}%</span>
             </div>
-            <div class="bg-gray-700 p-4 rounded-lg">
-                <p class="text-sm text-gray-300 font-semibold">Total Aportado</p>
-                <p class="text-2xl font-bold text-white">${formatCurrency(totalInvested)}</p>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-800 font-semibold">Total Aportado</p>
+                <p class="text-2xl font-bold text-gray-900">${formatCurrency(totalInvested)}</p>
             </div>
-            <div class="bg-emerald-500/10 p-4 rounded-lg">
-                <p class="text-sm text-emerald-300 font-semibold">Valor Final RV</p>
-                <p class="text-2xl font-bold text-white">${formatCurrency(finalPortfolio.rv)}</p>
+            <div class="bg-emerald-50 p-4 rounded-lg">
+                <p class="text-sm text-emerald-800 font-semibold">Valor Final RV</p>
+                <p class="text-2xl font-bold text-emerald-900">${formatCurrency(finalPortfolio.rv)}</p>
             </div>
-            <div class="bg-amber-500/10 p-4 rounded-lg">
-                <p class="text-sm text-amber-300 font-semibold">Valor Final RF</p>
-                <p class="text-2xl font-bold text-white">${formatCurrency(finalPortfolio.rf)}</p>
+            <div class="bg-amber-50 p-4 rounded-lg">
+                <p class="text-sm text-amber-800 font-semibold">Valor Final RF</p>
+                <p class="text-2xl font-bold text-amber-900">${formatCurrency(finalPortfolio.rf)}</p>
             </div>
-             <div class="bg-gray-600 p-4 rounded-lg">
-                <p class="text-sm text-gray-300 font-semibold">Valor Final Liquidez</p>
-                <p class="text-2xl font-bold text-white">${formatCurrency(finalPortfolio.liquidity)}</p>
+             <div class="bg-gray-200 p-4 rounded-lg">
+                <p class="text-sm text-gray-800 font-semibold">Valor Final Liquidez</p>
+                <p class="text-2xl font-bold text-gray-900">${formatCurrency(finalPortfolio.liquidity)}</p>
             </div>
         `;
     }
@@ -702,32 +608,28 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.logTableBody.innerHTML = '';
         history.forEach(log => {
             const row = document.createElement('tr');
-            row.className = 'border-b border-gray-700 hover:bg-gray-700/50';
+            row.className = 'bg-white border-b hover:bg-gray-50';
 
             let movementsHtml = '';
             if (log.dcaContribution > 0) {
                 movementsHtml += `<div class="text-xs"><strong>DCA:</strong> ${formatCurrency(log.dcaContribution)} (Liq. &rarr; RV)</div>`;
             }
-            if (Math.abs(log.extraRebalancedAmount) > 0.01) {
-                const direction = log.extraRebalancedAmount > 0 ? '(RF &rarr; RV)' : '(RV &rarr; RF)';
-                movementsHtml += `<div class="text-xs"><strong>Reb. Extra:</strong> ${formatCurrency(Math.abs(log.extraRebalancedAmount))} ${direction}</div>`;
-            }
             if (Math.abs(log.rebalancedAmount) > 0.01) {
                 const direction = log.rebalancedAmount > 0 ? '(RV &rarr; RF)' : '(RF &rarr; RV)';
-                movementsHtml += `<div class="text-xs"><strong>Reb. Auto:</strong> ${formatCurrency(Math.abs(log.rebalancedAmount))} ${direction}</div>`;
+                movementsHtml += `<div class="text-xs"><strong>Rebalanceo:</strong> ${formatCurrency(Math.abs(log.rebalancedAmount))} ${direction}</div>`;
             }
             if (log.sweptAmount > 0) {
                 movementsHtml += `<div class="text-xs"><strong>Inv. Liq.:</strong> ${formatCurrency(log.sweptAmount)} (Liq. &rarr; RF)</div>`;
             }
 
-            const growthClass = log.growth >= 0 ? 'text-green-400' : 'text-red-400';
+            const growthClass = log.growth >= 0 ? 'text-green-600' : 'text-red-600';
 
             row.innerHTML = `
-                <td class="px-4 py-2 font-medium text-white">${log.year}</td>
+                <td class="px-4 py-2 font-medium text-gray-900">${log.year}</td>
                 <td class="px-4 py-2">${formatCurrency(log.initialTotal)}</td>
                 <td class="px-4 py-2">${movementsHtml || '---'}</td>
                 <td class="px-4 py-2 font-semibold ${growthClass}">${formatCurrency(log.growth)}</td>
-                <td class="px-4 py-2 font-bold text-white">${formatCurrency(log.total)}</td>
+                <td class="px-4 py-2 font-bold text-gray-900">${formatCurrency(log.total)}</td>
             `;
             elements.logTableBody.appendChild(row);
         });
@@ -744,12 +646,6 @@ document.addEventListener('DOMContentLoaded', () => {
             amount: parseFloat(row.querySelector('[data-field="amount"]').value) || 0,
             receptionYear: parseInt(row.querySelector('[data-field="receptionYear"]').value) || 1,
             dcaPeriod: parseFloat(row.querySelector('[data-field="dcaPeriod"]').value) || 1,
-        }));
-        
-        const extraordinaryRebalances = Array.from(elements.extraRebalanceContainer.children).map(row => ({
-            amount: parseFloat(row.querySelector('[data-field="amount"]').value) || 0,
-            year: parseInt(row.querySelector('[data-field="year"]').value) || 1,
-            direction: row.querySelector('[data-field="direction"]').value,
         }));
 
         return {
@@ -768,7 +664,6 @@ document.addEventListener('DOMContentLoaded', () => {
             liquiditySweepEnabled: elements.liquiditySweepEnabled.checked,
             liquidityFloor: parseFloat(elements.liquidityFloor.value) || 0,
             extraordinaryIncomes: extraordinaryIncomes,
-            extraordinaryRebalances: extraordinaryRebalances,
             sp500Scenario: sp500Scenario
         };
     }
@@ -783,20 +678,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function getDefaultConfig() {
-        const baseConfig = {
-            initialRv: 60000, initialRf: 100000, initialCash: 15000,
-            futureSavings: 40000, futureSavingsYears: 5,
+        return {
+            initialRv: 53000, initialRf: 31000, initialCash: 91000,
+            futureSavings: 20000, futureSavingsYears: 5,
             dcaDrop: 20, dcaRise: 15,
             rfReturn: 2.5, cashReturn: 0.70,
-            rebalanceEnabled: true, rebalanceTarget: 60, rebalanceBand: 5,
-            liquiditySweepEnabled: true, liquidityFloor: 15000,
+            rebalanceEnabled: false, rebalanceTarget: 60, rebalanceBand: 5,
+            liquiditySweepEnabled: false, liquidityFloor: 10000,
             extraordinaryIncomes: [],
-            extraordinaryRebalances: [],
-            sp500Scenario: scenarios.calma,
+            sp500Scenario: generateScenario('neutral')
         };
-        return baseConfig;
     }
 
+    function generateScenario(type) {
+        const scenario = [];
+        for (let i = 0; i < YEARS; i++) {
+            let value;
+            switch (type) {
+                case 'pessimistic': // Avg ~3-4%, with significant volatility and a big crash
+                    value = (Math.random() - 0.5) * 40 + 3; 
+                    if (i === 1 || i === 2) value = (Math.random() * -20) -10; // Crash years
+                    if (i > 2 && i < 6) value = Math.random() * 15; // Slow recovery
+                    break;
+                case 'optimistic':  // Avg ~12-14%, strong bull run
+                    value = (Math.random() - 0.4) * 25 + 12; 
+                     if (i % 7 === 0 && i > 0) value = (Math.random() * -5) -2; // Minor correction
+                    break;
+                default: 'neutral' // Avg ~8-10%, historical average with volatility
+                    value = (Math.random() - 0.45) * 35 + 9;
+                    if (i === 2) value = -18; // A correction year
+                    break;
+            }
+            scenario.push(parseFloat(value.toFixed(2)));
+        }
+        return scenario;
+    }
+    
     function updateMonthlyDcaDisplay(config) {
         const years = config.futureSavingsYears > 0 ? config.futureSavingsYears : 1;
         const monthlyDca = (config.futureSavings / years) / 12;
@@ -842,29 +759,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    elements.extraRebalanceContainer.addEventListener('input', (event) => {
-         if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT') liveUpdate();
-    });
-
-    elements.addExtraRebalanceBtn.addEventListener('click', () => {
-        addExtraordinaryRebalanceRow();
-        liveUpdate();
-    });
-
-    elements.extraRebalanceContainer.addEventListener('click', (event) => {
-        if (event.target.classList.contains('delete-rebalance-btn')) {
-            const rowId = event.target.dataset.rowId;
-            document.getElementById(rowId).remove();
-            liveUpdate();
-        }
-    });
-
     elements.exportBtn.addEventListener('click', () => {
         const config = getConfigFromUI();
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config, null, 2));
         const a = document.createElement('a');
         a.href = dataStr;
-        a.download = "mi_estrategia.json";
+        a.download = "simulacion_config.json";
         a.click();
     });
 
@@ -894,25 +794,14 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.importFile.value = '';
     });
     
-    elements.scenarioCalma.addEventListener('click', () => {
-        const config = getConfigFromUI();
-        config.sp500Scenario = scenarios.calma;
-        config.extraordinaryIncomes = []; 
-        config.extraordinaryRebalances = [];
-        updateUI(config);
-        liveUpdate();
-    });
-    
-    elements.scenarioDespertar.addEventListener('click', () => {
-        const config = getConfigFromUI();
-        config.sp500Scenario = scenarios.despertar;
-        config.extraordinaryIncomes = [];
-        config.extraordinaryRebalances = [
-            { amount: 40000, year: 3, direction: 'rf-to-rv' },
-            { amount: 40000, year: 4, direction: 'rf-to-rv' }
-        ];
-        updateUI(config);
-        liveUpdate();
+    [elements.scenarioPessimistic, elements.scenarioNeutral, elements.scenarioOptimistic].forEach(btn => {
+        btn.addEventListener('click', () => {
+            const scenarioType = btn.id.split('-')[1];
+            const config = getConfigFromUI();
+            config.sp500Scenario = generateScenario(scenarioType);
+            updateUI(config);
+            liveUpdate();
+        });
     });
     
     function setupCollapsible(checkbox, optionsDiv) {
@@ -936,5 +825,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
 
