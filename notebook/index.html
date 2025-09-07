@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const FALLBACK_API_KEY = 'XXXXXXXXXXXXXXXXXX';
+    const FALLBACK_API_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
     // --- UTILITY FUNCTIONS ---
     function getApiKey() {
@@ -508,7 +508,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function editLogEntry(id) {
         const entry = state.log.find(e => e.id === id);
         if (!entry) return;
-        alert("La edición de movimientos no está disponible en esta versión para mantener la integridad de los cálculos. Por favor, borra el movimiento y créalo de nuevo si es necesario.");
+        
+        const newComments = prompt("Editar Comentarios:", entry.comments || '');
+
+        if (newComments !== null) {
+            entry.comments = newComments;
+            updateApp();
+        }
     }
 
     function togglePortfolioEdit(isEditing) {
