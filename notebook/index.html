@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuaderno de Bitácora del Inversor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .status-pill {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .status-bull { background-color: #10B981; color: #F9FAFB; } /* green-500 */
+        .status-bear { background-color: #EF4444; color: #F9FAFB; } /* red-500 */
+        .status-neutral { background-color: #6B7280; color: #F9FAFB; } /* gray-500 */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        textarea {
+            resize: vertical;
+        }
+        .portfolio-input:read-only {
+            background-color: transparent;
+            cursor: default;
+        }
+         .portfolio-input:not(:read-only) {
+            background-color: #4B5563; /* gray-600 */
+            outline: 2px solid #6366F1; /* indigo-500 */
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-white">Cuaderno de Bitácora del Inversor</h1>
+            <p class="text-gray-400 mt-2">Tu registro de contabilidad con indicador de mercado en tiempo real.</p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+
+            <!-- Columna Izquierda: Resumen y Consejero -->
+            <div class="lg:w-2/5 bg-gray-800 p-6 rounded-2xl shadow-lg flex flex-col gap-6">
+                <!-- Resumen de Cartera -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold text-white">Resumen de Cartera</h2>
+                        <button id="edit-portfolio-btn" title="Editar Valores Actuales" class="text-gray-400 hover:text-white transition"><i class="fas fa-pencil-alt"></i></button>
+                    </div>
+                    <div id="portfolio-summary" class="space-y-4">
+                        <!-- Renta Variable Section -->
+                        <div class="bg-gray-700 p-3 rounded-lg">
+                            <h3 class="font-bold mb-2"><i class="fas fa-chart-line text-green-400 mr-2"></i>Renta Variable</h3>
+                            <div class="space-y-1 text-sm pl-6">
+                                <div class="flex justify-between items-center">
+                                    <label for="portfolio-rv-current" class="text-gray-400">Valor Actual:</label>
+                                    <div class="flex items-center">
+                                        <input type="number" id="portfolio-rv-current" class="portfolio-input font-semibold text-base bg-transparent text-right w-28 outline-none text-white" placeholder="0" readonly>
+                                        <span class="ml-1 text-gray-400">€</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Total Aportado:</span>
+                                    <span id="portfolio-rv-contributed" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between items-center pt-1 mt-1 border-t border-gray-600">
+                                    <span class="text-gray-400">Ganancia/Pérdida:</span>
+                                    <span id="portfolio-rv-gain" class="font-bold text-base"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Renta Fija Section -->
+                        <div class="bg-gray-700 p-3 rounded-lg">
+                            <h3 class="font-bold mb-2"><i class="fas fa-shield-alt text-blue-400 mr-2"></i>Renta Fija</h3>
+                            <div class="space-y-1 text-sm pl-6">
+                               <div class="flex justify-between items-center">
+                                    <label for="portfolio-rf-current" class="text-gray-400">Valor Actual:</label>
+                                    <div class="flex items-center">
+                                        <input type="number" id="portfolio-rf-current" class="portfolio-input font-semibold text-base bg-transparent text-right w-28 outline-none text-white" placeholder="0" readonly>
+                                        <span class="ml-1 text-gray-400">€</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Total Aportado:</span>
+                                    <span id="portfolio-rf-contributed" class="font-semibold"></span>
+                                </div>
+                                <div class="flex justify-between items-center pt-1 mt-1 border-t border-gray-600">
+                                    <span class="text-gray-400">Ganancia/Pérdida:</span>
+                                    <span id="portfolio-rf-gain" class="font-bold text-base"></span>
+                                </div>
+                            </div>
+                        </div>
+                         <!-- Liquidez Section -->
+                        <div class="flex justify-between items-center bg-gray-700 p-3 rounded-lg">
+                            <label for="portfolio-cash" class="font-semibold"><i class="fas fa-coins text-yellow-400 mr-2"></i>Liquidez</label>
+                            <div class="flex items-center">
+                                <input type="number" id="portfolio-cash" class="portfolio-input font-bold text-lg text-right w-36 outline-none text-white" placeholder="0" readonly>
+                                <span class="ml-1 text-gray-400">€</span>
+                            </div>
+                        </div>
+                        <!-- Total Section -->
+                         <div class="flex justify-between items-center bg-gray-900 p-3 rounded-lg border-t-2 border-indigo-500">
+                            <span class="font-bold text-xl">Total Cartera</span>
+                            <span id="portfolio-total" class="font-extrabold text-2xl text-white"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Estado del Mercado -->
+                <div class="bg-gray-900/50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Indicador de Mercado: S&P 500 (SPY)</h3>
+                    <div id="market-status-loader" class="text-center text-gray-400">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>Cargando datos...
+                    </div>
+                    <div id="market-status-content" class="hidden space-y-3">
+                         <div class="flex justify-between items-center">
+                            <span class="font-semibold">Precio Actual:</span>
+                            <span id="price-current" class="font-bold text-xl"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold">Media 52 Semanas:</span>
+                            <span id="price-average" class="font-bold"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold">Desviación vs Media:</span>
+                            <span id="price-deviation" class="font-bold text-lg"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold">Estado:</span>
+                            <span id="market-condition" class="status-pill"></span>
+                        </div>
+                        <div class="text-xs text-center text-gray-500 pt-2">
+                            Última Sincronización: <span id="last-sync-time">Nunca</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Movimientos -->
+            <div class="lg:w-3/5 bg-gray-800 p-6 rounded-2xl shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                     <h2 class="text-2xl font-bold text-white">Registro de Movimientos</h2>
+                     <div class="flex gap-2">
+                        <button id="import-btn" title="Importar" class="bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition"><i class="fas fa-upload"></i></button>
+                        <button id="export-btn" title="Exportar" class="bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition"><i class="fas fa-download"></i></button>
+                     </div>
+                     <input type="file" id="import-file" class="hidden" accept=".json">
+                </div>
+
+                <!-- Formulario para añadir movimiento -->
+                <div class="bg-gray-900/50 p-4 rounded-lg mb-6">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Añadir Nuevo Movimiento</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                             <input type="date" id="op-date" class="p-2 border border-gray-600 rounded-md bg-gray-700 text-white">
+                             <select id="op-type" class="p-2 border border-gray-600 rounded-md bg-gray-700 text-white">
+                                <option value="Aportación a RV">Aportación a RV</option>
+                                <option value="Aportación a RF">Aportación a RF</option>
+                                <option value="Aportación a Liquidez">Aportación a Liquidez</option>
+                                <option value="Traspaso RV -> RF">Traspaso RV &rarr; RF</option>
+                                <option value="Traspaso RF -> RV">Traspaso RF &rarr; RV</option>
+                                <option value="Retirada RV -> Liquidez">Retirada RV &rarr; Liquidez</option>
+                                <option value="Retirada RF -> Liquidez">Retirada RF &rarr; Liquidez</option>
+                                <option value="Retirada Liquidez">Retirada Liquidez</option>
+                            </select>
+                            <input type="number" id="op-amount" placeholder="Cantidad (€)" class="p-2 border border-gray-600 rounded-md bg-gray-700 text-white">
+                        </div>
+                        <textarea id="op-comments" rows="3" placeholder="Añade tus observaciones y comentarios aquí..." class="w-full p-2 border border-gray-600 rounded-md bg-gray-700 text-white"></textarea>
+                        <button id="add-op-btn" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition font-semibold">Añadir Movimiento</button>
+                    </div>
+                </div>
+
+                <!-- Tabla de Movimientos -->
+                <div class="overflow-y-auto max-h-96">
+                    <table class="w-full text-sm text-left text-gray-400">
+                        <thead class="text-xs text-gray-300 uppercase bg-gray-700 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3 w-1/6">Fecha</th>
+                                <th class="px-4 py-3 w-1/4">Tipo</th>
+                                <th class="px-4 py-3 w-1/6 text-right">Cantidad</th>
+                                <th class="px-4 py-3 w-2/5">Comentarios</th>
+                                <th class="px-4 py-3 w-auto text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="log-table-body">
+                           <!-- Generado por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const elements = {
+        portfolioRvCurrent: document.getElementById('portfolio-rv-current'),
+        portfolioRvContributed: document.getElementById('portfolio-rv-contributed'),
+        portfolioRvGain: document.getElementById('portfolio-rv-gain'),
+        portfolioRfCurrent: document.getElementById('portfolio-rf-current'),
+        portfolioRfContributed: document.getElementById('portfolio-rf-contributed'),
+        portfolioRfGain: document.getElementById('portfolio-rf-gain'),
+        portfolioCash: document.getElementById('portfolio-cash'),
+        portfolioTotal: document.getElementById('portfolio-total'),
+        editPortfolioBtn: document.getElementById('edit-portfolio-btn'),
+        marketStatusLoader: document.getElementById('market-status-loader'),
+        marketStatusContent: document.getElementById('market-status-content'),
+        priceCurrent: document.getElementById('price-current'),
+        priceAverage: document.getElementById('price-average'),
+        priceDeviation: document.getElementById('price-deviation'),
+        marketCondition: document.getElementById('market-condition'),
+        lastSyncTime: document.getElementById('last-sync-time'),
+        opDate: document.getElementById('op-date'),
+        opType: document.getElementById('op-type'),
+        opAmount: document.getElementById('op-amount'),
+        opComments: document.getElementById('op-comments'),
+        addOpBtn: document.getElementById('add-op-btn'),
+        logTableBody: document.getElementById('log-table-body'),
+        importBtn: document.getElementById('import-btn'),
+        exportBtn: document.getElementById('export-btn'),
+        importFile: document.getElementById('import-file'),
+    };
+
+    let state = {
+        portfolio: {
+            rv: { currentValue: 11500, contributed: 10000 },
+            rf: { currentValue: 20500, contributed: 20000 },
+            cash: 5000,
+        },
+        log: [],
+        market: {
+            price: 0,
+            average52: 0, 
+            deviation: 0,
+            condition: 'neutral',
+            lastSync: null
+        }
+    };
+
+    const FALLBACK_API_KEY = 'XXXXXXXXXXXXXXXXXX';
+
+    // --- UTILITY FUNCTIONS ---
+    function getApiKey() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('apikey') || FALLBACK_API_KEY;
+    }
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value);
+    }
+    
+    // --- STATE MANAGEMENT ---
+    function saveState() {
+        localStorage.setItem('investorLogbookState', JSON.stringify(state));
+    }
+    function loadState() {
+        const savedState = localStorage.getItem('investorLogbookState');
+        if (savedState) {
+            const parsedState = JSON.parse(savedState);
+            // Backward compatibility for old state format
+            if (typeof parsedState.portfolio.rv === 'number') {
+                state.portfolio = {
+                    rv: { currentValue: parsedState.portfolio.rv, contributed: 0 },
+                    rf: { currentValue: parsedState.portfolio.rf, contributed: 0 },
+                    cash: parsedState.portfolio.cash
+                };
+                 // Advise user to create initial entries
+                console.warn("Old data format detected. Please create initial 'Aportación' entries for RV and RF to set your 'Total Aportado'.");
+            } else {
+                state = parsedState;
+            }
+        }
+    }
+
+    // --- RENDERING ---
+    function renderPortfolio() {
+        const { rv, rf, cash } = state.portfolio;
+
+        // RV Calculation and Render
+        const rvGain = rv.currentValue - rv.contributed;
+        const rvGainPercent = rv.contributed !== 0 ? (rvGain / rv.contributed) * 100 : 0;
+        elements.portfolioRvCurrent.value = rv.currentValue.toFixed(2);
+        elements.portfolioRvContributed.textContent = formatCurrency(rv.contributed);
+        elements.portfolioRvGain.innerHTML = `${formatCurrency(rvGain)} <span class="text-xs">(${rvGainPercent.toFixed(2)}%)</span>`;
+        elements.portfolioRvGain.className = rvGain >= 0 ? 'font-bold text-base text-green-400' : 'font-bold text-base text-red-400';
+
+        // RF Calculation and Render
+        const rfGain = rf.currentValue - rf.contributed;
+        const rfGainPercent = rf.contributed !== 0 ? (rfGain / rf.contributed) * 100 : 0;
+        elements.portfolioRfCurrent.value = rf.currentValue.toFixed(2);
+        elements.portfolioRfContributed.textContent = formatCurrency(rf.contributed);
+        elements.portfolioRfGain.innerHTML = `${formatCurrency(rfGain)} <span class="text-xs">(${rfGainPercent.toFixed(2)}%)</span>`;
+        elements.portfolioRfGain.className = rfGain >= 0 ? 'font-bold text-base text-green-400' : 'font-bold text-base text-red-400';
+        
+        // Cash and Total
+        elements.portfolioCash.value = cash.toFixed(2);
+        const total = rv.currentValue + rf.currentValue + cash;
+        elements.portfolioTotal.textContent = formatCurrency(total);
+    }
+    
+    function renderLog() {
+        elements.logTableBody.innerHTML = '';
+        const sortedLog = [...state.log].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        sortedLog.forEach(entry => {
+            const row = document.createElement('tr');
+            row.className = 'border-b border-gray-700 hover:bg-gray-700/50';
+            const commentsHtml = (entry.comments || '').replace(/\n/g, '<br>');
+            row.innerHTML = `
+                <td class="px-4 py-2 align-top">${new Date(entry.date).toLocaleDateString('es-ES', { year: '2-digit', month: '2-digit', day: '2-digit' })}</td>
+                <td class="px-4 py-2 align-top">${entry.type}</td>
+                <td class="px-4 py-2 align-top text-right font-semibold">${formatCurrency(entry.amount)}</td>
+                <td class="px-4 py-2 align-top text-sm text-gray-400">${commentsHtml}</td>
+                <td class="px-4 py-2 align-top text-center">
+                    <button data-id="${entry.id}" class="text-blue-400 hover:text-blue-600 edit-log-btn text-xs mr-2" title="Editar Registro"><i class="fas fa-pencil-alt"></i></button>
+                    <button data-id="${entry.id}" class="text-red-500 hover:text-red-700 delete-log-btn text-xs" title="Borrar Registro"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+            elements.logTableBody.appendChild(row);
+        });
+    }
+
+    function renderMarketStatus() {
+        const { price, average52, deviation, condition, lastSync } = state.market;
+        elements.priceCurrent.textContent = price > 0 ? formatCurrency(price) : 'N/A';
+        elements.priceAverage.textContent = average52 > 0 ? formatCurrency(average52) : 'N/A';
+        
+        const formattedDeviation = (deviation || 0).toFixed(2);
+        const deviationSign = deviation > 0 ? '+' : '';
+        const deviationColorClass = deviation >= 10 ? 'text-green-400' : deviation <= -20 ? 'text-red-400' : 'text-gray-100';
+        elements.priceDeviation.textContent = `${deviationSign}${formattedDeviation}%`;
+        elements.priceDeviation.className = `font-bold text-lg ${deviationColorClass}`;
+
+        elements.lastSyncTime.textContent = lastSync ? new Date(lastSync).toLocaleString('es-ES') : 'Nunca';
+
+        const conditionMap = {
+            bull: { text: 'Alcista', class: 'status-bull' },
+            bear: { text: 'Bajista', class: 'status-bear' },
+            neutral: { text: 'Neutral', class: 'status-neutral' }
+        };
+        elements.marketCondition.textContent = conditionMap[condition].text;
+        elements.marketCondition.className = `status-pill ${conditionMap[condition].class}`;
+        
+        elements.marketStatusLoader.classList.add('hidden');
+        elements.marketStatusContent.classList.remove('hidden');
+    }
+
+    // --- LOGIC & OPERATIONS ---
+    function handleManualPortfolioSave() {
+        state.portfolio.rv.currentValue = parseFloat(elements.portfolioRvCurrent.value) || 0;
+        state.portfolio.rf.currentValue = parseFloat(elements.portfolioRfCurrent.value) || 0;
+        state.portfolio.cash = parseFloat(elements.portfolioCash.value) || 0;
+        updateApp();
+    }
+
+    function processMarketData() {
+        const { price, average52 } = state.market;
+        if (!price || !average52 || average52 === 0) {
+            state.market.condition = 'neutral'; state.market.deviation = 0; return;
+        }
+        const deviationFromAvg = ((price - average52) / average52) * 100;
+        state.market.deviation = deviationFromAvg;
+        if (deviationFromAvg <= -20) state.market.condition = 'bear';
+        else if (deviationFromAvg >= 10) state.market.condition = 'bull';
+        else state.market.condition = 'neutral';
+    }
+    
+    async function fetchAndRefreshMarketData() {
+        elements.marketStatusLoader.classList.remove('hidden');
+        elements.marketStatusContent.classList.add('hidden');
+        const now = new Date();
+        const lastSync = state.market.lastSync ? new Date(state.market.lastSync) : null;
+        if (lastSync && (now - lastSync < 30 * 60 * 1000)) {
+            console.log("Usando datos de mercado cacheados.");
+            updateAppAfterFetch(); return;
+        }
+        const currentApiKey = getApiKey();
+        if (!currentApiKey || currentApiKey === 'YOUR_TWELVEDATA_API_KEY') {
+             if (!state.market.price) { state.market.price = 540.50; state.market.average52 = 490.00; }
+            updateAppAfterFetch(); return;
+        }
+        try {
+            console.log("Buscando nuevos datos de mercado...");
+            const [quoteRes, smaRes] = await Promise.all([
+                fetch(`https://api.twelvedata.com/quote?symbol=SPY&apikey=${currentApiKey}`),
+                fetch(`https://api.twelvedata.com/sma?symbol=SPY&interval=1week&time_period=52&outputsize=1&apikey=${currentApiKey}`)
+            ]);
+            const [quoteData, smaData] = await Promise.all([quoteRes.json(), smaRes.json()]);
+            if (quoteData.code >= 400 || !quoteData.close) throw new Error(quoteData.message || 'Error quote.');
+            if (smaData.code >= 400 || !smaData.values) throw new Error(smaData.message || 'Error SMA.');
+            state.market.price = parseFloat(quoteData.close);
+            state.market.average52 = parseFloat(smaData.values[0].sma);
+            state.market.lastSync = new Date().toISOString();
+        } catch (error) { console.warn("Error API: " + error.message); }
+        updateAppAfterFetch();
+    }
+
+    function addOperation() {
+        const amount = parseFloat(elements.opAmount.value);
+        if (!amount || amount <= 0) { alert('Por favor, introduce una cantidad válida.'); return; }
+
+        const newEntry = {
+            id: Date.now(),
+            date: elements.opDate.value,
+            type: elements.opType.value,
+            amount: amount,
+            comments: elements.opComments.value,
+        };
+
+        const p = state.portfolio;
+        switch (newEntry.type) {
+            case 'Aportación a RV':
+                p.rv.contributed += amount; p.rv.currentValue += amount;
+                break;
+            case 'Aportación a RF':
+                p.rf.contributed += amount; p.rf.currentValue += amount;
+                break;
+            case 'Aportación a Liquidez':
+                p.cash += amount;
+                break;
+            case 'Traspaso RV -> RF':
+                p.rv.contributed -= amount; p.rv.currentValue -= amount;
+                p.rf.contributed += amount; p.rf.currentValue += amount;
+                break;
+            case 'Traspaso RF -> RV':
+                p.rf.contributed -= amount; p.rf.currentValue -= amount;
+                p.rv.contributed += amount; p.rv.currentValue += amount;
+                break;
+            case 'Retirada RV -> Liquidez':
+                p.rv.contributed -= amount; p.rv.currentValue -= amount;
+                p.cash += amount;
+                break;
+            case 'Retirada RF -> Liquidez':
+                p.rf.contributed -= amount; p.rf.currentValue -= amount;
+                p.cash += amount;
+                break;
+            case 'Retirada Liquidez':
+                p.cash -= amount;
+                break;
+        }
+        
+        state.log.push(newEntry);
+        elements.opAmount.value = '';
+        elements.opComments.value = '';
+        elements.opDate.value = new Date().toISOString().split('T')[0];
+        updateApp();
+    }
+    
+    function deleteLogEntry(id) {
+        const entryToDelete = state.log.find(entry => entry.id === id);
+        if (!entryToDelete) return;
+
+        if (confirm('¿Seguro que quieres borrar este movimiento? Esta acción revertirá el cambio en los totales de tu cartera.')) {
+            const amount = entryToDelete.amount;
+            const p = state.portfolio;
+
+            // Reverse the financial operation
+            switch (entryToDelete.type) {
+                case 'Aportación a RV':
+                    p.rv.contributed -= amount; p.rv.currentValue -= amount;
+                    break;
+                case 'Aportación a RF':
+                    p.rf.contributed -= amount; p.rf.currentValue -= amount;
+                    break;
+                case 'Aportación a Liquidez':
+                    p.cash -= amount;
+                    break;
+                case 'Traspaso RV -> RF': // Reverse is RF -> RV
+                    p.rv.contributed += amount; p.rv.currentValue += amount;
+                    p.rf.contributed -= amount; p.rf.currentValue -= amount;
+                    break;
+                case 'Traspaso RF -> RV': // Reverse is RV -> RF
+                    p.rf.contributed += amount; p.rf.currentValue += amount;
+                    p.rv.contributed -= amount; p.rv.currentValue -= amount;
+                    break;
+                case 'Retirada RV -> Liquidez':
+                    p.rv.contributed += amount; p.rv.currentValue += amount;
+                    p.cash -= amount;
+                    break;
+                case 'Retirada RF -> Liquidez':
+                    p.rf.contributed += amount; p.rf.currentValue += amount;
+                    p.cash -= amount;
+                    break;
+                case 'Retirada Liquidez':
+                    p.cash += amount;
+                    break;
+            }
+
+            // Remove from log and update UI
+            state.log = state.log.filter(entry => entry.id !== id);
+            updateApp();
+        }
+    }
+
+    function editLogEntry(id) {
+        const entry = state.log.find(e => e.id === id);
+        if (!entry) return;
+        alert("La edición de movimientos no está disponible en esta versión para mantener la integridad de los cálculos. Por favor, borra el movimiento y créalo de nuevo si es necesario.");
+    }
+
+    function togglePortfolioEdit(isEditing) {
+        const icon = elements.editPortfolioBtn.querySelector('i');
+        const inputs = [elements.portfolioRvCurrent, elements.portfolioRfCurrent, elements.portfolioCash];
+        if (isEditing) {
+            icon.classList.replace('fa-pencil-alt', 'fa-save');
+            elements.editPortfolioBtn.title = "Guardar Cartera";
+            inputs.forEach(input => input.readOnly = false);
+        } else {
+            icon.classList.replace('fa-save', 'fa-pencil-alt');
+            elements.editPortfolioBtn.title = "Editar Valores Actuales";
+            inputs.forEach(input => input.readOnly = true);
+            handleManualPortfolioSave();
+        }
+    }
+
+    // --- EVENT LISTENERS ---
+    elements.addOpBtn.addEventListener('click', addOperation);
+    elements.editPortfolioBtn.addEventListener('click', () => togglePortfolioEdit(elements.portfolioRvCurrent.readOnly));
+    elements.logTableBody.addEventListener('click', (e) => {
+        const button = e.target.closest('button');
+        if (!button) return;
+        const id = parseInt(button.dataset.id);
+        if (button.classList.contains('delete-log-btn')) deleteLogEntry(id);
+        else if (button.classList.contains('edit-log-btn')) editLogEntry(id);
+    });
+    elements.exportBtn.addEventListener('click', () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+        const a = document.createElement('a');
+        a.href = dataStr;
+        a.download = `cuaderno_inversor_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+    });
+    elements.importBtn.addEventListener('click', () => elements.importFile.click());
+    elements.importFile.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedState = JSON.parse(e.target.result);
+                if (importedState.portfolio && importedState.log) {
+                    state = importedState;
+                    updateApp();
+                } else { alert('Error: El archivo no tiene el formato correcto.'); }
+            } catch (error) { alert('Error al leer el archivo.'); }
+        };
+        reader.readAsText(file);
+        elements.importFile.value = '';
+    });
+    
+    // --- APP INITIALIZATION ---
+    function updateApp() {
+        saveState();
+        renderPortfolio();
+        renderLog();
+        processMarketData();
+        renderMarketStatus();
+    }
+    
+    function updateAppAfterFetch() {
+        processMarketData();
+        renderMarketStatus();
+        saveState();
+    }
+
+    loadState();
+    updateApp();
+    fetchAndRefreshMarketData();
+    elements.opDate.value = new Date().toISOString().split('T')[0];
+});
+</script>
+
+</body>
+</html>
+

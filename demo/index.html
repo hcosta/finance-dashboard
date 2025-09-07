@@ -125,21 +125,12 @@
                     </div>
                 </div>
                 
-                 <!-- Ingresos Extraordinarios -->
+                 <!-- Operaciones Planificadas -->
                 <div class="mb-6 p-4 bg-gray-900/50 rounded-lg">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Ingresos Extraordinarios</h3>
-                    <div id="extra-income-container" class="space-y-4"></div>
-                    <button id="add-extra-income-btn" class="mt-3 w-full bg-gray-700 text-gray-200 py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300 flex items-center justify-center gap-2">
-                        <i class="fas fa-plus-circle"></i> Añadir Ingreso Extra
-                    </button>
-                </div>
-
-                 <!-- Rebalanceos Extraordinarios -->
-                <div class="mb-6 p-4 bg-gray-900/50 rounded-lg">
-                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Rebalanceos Extraordinarios</h3>
-                    <div id="extra-rebalance-container" class="space-y-4"></div>
-                    <button id="add-extra-rebalance-btn" class="mt-3 w-full bg-gray-700 text-gray-200 py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300 flex items-center justify-center gap-2">
-                        <i class="fas fa-exchange-alt"></i> Añadir Rebalanceo Extra
+                    <h3 class="text-lg font-semibold mb-3 text-gray-100">Operaciones Planificadas</h3>
+                    <div id="planned-operations-container" class="space-y-4"></div>
+                    <button id="add-operation-btn" class="mt-3 w-full bg-gray-700 text-gray-200 py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-plus-circle"></i> Añadir Operación
                     </button>
                 </div>
 
@@ -291,6 +282,8 @@ document.addEventListener('DOMContentLoaded', () => {
         futureSavings: document.getElementById('future-savings'),
         futureSavingsYears: document.getElementById('future-savings-years'),
         monthlyDcaDisplay: document.getElementById('monthly-dca-display'),
+        plannedOperationsContainer: document.getElementById('planned-operations-container'),
+        addOperationBtn: document.getElementById('add-operation-btn'),
         dcaDrop: document.getElementById('dca-drop'),
         dcaRise: document.getElementById('dca-rise'),
         rfReturn: document.getElementById('rf-return'),
@@ -304,10 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
         liquiditySweepEnabled: document.getElementById('liquidity-sweep-enabled'),
         liquiditySweepOptions: document.getElementById('liquidity-sweep-options'),
         liquidityFloor: document.getElementById('liquidity-floor'),
-        extraIncomeContainer: document.getElementById('extra-income-container'),
-        addExtraIncomeBtn: document.getElementById('add-extra-income-btn'),
-        extraRebalanceContainer: document.getElementById('extra-rebalance-container'),
-        addExtraRebalanceBtn: document.getElementById('add-extra-rebalance-btn'),
         sp500InputsContainer: document.getElementById('sp500-inputs'),
         chartCanvas: document.getElementById('simulation-chart'),
         resultsSummary: document.getElementById('results-summary'),
@@ -334,95 +323,106 @@ document.addEventListener('DOMContentLoaded', () => {
         let rv = config.initialRv;
         let rf = config.initialRf;
         let cash = config.initialCash;
-        let opportunityFund = 0;
+        let opportunityFund = 0; // Tactical cash from DCA Rise and Operations
+        let dcaOperationsPool = {}; // Holds funds for DCA operations
 
         const history = [];
         
         for (let year = 1; year <= YEARS; year++) {
-            const initialTotal = rv + rf + cash + opportunityFund;
+            const initialTotal = rv + rf + cash + opportunityFund + Object.values(dcaOperationsPool).reduce((a, b) => a + b, 0);
             
             let yearlyDcaApplied = 0;
             let amountRebalanced = 0;
-            let amountExtraRebalanced = 0;
             let amountSwept = 0;
+            let initialTransferLog = {};
+            
+            // Activate planned operations for the current year
+            config.plannedOperations.forEach((op, index) => {
+                if (op.year === year) {
+                    let amountToMove = 0;
+                    if (op.source === 'rf') {
+                        amountToMove = Math.min(rf, op.amount);
+                        rf -= amountToMove;
+                    } else if (op.source === 'rv') {
+                        amountToMove = Math.min(rv, op.amount);
+                        rv -= amountToMove;
+                    } else if (op.source === 'cash') {
+                        amountToMove = Math.min(cash, op.amount);
+                        cash -= amountToMove;
+                    }
+                    else { // new-savings
+                        amountToMove = op.amount;
+                    }
 
-            // Recibir ingresos extraordinarios
-             config.extraordinaryIncomes.forEach(income => {
-                if (income.receptionYear === year) {
-                    cash += income.amount;
+                    if (op.dcaPeriod > 0) {
+                        dcaOperationsPool[index] = (dcaOperationsPool[index] || 0) + amountToMove;
+                         initialTransferLog[index] = { amount: amountToMove, source: op.source, dest: op.dest };
+                    } else { // Immediate transfer
+                        if (op.dest === 'rv') rv += amountToMove;
+                        if (op.dest === 'rf') rf += amountToMove;
+                        yearlyDcaApplied += amountToMove; // Log as a contribution/movement
+                    }
+                }
+            });
+
+
+            // 1. Aportaciones (DCA)
+            let yearlyDcaToRv = 0;
+            let yearlyDcaToRf = 0;
+
+            // Regular savings DCA
+            if (year <= config.futureSavingsYears && config.futureSavingsYears > 0) {
+                yearlyDcaToRv += (config.futureSavings / config.futureSavingsYears);
+            }
+
+            // DCA from planned operations
+            Object.keys(dcaOperationsPool).forEach(index => {
+                const op = config.plannedOperations[index];
+                if (year >= op.year && year < op.year + op.dcaPeriod) {
+                    const yearlyAmount = op.amount / op.dcaPeriod;
+                    const amountFromPool = Math.min(dcaOperationsPool[index], yearlyAmount);
+                    dcaOperationsPool[index] -= amountFromPool;
+
+                    if(op.dest === 'rv') yearlyDcaToRv += amountFromPool;
+                    if(op.dest === 'rf') yearlyDcaToRf += amountFromPool;
                 }
             });
             
-            // 1. Aportaciones (DCA) - Tratado como DINERO NUEVO
-            let baseYearlyDca = 0;
-            if (year <= config.futureSavingsYears && config.futureSavingsYears > 0) {
-                 baseYearlyDca += (config.futureSavings / config.futureSavingsYears);
-            }
-            config.extraordinaryIncomes
-                .filter(income => year >= income.receptionYear && year < income.receptionYear + income.dcaPeriod)
-                .forEach(income => {
-                    baseYearlyDca += (income.amount / income.dcaPeriod);
-                });
+            // Apply Opportunistic Multiplier only to RV contributions
+            const sp500Return = config.sp500Scenario[year - 1] / 100;
+            let dcaMultiplier = 1;
+            if (sp500Return <= -(config.dcaDrop / 100)) dcaMultiplier = 2;
+            else if (sp500Return >= (config.dcaRise / 100)) dcaMultiplier = 0.5;
 
-            if (baseYearlyDca > 0) {
-                const sp500Return = config.sp500Scenario[year - 1] / 100;
-                let dcaMultiplier = 1;
+            let finalYearlyDcaToRv = yearlyDcaToRv * dcaMultiplier;
+
+            if (dcaMultiplier === 0.5) {
+                opportunityFund += yearlyDcaToRv * 0.5;
+            } else if (dcaMultiplier === 2) {
+                const extraNeeded = yearlyDcaToRv; // Since final is 2x, extra is 1x
+                const fromOpportunityFund = Math.min(opportunityFund, extraNeeded);
+                opportunityFund -= fromOpportunityFund;
+                finalYearlyDcaToRv += fromOpportunityFund;
                 
-                if (sp500Return <= -(config.dcaDrop / 100)) dcaMultiplier = 2;
-                else if (sp500Return >= (config.dcaRise / 100)) dcaMultiplier = 0.5;
-
-                if (dcaMultiplier === 0.5) {
-                    const amountToInvest = baseYearlyDca * 0.5;
-                    rv += amountToInvest;
-                    opportunityFund += amountToInvest; // La otra mitad a la reserva
-                    yearlyDcaApplied = amountToInvest;
-                } else if (dcaMultiplier === 1) {
-                    rv += baseYearlyDca;
-                    yearlyDcaApplied = baseYearlyDca;
-                } else if (dcaMultiplier === 2) {
-                    // Invertir la aportación base
-                    rv += baseYearlyDca;
-                    yearlyDcaApplied = baseYearlyDca;
-
-                    // E intentar igualarla desde la liquidez
-                    const extraToInvest = baseYearlyDca;
-                    const fromOpportunityFund = Math.min(opportunityFund, extraToInvest);
-                    opportunityFund -= fromOpportunityFund;
-                    rv += fromOpportunityFund;
-                    yearlyDcaApplied += fromOpportunityFund;
-
-                    const remainingNeeded = extraToInvest - fromOpportunityFund;
-                    if (remainingNeeded > 0) {
-                        const fromCash = Math.min(cash, remainingNeeded);
-                        cash -= fromCash;
-                        rv += fromCash;
-                        yearlyDcaApplied += fromCash;
-                    }
+                const remainingNeeded = extraNeeded - fromOpportunityFund;
+                if(remainingNeeded > 0) {
+                    const fromCash = Math.min(cash, remainingNeeded);
+                    cash -= fromCash;
+                    finalYearlyDcaToRv += fromCash;
                 }
             }
             
+            rv += finalYearlyDcaToRv;
+            rf += yearlyDcaToRf;
+            yearlyDcaApplied = finalYearlyDcaToRv + yearlyDcaToRf;
+            
             // 2. Crecimiento de las inversiones
-            const currentYearSp500Return = config.sp500Scenario[year - 1] / 100;
-            rv *= (1 + currentYearSp500Return); 
+            rv *= (1 + sp500Return); 
             rf *= (1 + config.rfReturn / 100);
             cash *= (1 + config.cashReturn / 100);
             opportunityFund *= (1 + config.cashReturn / 100);
-
-            // Rebalanceos Extraordinarios (DESPUÉS del crecimiento)
-            config.extraordinaryRebalances.forEach(reb => {
-                if(reb.year === year) {
-                    if (reb.direction === 'rf-to-rv') {
-                        const amountToMove = Math.min(rf, reb.amount);
-                        rf -= amountToMove;
-                        rv += amountToMove;
-                        amountExtraRebalanced += amountToMove;
-                    } else { // rv-to-rf
-                        const amountToMove = Math.min(rv, reb.amount);
-                        rv -= amountToMove;
-                        rf += amountToMove;
-                        amountExtraRebalanced -= amountToMove; 
-                    }
-                }
+            Object.keys(dcaOperationsPool).forEach(key => {
+                dcaOperationsPool[key] *= (1 + config.cashReturn / 100);
             });
 
 
@@ -439,7 +439,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (currentRvRatio > upperBand || currentRvRatio < lowerBand) {
                         let amountToMove = (rv - investedTotal * targetRatio);
                         
-                        // Apply the cap if it's enabled (> 0)
                         if (config.rebalanceMaxAmount > 0) {
                             const cappedAmount = Math.min(Math.abs(amountToMove), config.rebalanceMaxAmount);
                             amountToMove = cappedAmount * Math.sign(amountToMove);
@@ -453,21 +452,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // 4. Inversión Automática de Liquidez (Sweep)
-            let currentLiquidity = cash + opportunityFund;
+            let currentLiquidity = cash + opportunityFund + Object.values(dcaOperationsPool).reduce((a, b) => a + b, 0);
             if (config.liquiditySweepEnabled && currentLiquidity > config.liquidityFloor) {
-                const excessCash = currentLiquidity - config.liquidityFloor;
-                 // Prioritize taking from opportunity fund first if it exists, as it's tactical cash
-                const fromOpportunityFund = Math.min(opportunityFund, excessCash);
-                opportunityFund -= fromOpportunityFund;
+                let excessCash = currentLiquidity - config.liquidityFloor;
                 
-                const fromCash = excessCash - fromOpportunityFund;
+                // Prioritize taking from tactical pools last
+                const fromCash = Math.min(cash, excessCash);
                 cash -= fromCash;
+                excessCash -= fromCash;
 
-                rf += excessCash;
-                amountSwept = excessCash;
+                if (excessCash > 0) {
+                    const fromOpportunityFund = Math.min(opportunityFund, excessCash);
+                    opportunityFund -= fromOpportunityFund;
+                    excessCash -= fromOpportunityFund;
+                }
+                
+                rf += (currentLiquidity - config.liquidityFloor - excessCash);
+                amountSwept = (currentLiquidity - config.liquidityFloor - excessCash);
             }
 
-            const finalTotal = rv + rf + cash + opportunityFund;
+            const totalLiquidity = cash + opportunityFund + Object.values(dcaOperationsPool).reduce((a, b) => a + b, 0);
+            const finalTotal = rv + rf + totalLiquidity;
             const growth = finalTotal - initialTotal - yearlyDcaApplied;
 
 
@@ -477,17 +482,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 total: finalTotal,
                 rv: rv,
                 rf: rf,
-                liquidity: cash + opportunityFund,
+                liquidity: totalLiquidity,
                 dcaContribution: yearlyDcaApplied,
                 rebalancedAmount: amountRebalanced,
-                extraRebalancedAmount: amountExtraRebalanced,
                 sweptAmount: amountSwept,
-                growth: growth
+                growth: growth,
+                initialTransferLog
             });
         }
-
-        const totalExtraIncomes = config.extraordinaryIncomes.reduce((sum, income) => sum + income.amount, 0);
-        const totalInvested = config.initialRv + config.initialRf + config.initialCash + config.futureSavings + totalExtraIncomes;
+        
+        const totalNewSavings = config.futureSavings + config.plannedOperations
+            .filter(op => op.source === 'new-savings')
+            .reduce((sum, op) => sum + op.amount, 0);
+            
+        const totalInvested = config.initialRv + config.initialRf + config.initialCash + totalNewSavings;
         
         return { history, totalInvested };
     }
@@ -517,14 +525,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         updateMonthlyDcaDisplay(config);
 
-        elements.extraIncomeContainer.innerHTML = '';
-        if(config.extraordinaryIncomes) {
-            config.extraordinaryIncomes.forEach(income => addExtraordinaryIncomeRow(income));
-        }
-        
-        elements.extraRebalanceContainer.innerHTML = '';
-        if(config.extraordinaryRebalances) {
-            config.extraordinaryRebalances.forEach(reb => addExtraordinaryRebalanceRow(reb));
+        elements.plannedOperationsContainer.innerHTML = '';
+        if(config.plannedOperations) {
+            config.plannedOperations.forEach(op => addOperationRow(op));
         }
 
         elements.sp500InputsContainer.innerHTML = '';
@@ -538,67 +541,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    function addExtraordinaryIncomeRow(income = { amount: 10000, receptionYear: 10, dcaPeriod: 1 }) {
-        const rowId = `income-${Date.now()}`;
+    function addOperationRow(op = { amount: 10000, year: 5, source: 'rf', dest: 'rv', dcaPeriod: 1 }) {
+        const rowId = `op-${Date.now()}`;
         const row = document.createElement('div');
         row.id = rowId;
         row.className = 'p-3 border border-gray-700 rounded-lg bg-gray-800 space-y-2';
         row.innerHTML = `
             <div class="flex justify-between items-center">
-                <p class="text-sm font-semibold text-gray-100">Ingreso Extra</p>
-                <button data-row-id="${rowId}" class="text-red-500 hover:text-red-700 delete-income-btn">&times;</button>
-            </div>
-            <div>
-                <label class="text-xs text-gray-300">Cantidad (€)</label>
-                <input type="number" class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="amount" value="${income.amount}">
+                <p class="text-sm font-semibold text-gray-100">Operación</p>
+                <button data-row-id="${rowId}" class="text-red-500 hover:text-red-700 delete-op-btn">&times;</button>
             </div>
             <div class="flex gap-2">
                 <div class="w-1/2">
-                    <label class="text-xs text-gray-300">Año Recepción</label>
-                    <input type="number" class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="receptionYear" value="${income.receptionYear}" min="1" max="30">
+                    <label class="text-xs text-gray-300">Cantidad (€)</label>
+                    <input type="number" class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="amount" value="${op.amount}">
                 </div>
                 <div class="w-1/2">
-                    <label class="text-xs text-gray-300">Invertir en</label>
+                    <label class="text-xs text-gray-300">Año Ejecución</label>
+                    <input type="number" class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="year" value="${op.year}" min="1" max="30">
+                </div>
+            </div>
+            <div class="flex gap-2 items-end">
+                <div class="w-1/3">
+                    <label class="text-xs text-gray-300">Origen</label>
+                    <select class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="source">
+                        <option value="new-savings" ${op.source === 'new-savings' ? 'selected' : ''}>Ahorro Nuevo</option>
+                        <option value="cash" ${op.source === 'cash' ? 'selected' : ''}>Ahorro Actual</option>
+                        <option value="rf" ${op.source === 'rf' ? 'selected' : ''}>Renta Fija</option>
+                        <option value="rv" ${op.source === 'rv' ? 'selected' : ''}>Renta Variable</option>
+                    </select>
+                </div>
+                <div class="w-1/3">
+                    <label class="text-xs text-gray-300">Destino</label>
+                    <select class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="dest">
+                        <option value="rv" ${op.dest === 'rv' ? 'selected' : ''}>Renta Variable</option>
+                        <option value="rf" ${op.dest === 'rf' ? 'selected' : ''}>Renta Fija</option>
+                    </select>
+                </div>
+                 <div class="w-1/3">
+                    <label class="text-xs text-gray-300">Plazo Inversión</label>
                     <select class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="dcaPeriod">
-                        <option value="1" ${income.dcaPeriod == 1 ? 'selected' : ''}>1 año</option>
-                        <option value="1.5" ${income.dcaPeriod == 1.5 ? 'selected' : ''}>1.5 años</option>
-                        <option value="2" ${income.dcaPeriod == 2 ? 'selected' : ''}>2 años</option>
+                        <option value="0" ${op.dcaPeriod == 0 ? 'selected' : ''}>Inmediato</option>
+                        <option value="1" ${op.dcaPeriod == 1 ? 'selected' : ''}>1 año</option>
+                        <option value="1.5" ${op.dcaPeriod == 1.5 ? 'selected' : ''}>1.5 años</option>
+                        <option value="2" ${op.dcaPeriod == 2 ? 'selected' : ''}>2 años</option>
                     </select>
                 </div>
             </div>
         `;
-        elements.extraIncomeContainer.appendChild(row);
-    }
-    
-    function addExtraordinaryRebalanceRow(rebalance = { amount: 10000, year: 5, direction: 'rf-to-rv' }) {
-        const rowId = `rebalance-${Date.now()}`;
-        const row = document.createElement('div');
-        row.id = rowId;
-        row.className = 'p-3 border border-gray-700 rounded-lg bg-gray-800 space-y-2';
-        row.innerHTML = `
-             <div class="flex justify-between items-center">
-                <p class="text-sm font-semibold text-gray-100">Rebalanceo Extra</p>
-                <button data-row-id="${rowId}" class="text-red-500 hover:text-red-700 delete-rebalance-btn">&times;</button>
-            </div>
-            <div>
-                <label class="text-xs text-gray-300">Cantidad (€)</label>
-                <input type="number" class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="amount" value="${rebalance.amount}">
-            </div>
-            <div class="flex gap-2">
-                <div class="w-1/2">
-                    <label class="text-xs text-gray-300">Año</label>
-                    <input type="number" class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="year" value="${rebalance.year}" min="1" max="30">
-                </div>
-                <div class="w-1/2">
-                    <label class="text-xs text-gray-300">Dirección</label>
-                    <select class="w-full p-1 border rounded bg-gray-700 border-gray-600 text-white" data-field="direction">
-                        <option value="rf-to-rv" ${rebalance.direction === 'rf-to-rv' ? 'selected' : ''}>RF &rarr; RV</option>
-                        <option value="rv-to-rf" ${rebalance.direction === 'rv-to-rf' ? 'selected' : ''}>RV &rarr; RF</option>
-                    </select>
-                </div>
-            </div>
-        `;
-        elements.extraRebalanceContainer.appendChild(row);
+        elements.plannedOperationsContainer.appendChild(row);
     }
 
 
@@ -672,16 +663,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const lines = [];
                                 
                                 lines.push(`Crecimiento Año: ${formatCurrency(yearData.growth)}`);
+                                const sourceMap = {'rf': 'RF', 'rv': 'RV', 'new-savings': 'Ahorro Nuevo', 'cash': 'Ahorro Actual'};
+
+                                 Object.values(yearData.initialTransferLog).forEach(log => {
+                                    const sourceText = sourceMap[log.source] || log.source.toUpperCase();
+                                    lines.push(`Op. Táctica: ${formatCurrency(log.amount)} (${sourceText} \u2192 Liq.)`);
+                                });
 
                                 if (yearData.dcaContribution > 0) {
-                                    lines.push(`Aportación DCA: ${formatCurrency(yearData.dcaContribution)}`);
+                                    lines.push(`Aportación/DCA: ${formatCurrency(yearData.dcaContribution)}`);
                                 }
                                 
-                                if (Math.abs(yearData.extraRebalancedAmount) > 0.01) {
-                                    const direction = yearData.extraRebalancedAmount > 0 ? '(RF \u2192 RV)' : '(RV \u2192 RF)';
-                                    lines.push(`Reb. Extra: ${formatCurrency(Math.abs(yearData.extraRebalancedAmount))} ${direction}`);
-                                }
-
                                 if (Math.abs(yearData.rebalancedAmount) > 0.01) {
                                     const direction = yearData.rebalancedAmount > 0 ? '(RV \u2192 RF)' : '(RF \u2192 RV)';
                                     lines.push(`Reb. Auto: ${formatCurrency(Math.abs(yearData.rebalancedAmount))} ${direction}`);
@@ -746,12 +738,14 @@ document.addEventListener('DOMContentLoaded', () => {
             row.className = 'border-b border-gray-700 hover:bg-gray-700/50';
 
             let movementsHtml = '';
+            const sourceMap = {'rf': 'RF', 'rv': 'RV', 'new-savings': 'Ahorro Nuevo', 'cash': 'Ahorro Actual'};
+
+            Object.values(log.initialTransferLog).forEach(transfer => {
+                const sourceText = sourceMap[transfer.source] || transfer.source.toUpperCase();
+                movementsHtml += `<div class="text-xs"><strong>Op. Táctica:</strong> ${formatCurrency(transfer.amount)} (${sourceText} &rarr; Liq.)</div>`;
+            });
             if (log.dcaContribution > 0) {
-                movementsHtml += `<div class="text-xs"><strong>DCA:</strong> ${formatCurrency(log.dcaContribution)} (Liq. &rarr; RV)</div>`;
-            }
-            if (Math.abs(log.extraRebalancedAmount) > 0.01) {
-                const direction = log.extraRebalancedAmount > 0 ? '(RF &rarr; RV)' : '(RV &rarr; RF)';
-                movementsHtml += `<div class="text-xs"><strong>Reb. Extra:</strong> ${formatCurrency(Math.abs(log.extraRebalancedAmount))} ${direction}</div>`;
+                movementsHtml += `<div class="text-xs"><strong>Aportación/DCA:</strong> ${formatCurrency(log.dcaContribution)}</div>`;
             }
             if (Math.abs(log.rebalancedAmount) > 0.01) {
                 const direction = log.rebalancedAmount > 0 ? '(RV &rarr; RF)' : '(RF &rarr; RV)';
@@ -781,16 +775,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function getConfigFromUI() {
         const sp500Scenario = Array.from(elements.sp500InputsContainer.querySelectorAll('input')).map(input => parseFloat(input.value) || 0);
         
-        const extraordinaryIncomes = Array.from(elements.extraIncomeContainer.children).map(row => ({
-            amount: parseFloat(row.querySelector('[data-field="amount"]').value) || 0,
-            receptionYear: parseInt(row.querySelector('[data-field="receptionYear"]').value) || 1,
-            dcaPeriod: parseFloat(row.querySelector('[data-field="dcaPeriod"]').value) || 1,
-        }));
-        
-        const extraordinaryRebalances = Array.from(elements.extraRebalanceContainer.children).map(row => ({
+        const plannedOperations = Array.from(elements.plannedOperationsContainer.children).map(row => ({
             amount: parseFloat(row.querySelector('[data-field="amount"]').value) || 0,
             year: parseInt(row.querySelector('[data-field="year"]').value) || 1,
-            direction: row.querySelector('[data-field="direction"]').value,
+            source: row.querySelector('[data-field="source"]').value,
+            dest: row.querySelector('[data-field="dest"]').value,
+            dcaPeriod: parseFloat(row.querySelector('[data-field="dcaPeriod"]').value) || 0,
         }));
 
         return {
@@ -810,8 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rebalanceMaxAmount: parseFloat(elements.rebalanceMaxAmount.value) || 0,
             liquiditySweepEnabled: elements.liquiditySweepEnabled.checked,
             liquidityFloor: parseFloat(elements.liquidityFloor.value) || 0,
-            extraordinaryIncomes: extraordinaryIncomes,
-            extraordinaryRebalances: extraordinaryRebalances,
+            plannedOperations: plannedOperations,
             sp500Scenario: sp500Scenario
         };
     }
@@ -827,14 +816,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function getDefaultConfig() {
         const baseConfig = {
-            initialRv: 6000, initialRf: 10000, initialCash: 1500,
-            futureSavings: 4000, futureSavingsYears: 5,
+            initialRv: 60000, initialRf: 100000, initialCash: 15000,
+            futureSavings: 40000, futureSavingsYears: 5,
             dcaDrop: 20, dcaRise: 15,
             rfReturn: 2.5, cashReturn: 0.70,
-            rebalanceEnabled: true, rebalanceTarget: 60, rebalanceBand: 5, rebalanceStartYear: 20, rebalanceMaxAmount: 2000,
-            liquiditySweepEnabled: true, liquidityFloor: 1500,
-            extraordinaryIncomes: [],
-            extraordinaryRebalances: [],
+            rebalanceEnabled: true, rebalanceTarget: 60, rebalanceBand: 5, rebalanceStartYear: 20, rebalanceMaxAmount: 20000,
+            liquiditySweepEnabled: true, liquidityFloor: 15000,
+            plannedOperations: [],
             sp500Scenario: scenarios.calma,
         };
         return baseConfig;
@@ -878,34 +866,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.target.tagName === 'INPUT') liveUpdate();
     });
     
-    elements.extraIncomeContainer.addEventListener('input', (event) => {
+    elements.plannedOperationsContainer.addEventListener('input', (event) => {
          if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT') liveUpdate();
     });
     
-    elements.addExtraIncomeBtn.addEventListener('click', () => {
-        addExtraordinaryIncomeRow();
+    elements.addOperationBtn.addEventListener('click', () => {
+        addOperationRow();
         liveUpdate();
     });
     
-    elements.extraIncomeContainer.addEventListener('click', (event) => {
-        if (event.target.classList.contains('delete-income-btn')) {
-            const rowId = event.target.dataset.rowId;
-            document.getElementById(rowId).remove();
-            liveUpdate();
-        }
-    });
-
-    elements.extraRebalanceContainer.addEventListener('input', (event) => {
-         if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT') liveUpdate();
-    });
-
-    elements.addExtraRebalanceBtn.addEventListener('click', () => {
-        addExtraordinaryRebalanceRow();
-        liveUpdate();
-    });
-
-    elements.extraRebalanceContainer.addEventListener('click', (event) => {
-        if (event.target.classList.contains('delete-rebalance-btn')) {
+    elements.plannedOperationsContainer.addEventListener('click', (event) => {
+        if (event.target.classList.contains('delete-op-btn')) {
             const rowId = event.target.dataset.rowId;
             document.getElementById(rowId).remove();
             liveUpdate();
@@ -952,17 +923,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const scenarioType = btn.id.split('-')[1];
             const config = getConfigFromUI();
             config.sp500Scenario = scenarios[scenarioType];
-            config.extraordinaryIncomes = []; 
-            config.extraordinaryRebalances = [];
+            config.plannedOperations = [];
             
             if (scenarioType === 'despertar') {
-                 config.extraordinaryRebalances = [
-                    { amount: 40000, year: 3, direction: 'rf-to-rv' },
-                    { amount: 40000, year: 4, direction: 'rf-to-rv' }
+                 config.plannedOperations = [
+                    { amount: 40000, year: 3, source: 'rf', dest: 'rv', dcaPeriod: 1.5 },
+                    { amount: 40000, year: 4, source: 'rf', dest: 'rv', dcaPeriod: 1.5 }
                 ];
             } else if (scenarioType === 'benner') {
-                 config.extraordinaryRebalances = [
-                    { amount: 80000, year: 8, direction: 'rf-to-rv' } // Deploy during the Panic of 2032 (year 8 of simulation)
+                 config.plannedOperations = [
+                    { amount: 80000, year: 8, source: 'rf', dest: 'rv', dcaPeriod: 2 } // Deploy during the Panic of 2032 (year 8 of simulation)
                 ];
             }
 
