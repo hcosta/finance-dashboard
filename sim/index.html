@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Inversión a Largo Plazo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilos para el Modal (con CSS estándar para máxima compatibilidad) */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* shadow-xl */
+            padding: 1.5rem; /* p-6 */
+            width: 100%;
+            max-width: 32rem; /* max-w-lg */
+            transform: scale(0.95);
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-blue-700">Simulador de Inversión Avanzado</h1>
+            <p class="text-gray-600 mt-2">Proyecta tu patrimonio, planifica aportaciones, simula crisis y rebalancea tu cartera.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Columna de Controles -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Patrimonio Inicial -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">Patrimonio Inicial y Crecimiento</h2>
+                    <div class="space-y-4">
+                        <!-- Campos de patrimonio -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="rf-inicial" class="block mb-2 text-sm font-medium text-gray-700">Renta Fija (€)</label>
+                                <input type="number" id="rf-inicial" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="10000">
+                            </div>
+                            <div>
+                                <label for="rf-crecimiento" class="block mb-2 text-sm font-medium text-gray-700">Crec. Anual (%)</label>
+                                <input type="number" id="rf-crecimiento" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="2.5" step="0.1">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="rv-inicial" class="block mb-2 text-sm font-medium text-gray-700">Renta Variable (€)</label>
+                                <input type="number" id="rv-inicial" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="30000">
+                            </div>
+                            <div>
+                                <label for="rv-crecimiento" class="block mb-2 text-sm font-medium text-gray-700">Crec. Anual (%)</label>
+                                <input type="number" id="rv-crecimiento" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="8" step="0.1">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                             <div>
+                                <label for="oro-inicial" class="block mb-2 text-sm font-medium text-gray-700">Oro (€)</label>
+                                <input type="number" id="oro-inicial" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="5000">
+                            </div>
+                            <div>
+                                <label for="oro-crecimiento" class="block mb-2 text-sm font-medium text-gray-700">Crec. Anual (%)</label>
+                                <input type="number" id="oro-crecimiento" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="4" step="0.1">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="ahorro-inicial" class="block mb-2 text-sm font-medium text-gray-700">Ahorro/Liquidez (€)</label>
+                                <input type="number" id="ahorro-inicial" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="5000">
+                            </div>
+                             <div>
+                                <label for="ahorro-crecimiento" class="block mb-2 text-sm font-medium text-gray-700">Crec. Anual (%)</label>
+                                <input type="number" id="ahorro-crecimiento" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="1" step="0.1">
+                            </div>
+                        </div>
+                         <div class="grid grid-cols-2 gap-4">
+                             <div>
+                                <label for="crypto-inicial" class="block mb-2 text-sm font-medium text-gray-700">Cryptos (€)</label>
+                                <input type="number" id="crypto-inicial" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="2000">
+                            </div>
+                             <div>
+                                <label for="crypto-crecimiento" class="block mb-2 text-sm font-medium text-gray-700">Crec. Anual (%)</label>
+                                <input type="number" id="crypto-crecimiento" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="15" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parámetros de Simulación -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">Parámetros de Simulación</h2>
+                     <div class="space-y-4">
+                        <div>
+                            <label for="anos" class="block mb-2 text-sm font-medium text-gray-700">Años a Simular</label>
+                            <input type="number" id="anos" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="40">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="stress-test" class="block text-sm font-medium text-gray-700">Modo "Stress Test"</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="stress-test" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Eventos -->
+                <div class="space-y-6">
+                    <!-- Aportaciones DCA -->
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-gray-800">Aportaciones (DCA)</h3>
+                            <button id="btn-add-dca" class="px-3 py-1 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-lg">+</button>
+                        </div>
+                        <div id="dca-list" class="space-y-2"></div>
+                    </div>
+                    <!-- Crisis -->
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-gray-800">Crisis de Mercado</h3>
+                             <button id="btn-add-crisis" class="px-3 py-1 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-lg">+</button>
+                        </div>
+                        <div id="crisis-list" class="space-y-2"></div>
+                    </div>
+                     <!-- Rebalanceos -->
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-gray-800">Rebalanceos de Cartera</h3>
+                            <button id="btn-add-rebalance" class="px-3 py-1 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-lg">+</button>
+                        </div>
+                        <div id="rebalance-list" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <button id="run-simulation" class="w-full text-lg px-4 py-3 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700">
+                        Lanzar Simulación
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Columna de Resultados -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 h-full">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">Evolución del Patrimonio</h2>
+                    <div class="relative h-[400px] md:h-[500px]">
+                         <canvas id="investment-chart"></canvas>
+                    </div>
+                    <div id="results-summary" class="mt-6 text-center"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <!-- Modal DCA -->
+    <div id="dca-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">Añadir Aportación (DCA)</h3>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="dca-ano" class="block mb-2 text-sm font-medium text-gray-700">Año de Inicio</label>
+                        <input type="number" id="dca-ano" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="0" value="1">
+                    </div>
+                    <div>
+                        <label for="dca-mes" class="block mb-2 text-sm font-medium text-gray-700">Mes de Inicio</label>
+                        <input type="number" id="dca-mes" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="1" max="12" value="1">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                     <div>
+                        <label for="dca-duracion" class="block mb-2 text-sm font-medium text-gray-700">Duración (meses)</label>
+                        <input type="number" id="dca-duracion" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="18" min="1">
+                    </div>
+                    <div>
+                        <label for="dca-cantidad" class="block mb-2 text-sm font-medium text-gray-700">Cantidad Mensual (€)</label>
+                        <input type="number" id="dca-cantidad" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="300">
+                    </div>
+                </div>
+                <hr>
+                <p class="font-semibold text-gray-700">Distribución de la aportación (%):</p>
+                <div class="grid grid-cols-5 gap-2 items-center">
+                     <label for="dca-rf-pct" class="block text-sm font-medium text-gray-700">RF</label>
+                    <input type="number" id="dca-rf-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2" value="25" min="0" max="100">
+                     <label for="dca-rv-pct" class="block text-sm font-medium text-gray-700">RV</label>
+                    <input type="number" id="dca-rv-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2" value="60" min="0" max="100">
+                     <label for="dca-oro-pct" class="block text-sm font-medium text-gray-700">Oro</label>
+                    <input type="number" id="dca-oro-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2" value="15" min="0" max="100">
+                     <label for="dca-ahorro-pct" class="block text-sm font-medium text-gray-700">Ahorro</label>
+                    <input type="number" id="dca-ahorro-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2" value="0" min="0" max="100">
+                     <label for="dca-crypto-pct" class="block text-sm font-medium text-gray-700">Crypto</label>
+                    <input type="number" id="dca-crypto-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2" value="0" min="0" max="100">
+                </div>
+                <p id="dca-pct-error" class="text-red-500 text-sm hidden">Los porcentajes deben sumar 100.</p>
+            </div>
+            <div class="flex justify-end mt-6 space-x-3">
+                <button id="dca-cancel" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-gray-500 hover:bg-gray-600">Cancelar</button>
+                <button id="dca-save" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700">Guardar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Crisis -->
+    <div id="crisis-modal" class="modal">
+         <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">Añadir Crisis de Mercado</h3>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="crisis-ano" class="block mb-2 text-sm font-medium text-gray-700">Año</label>
+                        <input type="number" id="crisis-ano" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="0" value="5">
+                    </div>
+                     <div>
+                        <label for="crisis-mes" class="block mb-2 text-sm font-medium text-gray-700">Mes</label>
+                        <input type="number" id="crisis-mes" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="1" max="12" value="3">
+                    </div>
+                </div>
+                <div>
+                     <label for="crisis-caida" class="block mb-2 text-sm font-medium text-gray-700">Caída RV y Crypto (%)</label>
+                     <input type="number" id="crisis-caida" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="30" min="0" max="100">
+                </div>
+            </div>
+            <div class="flex justify-end mt-6 space-x-3">
+                <button id="crisis-cancel" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-gray-500 hover:bg-gray-600">Cancelar</button>
+                <button id="crisis-save" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Rebalanceo -->
+    <div id="rebalance-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">Añadir Rebalanceo de Cartera</h3>
+             <div class="space-y-4">
+                 <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="rebalance-ano" class="block mb-2 text-sm font-medium text-gray-700">Año</label>
+                        <input type="number" id="rebalance-ano" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="0" value="10">
+                    </div>
+                     <div>
+                        <label for="rebalance-mes" class="block mb-2 text-sm font-medium text-gray-700">Mes</label>
+                        <input type="number" id="rebalance-mes" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="1" max="12" value="1">
+                    </div>
+                </div>
+                <hr>
+                <p class="font-semibold text-gray-700">Nuevos porcentajes objetivo (%):</p>
+                 <div class="grid grid-cols-5 gap-2 items-center">
+                     <label for="rebalance-rf-pct" class="block text-sm font-medium text-gray-700">RF</label>
+                    <input type="number" id="rebalance-rf-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2" value="40" min="0" max="100">
+                     <label for="rebalance-rv-pct" class="block text-sm font-medium text-gray-700">RV</label>
+                    <input type="number" id="rebalance-rv-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2" value="40" min="0" max="100">
+                     <label for="rebalance-oro-pct" class="block text-sm font-medium text-gray-700">Oro</label>
+                    <input type="number" id="rebalance-oro-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2" value="10" min="0" max="100">
+                     <label for="rebalance-ahorro-pct" class="block text-sm font-medium text-gray-700">Ahorro</label>
+                    <input type="number" id="rebalance-ahorro-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2" value="5" min="0" max="100">
+                     <label for="rebalance-crypto-pct" class="block text-sm font-medium text-gray-700">Crypto</label>
+                    <input type="number" id="rebalance-crypto-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2" value="5" min="0" max="100">
+                </div>
+                <p id="rebalance-pct-error" class="text-red-500 text-sm hidden">Los porcentajes deben sumar 100.</p>
+             </div>
+             <div class="flex justify-end mt-6 space-x-3">
+                <button id="rebalance-cancel" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-gray-500 hover:bg-gray-600">Cancelar</button>
+                <button id="rebalance-save" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // --- CONFIGURACIÓN INICIAL Y REFERENCIAS AL DOM ---
+        const ASSET_KEYS = ['rf', 'rv', 'oro', 'ahorro', 'crypto'];
+        const ASSET_NAMES = {
+            rf: 'Renta Fija',
+            rv: 'Renta Variable',
+            oro: 'Oro',
+            ahorro: 'Ahorro',
+            crypto: 'Cryptos'
+        };
+        const ASSET_COLORS = {
+            rf: 'rgba(54, 162, 235, 0.8)',
+            rv: 'rgba(255, 99, 132, 0.8)',
+            oro: 'rgba(255, 206, 86, 0.8)',
+            ahorro: 'rgba(75, 192, 192, 0.8)',
+            crypto: 'rgba(153, 102, 255, 0.8)',
+            total: 'rgba(0, 0, 0, 1)'
+        };
+
+        // Elementos de la UI
+        const runButton = document.getElementById('run-simulation');
+        const resultsSummary = document.getElementById('results-summary');
+
+        // Almacenamiento de eventos
+        let dcaPlans = [];
+        let crises = [];
+        let rebalances = [];
+
+        // Chart.js
+        const ctx = document.getElementById('investment-chart').getContext('2d');
+        let investmentChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value);
+                            }
+                        }
+                    },
+                    x: {
+                       title: {
+                           display: true,
+                           text: 'Años'
+                       }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                     label += new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- MANEJO DE MODALES ---
+        const setupModal = (modalId, openBtnId, saveBtnId, cancelBtnId, saveCallback) => {
+            const modal = document.getElementById(modalId);
+            const openBtn = document.getElementById(openBtnId);
+            const saveBtn = document.getElementById(saveBtnId);
+            const cancelBtn = document.getElementById(cancelBtnId);
+
+            const open = () => modal.classList.add('active');
+            const close = () => modal.classList.remove('active');
+
+            openBtn.addEventListener('click', open);
+            cancelBtn.addEventListener('click', close);
+            saveBtn.addEventListener('click', () => {
+                if(saveCallback()) {
+                    close();
+                }
+            });
+            // Cerrar al hacer clic fuera del contenido
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    close();
+                }
+            });
+        };
+
+        // Modal DCA
+        setupModal('dca-modal', 'btn-add-dca', 'dca-save', 'dca-cancel', () => {
+            const errorEl = document.getElementById('dca-pct-error');
+            const pcts = {
+                rf: parseFloat(document.getElementById('dca-rf-pct').value),
+                rv: parseFloat(document.getElementById('dca-rv-pct').value),
+                oro: parseFloat(document.getElementById('dca-oro-pct').value),
+                ahorro: parseFloat(document.getElementById('dca-ahorro-pct').value),
+                crypto: parseFloat(document.getElementById('dca-crypto-pct').value)
+            };
+            const totalPct = Object.values(pcts).reduce((a, b) => a + b, 0);
+
+            if (Math.abs(totalPct - 100) > 0.01) {
+                errorEl.classList.remove('hidden');
+                return false;
+            }
+            errorEl.classList.add('hidden');
+
+            const plan = {
+                id: Date.now(),
+                startYear: parseInt(document.getElementById('dca-ano').value),
+                startMonth: parseInt(document.getElementById('dca-mes').value),
+                duration: parseInt(document.getElementById('dca-duracion').value),
+                amount: parseFloat(document.getElementById('dca-cantidad').value),
+                percentages: pcts,
+            };
+            dcaPlans.push(plan);
+            renderDcaList();
+            return true;
+        });
+
+        // Modal Crisis
+        setupModal('crisis-modal', 'btn-add-crisis', 'crisis-save', 'crisis-cancel', () => {
+            const crisis = {
+                id: Date.now(),
+                year: parseInt(document.getElementById('crisis-ano').value),
+                month: parseInt(document.getElementById('crisis-mes').value),
+                drop: parseFloat(document.getElementById('crisis-caida').value)
+            };
+            crises.push(crisis);
+            renderCrisisList();
+            return true;
+        });
+        
+        // Modal Rebalanceo
+        setupModal('rebalance-modal', 'btn-add-rebalance', 'rebalance-save', 'rebalance-cancel', () => {
+            const errorEl = document.getElementById('rebalance-pct-error');
+            const pcts = {
+                rf: parseFloat(document.getElementById('rebalance-rf-pct').value),
+                rv: parseFloat(document.getElementById('rebalance-rv-pct').value),
+                oro: parseFloat(document.getElementById('rebalance-oro-pct').value),
+                ahorro: parseFloat(document.getElementById('rebalance-ahorro-pct').value),
+                crypto: parseFloat(document.getElementById('rebalance-crypto-pct').value)
+            };
+            const totalPct = Object.values(pcts).reduce((a, b) => a + b, 0);
+
+            if (Math.abs(totalPct - 100) > 0.01) {
+                errorEl.classList.remove('hidden');
+                return false;
+            }
+            errorEl.classList.add('hidden');
+
+            const rebalance = {
+                id: Date.now(),
+                year: parseInt(document.getElementById('rebalance-ano').value),
+                month: parseInt(document.getElementById('rebalance-mes').value),
+                percentages: pcts
+            };
+            rebalances.push(rebalance);
+            renderRebalanceList();
+            return true;
+        });
+
+        // --- RENDERIZADO DE LISTAS DE EVENTOS ---
+        const renderDcaList = () => {
+            const listEl = document.getElementById('dca-list');
+            listEl.innerHTML = dcaPlans.map(p => `
+                <div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center">
+                    <span>Año ${p.startYear}, Mes ${p.startMonth}: ${new Intl.NumberFormat('es-ES').format(p.amount)}€/mes (${p.duration}m)</span>
+                    <button data-id="${p.id}" class="dca-delete px-2 py-1 rounded font-semibold text-white transition-colors duration-200 bg-red-600 hover:bg-red-700 text-xs">X</button>
+                </div>
+            `).join('');
+            document.querySelectorAll('.dca-delete').forEach(btn => btn.addEventListener('click', (e) => {
+                dcaPlans = dcaPlans.filter(p => p.id != e.target.dataset.id);
+                renderDcaList();
+            }));
+        };
+
+        const renderCrisisList = () => {
+            const listEl = document.getElementById('crisis-list');
+            listEl.innerHTML = crises.map(c => `
+                <div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center">
+                    <span>Año ${c.year}, Mes ${c.month}: Caída del ${c.drop}%</span>
+                    <button data-id="${c.id}" class="crisis-delete px-2 py-1 rounded font-semibold text-white transition-colors duration-200 bg-red-600 hover:bg-red-700 text-xs">X</button>
+                </div>
+            `).join('');
+             document.querySelectorAll('.crisis-delete').forEach(btn => btn.addEventListener('click', (e) => {
+                crises = crises.filter(c => c.id != e.target.dataset.id);
+                renderCrisisList();
+            }));
+        };
+        
+        const renderRebalanceList = () => {
+            const listEl = document.getElementById('rebalance-list');
+            listEl.innerHTML = rebalances.map(r => `
+                <div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center">
+                    <span>Año ${r.year}, Mes ${r.month}: Rebalanceo</span>
+                    <button data-id="${r.id}" class="rebalance-delete px-2 py-1 rounded font-semibold text-white transition-colors duration-200 bg-red-600 hover:bg-red-700 text-xs">X</button>
+                </div>
+            `).join('');
+             document.querySelectorAll('.rebalance-delete').forEach(btn => btn.addEventListener('click', (e) => {
+                rebalances = rebalances.filter(r => r.id != e.target.dataset.id);
+                renderRebalanceList();
+            }));
+        };
+
+        // --- LÓGICA DE SIMULACIÓN ---
+        const runSimulation = () => {
+            // 1. Recoger datos de entrada
+            const initialPortfolio = {};
+            const annualGrowth = {};
+            ASSET_KEYS.forEach(key => {
+                initialPortfolio[key] = parseFloat(document.getElementById(`${key}-inicial`).value) || 0;
+                annualGrowth[key] = parseFloat(document.getElementById(`${key}-crecimiento`).value) || 0;
+            });
+            const simulationYears = parseInt(document.getElementById('anos').value) || 40;
+            const isStressTest = document.getElementById('stress-test').checked;
+
+            // 2. Preparar la simulación
+            const monthlyGrowth = {};
+            ASSET_KEYS.forEach(key => {
+                let rate = annualGrowth[key];
+                if (isStressTest) {
+                    if (key === 'rv') rate -= 5;
+                    if (key === 'crypto') rate -= 20;
+                    if (key === 'oro') rate -= 2;
+                    if (key === 'rf') rate -= 1;
+                }
+                monthlyGrowth[key] = Math.pow(1 + rate / 100, 1 / 12) - 1;
+            });
+            
+            const totalMonths = simulationYears * 12;
+            let portfolioHistory = [];
+            let currentPortfolio = { ...initialPortfolio };
+            
+            // 3. Bucle principal de simulación (mensual)
+            for (let month = 0; month <= totalMonths; month++) {
+                const currentYear = Math.floor(month / 12);
+                const currentMonthInYear = (month % 12) + 1;
+
+                if (month > 0) {
+                     // a. Aplicar crecimiento
+                    ASSET_KEYS.forEach(key => {
+                        currentPortfolio[key] *= (1 + monthlyGrowth[key]);
+                    });
+
+                    // b. Aplicar aportaciones DCA
+                    dcaPlans.forEach(plan => {
+                        const startTotalMonth = plan.startYear * 12 + plan.startMonth;
+                        const endTotalMonth = startTotalMonth + plan.duration;
+                        if (month >= startTotalMonth && month < endTotalMonth) {
+                             ASSET_KEYS.forEach(key => {
+                                currentPortfolio[key] += plan.amount * (plan.percentages[key] / 100);
+                            });
+                        }
+                    });
+
+                    // c. Aplicar crisis
+                    crises.forEach(crisis => {
+                        if (crisis.year === currentYear && crisis.month === currentMonthInYear) {
+                            currentPortfolio.rv *= (1 - crisis.drop / 100);
+                            currentPortfolio.crypto *= (1 - crisis.drop / 100);
+                        }
+                    });
+
+                    // d. Aplicar rebalanceos
+                    rebalances.forEach(rebalance => {
+                        if (rebalance.year === currentYear && rebalance.month === currentMonthInYear) {
+                            const totalValue = Object.values(currentPortfolio).reduce((a,b) => a+b, 0);
+                            ASSET_KEYS.forEach(key => {
+                                currentPortfolio[key] = totalValue * (rebalance.percentages[key] / 100);
+                            });
+                        }
+                    });
+                }
+                
+                // e. Guardar histórico
+                const totalValue = Object.values(currentPortfolio).reduce((a, b) => a + b, 0);
+                portfolioHistory.push({ ...currentPortfolio, total: totalValue });
+            }
+
+            // 4. Renderizar resultados
+            renderResults(portfolioHistory, simulationYears);
+        };
+        
+        // --- RENDERIZADO DE RESULTADOS ---
+        const renderResults = (history, years) => {
+            const labels = Array.from({ length: years + 1 }, (_, i) => i);
+            const yearlyData = labels.map(year => history[year * 12]);
+
+            const datasets = [
+                {
+                    label: 'Patrimonio Total',
+                    data: yearlyData.map(p => p.total),
+                    borderColor: ASSET_COLORS.total,
+                    backgroundColor: ASSET_COLORS.total,
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.1
+                },
+                ...ASSET_KEYS.map(key => ({
+                    label: ASSET_NAMES[key],
+                    data: yearlyData.map(p => p[key]),
+                    borderColor: ASSET_COLORS[key],
+                    backgroundColor: ASSET_COLORS[key],
+                    borderWidth: 1.5,
+                    fill: false,
+                    hidden: true, // Ocultos por defecto para no saturar
+                }))
+            ];
+
+            investmentChart.data.labels = labels;
+            investmentChart.data.datasets = datasets;
+            investmentChart.update();
+            
+            // Renderizar resumen
+            const finalValue = history[history.length - 1].total;
+            resultsSummary.innerHTML = `
+                <p class="text-lg">Después de <span class="font-bold">${years}</span> años, tu patrimonio estimado es:</p>
+                <p class="text-4xl font-bold text-blue-700 mt-2">${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(finalValue)}</p>
+            `;
+        };
+
+        // --- EVENT LISTENER PRINCIPAL ---
+        runButton.addEventListener('click', runSimulation);
+
+        // --- LANZAR SIMULACIÓN INICIAL ---
+        runSimulation();
+    });
+    </script>
+
+</body>
+</html>
+
