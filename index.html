@@ -130,9 +130,11 @@
                                     <tr>
                                         <th scope="col" class="px-6 py-3">Año</th>
                                         <th scope="col" class="px-6 py-3">Patrimonio Total</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Ahorro %</th>
                                         <th scope="col" class="px-6 py-3 text-center">RF %</th>
                                         <th scope="col" class="px-6 py-3 text-center">RV %</th>
                                         <th scope="col" class="px-6 py-3 text-center">Metales %</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Cryptos %</th>
                                     </tr>
                                 </thead>
                                 <tbody id="summary-table-body">
@@ -174,6 +176,14 @@
                 <div class="mt-2 flex items-center">
                     <input id="dca-ajustar-inflacion" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                     <label for="dca-ajustar-inflacion" class="ml-2 text-sm font-medium text-gray-900">Ajustar a inflación anual</label>
+                </div>
+                <div class="mt-2 flex items-center">
+                    <input id="dca-rebalance-rf-rv" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="dca-rebalance-rf-rv" class="ml-2 text-sm font-medium text-gray-900">Traspaso RF a RV (imp. 20% plusvalía)</label>
+                </div>
+                <div class="mt-2 flex items-center">
+                    <input id="dca-rebalance-ahorro-rv" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="dca-rebalance-ahorro-rv" class="ml-2 text-sm font-medium text-gray-900">Traspaso Ahorro a RV (sin plusvalía)</label>
                 </div>
                 <hr>
                 <p class="font-semibold text-gray-700">Distribución de la aportación (%):</p>
@@ -247,33 +257,33 @@
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         // --- CONFIGURACIÓN INICIAL Y CONSTANTES ---
-        const ASSET_KEYS = ['rf', 'rv', 'metales'];
+        const ASSET_KEYS = ['ahorro', 'rf', 'rv', 'metales', 'cryptos'];
         const ASSET_NAMES = {
-            rf: 'Renta Fija', rv: 'Renta Variable', metales: 'Metales'
+            ahorro: 'Ahorro', rf: 'Renta Fija', rv: 'Renta Variable', metales: 'Metales', cryptos: 'Cryptos'
         };
         const ASSET_COLORS = {
-            rf: 'rgba(54, 162, 235, 0.8)', rv: 'rgba(255, 99, 132, 0.8)',
-            metales: 'rgba(255, 206, 86, 0.8)',
+            ahorro: 'rgba(153, 102, 255, 0.8)', rf: 'rgba(54, 162, 235, 0.8)', rv: 'rgba(255, 99, 132, 0.8)',
+            metales: 'rgba(255, 206, 86, 0.8)', cryptos: 'rgba(255, 159, 64, 0.8)',
             total: 'rgba(0, 0, 0, 1)',
             contributed: 'rgba(100, 100, 100, 0.7)'
         };
         const SCENARIOS = {
             manual: {},
             negativo: {
-                growth: { rf: 1.5, rv: 5.0, metales: 3.5 },
+                growth: { ahorro: 0.5, rf: 1.5, rv: 5.0, metales: 4, cryptos: 8.0 },
                 crises: [
-                    { id: Date.now() + 1, year: 4, month: 3, drops: { rv: 35 }, auto: true },
-                    { id: Date.now() + 2, year: 12, month: 9, drops: { rv: 25 }, auto: true }
+                    { id: Date.now() + 1, year: 4, month: 3, drops: { rv: 35, metales: 25, cryptos: 60 }, auto: true },
+                    { id: Date.now() + 2, year: 12, month: 9, drops: { rv: 25, metales: 15, cryptos: 40 }, auto: true }
                 ]
             },
             neutro: {
-                growth: { rf: 2.5, rv: 7.5, metales: 3.0 },
+                growth: { ahorro: 0.75, rf: 2.5, rv: 6.5, metales: 5, cryptos: 10.0 },
                 crises: [
-                    { id: Date.now() + 3, year: 7, month: 6, drops: { rv: 25 }, auto: true }
+                    { id: Date.now() + 3, year: 7, month: 6, drops: { rv: 25, metales: 15, cryptos: 40 }, auto: true }
                 ]
             },
             positivo: {
-                growth: { rf: 3.0, rv: 9.5, metales: 4.0 },
+                growth: { ahorro: 1.0, rf: 3.0, rv: 9.5, metales: 8.0, cryptos: 15.0 },
                 crises: []
             }
         };
@@ -295,6 +305,7 @@
             const dcaContainer = document.getElementById('dca-pct-inputs');
             const crisisContainer = document.getElementById('crisis-pct-inputs');
             const rebalanceContainer = document.getElementById('rebalance-pct-inputs');
+            const defaultGrowth = { ahorro: 0.75, cryptos: 10.0 };
 
             patrimonioContainer.innerHTML = ASSET_KEYS.map(key => `
                 <div class="grid grid-cols-2 gap-4">
@@ -304,7 +315,7 @@
                     </div>
                     <div>
                         <label for="${key}-crecimiento" class="block mb-2 text-sm font-medium text-gray-700">Crec. Anual (%)</label>
-                        <input type="number" id="${key}-crecimiento" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="0" step="0.1">
+                        <input type="number" id="${key}-crecimiento" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="${defaultGrowth[key] || 0}" step="0.1">
                     </div>
                 </div>
             `).join('');
@@ -319,7 +330,7 @@
                  <input type="number" id="rebalance-${key}-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 text-center" value="0" min="0" max="100"></div>
             `).join('');
             
-            crisisContainer.innerHTML = ['rv'].map(key => `
+            crisisContainer.innerHTML = ['rv', 'metales', 'cryptos'].map(key => `
                  <div><label for="crisis-caida-${key}" class="block mb-2 text-sm font-medium text-gray-700">${ASSET_NAMES[key]}</label>
                  <input type="number" id="crisis-caida-${key}" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="0" min="0" max="100"></div>
             `).join('');
@@ -492,6 +503,8 @@
             document.getElementById('dca-duracion').value = plan ? plan.duration : 18;
             document.getElementById('dca-cantidad').value = plan ? plan.amount : 300;
             document.getElementById('dca-ajustar-inflacion').checked = plan ? plan.adjustForInflation : false;
+            document.getElementById('dca-rebalance-rf-rv').checked = plan ? plan.isRebalanceRfRv : false;
+            document.getElementById('dca-rebalance-ahorro-rv').checked = plan ? plan.isRebalanceAhorroRv : false;
             ASSET_KEYS.forEach(key => {
                 document.getElementById(`dca-${key}-pct`).value = plan && plan.percentages[key] ? plan.percentages[key] : 0;
             });
@@ -511,7 +524,9 @@
                 duration: parseInt(document.getElementById('dca-duracion').value),
                 amount: parseFloat(document.getElementById('dca-cantidad').value),
                 percentages: pcts,
-                adjustForInflation: document.getElementById('dca-ajustar-inflacion').checked
+                adjustForInflation: document.getElementById('dca-ajustar-inflacion').checked,
+                isRebalanceRfRv: document.getElementById('dca-rebalance-rf-rv').checked,
+                isRebalanceAhorroRv: document.getElementById('dca-rebalance-ahorro-rv').checked
             };
             
             if (editingEventId) {
@@ -526,12 +541,20 @@
         const openCrisisModalForEdit = (crisis) => {
             document.getElementById('crisis-ano').value = crisis ? crisis.year : 5;
             document.getElementById('crisis-mes').value = crisis ? crisis.month : 3;
-            document.getElementById('crisis-caida-rv').value = crisis ? crisis.drops.rv : 0;
+            ['rv', 'metales', 'cryptos'].forEach(key => {
+                document.getElementById(`crisis-caida-${key}`).value = crisis && crisis.drops[key] ? crisis.drops[key] : 0;
+            });
         };
         setupModal('crisis-modal', 'btn-add-crisis', 'crisis-save', 'crisis-cancel', () => {
+            const drops = {};
+            ['rv', 'metales', 'cryptos'].forEach(key => {
+                const value = parseFloat(document.getElementById(`crisis-caida-${key}`).value) || 0;
+                if (value > 0) drops[key] = value;
+            });
+
             const newCrisis = {
                 id: editingEventId || Date.now(), year: parseInt(document.getElementById('crisis-ano').value), month: parseInt(document.getElementById('crisis-mes').value),
-                drops: { rv: parseFloat(document.getElementById('crisis-caida-rv').value) || 0 }
+                drops: drops
             };
 
             if (editingEventId) {
@@ -573,7 +596,7 @@
 
         const renderDcaList = () => {
             const listEl = document.getElementById('dca-list');
-            listEl.innerHTML = dcaPlans.map(p => `<div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center"><span>Año ${p.startYear}, Mes ${p.startMonth}: ${new Intl.NumberFormat('es-ES').format(p.amount)}€/mes (${p.duration}m) ${p.adjustForInflation ? '📈' : ''}</span><div class="space-x-1"><button data-id="${p.id}" class="dca-edit px-2 py-1 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600 text-xs">E</button><button data-id="${p.id}" class="dca-delete px-2 py-1 rounded font-semibold text-white bg-red-600 hover:bg-red-700 text-xs">X</button></div></div>`).join('');
+            listEl.innerHTML = dcaPlans.map(p => `<div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center"><span>Año ${p.startYear}, Mes ${p.startMonth}: ${new Intl.NumberFormat('es-ES').format(p.amount)}€/mes (${p.duration}m) ${p.adjustForInflation ? '📈' : ''} ${p.isRebalanceRfRv ? '🔄 RF a RV' : ''} ${p.isRebalanceAhorroRv ? '↪️ Ahorro a RV' : ''}</span><div class="space-x-1"><button data-id="${p.id}" class="dca-edit px-2 py-1 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600 text-xs">E</button><button data-id="${p.id}" class="dca-delete px-2 py-1 rounded font-semibold text-white bg-red-600 hover:bg-red-700 text-xs">X</button></div></div>`).join('');
             document.querySelectorAll('.dca-delete').forEach(btn => btn.addEventListener('click', (e) => { dcaPlans = dcaPlans.filter(p => p.id != e.target.dataset.id); renderDcaList(); debouncedRunSimulation(); }));
             document.querySelectorAll('.dca-edit').forEach(btn => btn.addEventListener('click', (e) => {
                 editingEventId = parseInt(e.target.dataset.id);
@@ -585,7 +608,8 @@
         };
         const renderCrisisList = () => {
              const listEl = document.getElementById('crisis-list');
-            listEl.innerHTML = crises.map(c => `<div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center ${c.auto ? 'opacity-70' : ''}"><span>Año ${c.year}, Mes ${c.month}: Caída RV(${c.drops.rv}%) ${c.auto ? '(Auto)' : ''}</span><div class="space-x-1"><button data-id="${c.id}" class="crisis-edit px-2 py-1 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600 text-xs">E</button><button data-id="${c.id}" class="crisis-delete px-2 py-1 rounded font-semibold text-white bg-red-600 hover:bg-red-700 text-xs">X</button></div></div>`).join('');
+            const crisisSummary = c => Object.keys(c.drops).map(key => `${key.toUpperCase()}(${c.drops[key]}%)`).join(' ');
+            listEl.innerHTML = crises.map(c => `<div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center ${c.auto ? 'opacity-70' : ''}"><span>Año ${c.year}, Mes ${c.month}: Caída ${crisisSummary(c)} ${c.auto ? '(Auto)' : ''}</span><div class="space-x-1"><button data-id="${c.id}" class="crisis-edit px-2 py-1 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600 text-xs">E</button><button data-id="${c.id}" class="crisis-delete px-2 py-1 rounded font-semibold text-white bg-red-600 hover:bg-red-700 text-xs">X</button></div></div>`).join('');
              document.querySelectorAll('.crisis-delete').forEach(btn => btn.addEventListener('click', (e) => { crises = crises.filter(c => c.id != e.target.dataset.id); renderCrisisList(); debouncedRunSimulation(); }));
              document.querySelectorAll('.crisis-edit').forEach(btn => btn.addEventListener('click', (e) => {
                 editingEventId = parseInt(e.target.dataset.id);
@@ -608,11 +632,26 @@
             }));
         };
 
+        // Lógica para que los checkboxes de traspaso sean mutuamente excluyentes
+        const rebalanceRfRvCheckbox = document.getElementById('dca-rebalance-rf-rv');
+        const rebalanceAhorroRvCheckbox = document.getElementById('dca-rebalance-ahorro-rv');
+        rebalanceRfRvCheckbox.addEventListener('change', () => {
+            if (rebalanceRfRvCheckbox.checked) {
+                rebalanceAhorroRvCheckbox.checked = false;
+            }
+        });
+        rebalanceAhorroRvCheckbox.addEventListener('change', () => {
+            if (rebalanceAhorroRvCheckbox.checked) {
+                rebalanceRfRvCheckbox.checked = false;
+            }
+        });
+
         // --- LÓGICA DE SIMULACIÓN PRINCIPAL ---
         const runSimulation = () => {
             const initialPortfolio = {};
             ASSET_KEYS.forEach(key => {
-                initialPortfolio[key] = parseFloat(document.getElementById(`${key}-inicial`).value) || 0;
+                const initialValue = parseFloat(document.getElementById(`${key}-inicial`).value) || 0;
+                initialPortfolio[key] = { value: initialValue, cost: initialValue };
             });
             const annualGrowth = {};
             ASSET_KEYS.forEach(key => {
@@ -626,46 +665,102 @@
             
             const totalMonths = simulationYears * 12;
             let portfolioHistory = [];
-            let currentPortfolio = { ...initialPortfolio };
-            let totalContributed = Object.values(initialPortfolio).reduce((a, b) => a + b, 0);
+            let currentPortfolio = JSON.parse(JSON.stringify(initialPortfolio));
+            let totalContributed = Object.values(initialPortfolio).reduce((acc, asset) => acc + asset.cost, 0);
             
             for (let month = 0; month <= totalMonths; month++) {
                 const currentYear = Math.floor(month / 12);
                 const currentMonthInYear = (month % 12) + 1;
 
                 if (month > 0) {
-                    ASSET_KEYS.forEach(key => { currentPortfolio[key] *= (1 + monthlyGrowth[key]); });
+                    ASSET_KEYS.forEach(key => { currentPortfolio[key].value *= (1 + monthlyGrowth[key]); });
                     
                     dcaPlans.forEach(plan => { 
                         const startTotalMonth = (plan.startYear - 1) * 12 + plan.startMonth;
                         const endTotalMonth = startTotalMonth + plan.duration;
                         if (month >= startTotalMonth && month < endTotalMonth) {
-                             let currentAmount = plan.amount;
-                             if (plan.adjustForInflation) {
+                            let currentAmount = plan.amount;
+                            if (plan.adjustForInflation && !plan.isRebalanceRfRv) { // Inflation adjust only for new money
                                 const yearOfPlan = Math.floor((month - startTotalMonth) / 12);
                                 currentAmount = plan.amount * Math.pow(1 + inflationRate / 100, yearOfPlan);
-                             }
-                             totalContributed += currentAmount;
-                             ASSET_KEYS.forEach(key => { currentPortfolio[key] += currentAmount * ((plan.percentages[key] || 0) / 100); });
+                            }
+
+                            if (plan.isRebalanceRfRv) {
+                                const transferAmount = currentAmount;
+                                const sourceAsset = 'rf';
+                                const destinationAsset = 'rv';
+
+                                if (currentPortfolio[sourceAsset].value >= transferAmount) {
+                                    const sourceBefore = { ...currentPortfolio[sourceAsset] };
+                                    let gainRatio = 0;
+                                    if (sourceBefore.value > sourceBefore.cost && sourceBefore.value > 0) {
+                                        gainRatio = (sourceBefore.value - sourceBefore.cost) / sourceBefore.value;
+                                    }
+
+                                    const gainInTransfer = transferAmount * gainRatio;
+                                    const tax = gainInTransfer > 0 ? gainInTransfer * 0.20 : 0;
+                                    const netAmount = transferAmount - tax;
+
+                                    // Update Source (RF)
+                                    currentPortfolio[sourceAsset].value -= transferAmount;
+                                    if (sourceBefore.value > 0) {
+                                        currentPortfolio[sourceAsset].cost -= transferAmount * (sourceBefore.cost / sourceBefore.value);
+                                    }
+
+                                    // Update Destination (RV)
+                                    currentPortfolio[destinationAsset].value += netAmount;
+                                    currentPortfolio[destinationAsset].cost += netAmount;
+                                }
+                            } else if (plan.isRebalanceAhorroRv) {
+                                const transferAmount = currentAmount;
+                                const sourceAsset = 'ahorro';
+                                const destinationAsset = 'rv';
+
+                                if (currentPortfolio[sourceAsset].value >= transferAmount) {
+                                    // Update Source (Ahorro)
+                                    currentPortfolio[sourceAsset].value -= transferAmount;
+                                    currentPortfolio[sourceAsset].cost -= transferAmount;
+                                    
+                                    // Update Destination (RV)
+                                    currentPortfolio[destinationAsset].value += transferAmount;
+                                    currentPortfolio[destinationAsset].cost += transferAmount;
+                                }
+                            } else {
+                                totalContributed += currentAmount;
+                                ASSET_KEYS.forEach(key => { 
+                                    const contribution = currentAmount * ((plan.percentages[key] || 0) / 100);
+                                    currentPortfolio[key].value += contribution;
+                                    currentPortfolio[key].cost += contribution;
+                                });
+                            }
                         }
                     });
                     
                     crises.forEach(crisis => { 
                         if ((crisis.year - 1) === currentYear && crisis.month === currentMonthInYear) {
-                            currentPortfolio.rv *= (1 - (crisis.drops.rv || 0) / 100);
+                             Object.keys(crisis.drops).forEach(assetKey => {
+                                if (currentPortfolio[assetKey] !== undefined) {
+                                    currentPortfolio[assetKey].value *= (1 - (crisis.drops[assetKey] || 0) / 100);
+                                }
+                            });
                         }
                     });
                     
                     rebalances.forEach(rebalance => { 
                          if ((rebalance.year - 1) === currentYear && rebalance.month === currentMonthInYear) {
-                            const totalValue = Object.values(currentPortfolio).reduce((a,b) => a+b, 0);
-                            ASSET_KEYS.forEach(key => { currentPortfolio[key] = totalValue * ((rebalance.percentages[key] || 0) / 100); });
+                            const totalValue = ASSET_KEYS.reduce((acc, key) => acc + currentPortfolio[key].value, 0);
+                            const totalCost = ASSET_KEYS.reduce((acc, key) => acc + currentPortfolio[key].cost, 0);
+                            ASSET_KEYS.forEach(key => { 
+                                const targetPct = (rebalance.percentages[key] || 0) / 100;
+                                currentPortfolio[key].value = totalValue * targetPct;
+                                currentPortfolio[key].cost = totalCost * targetPct;
+                             });
                         }
                     });
                 }
                 
-                const totalValue = Object.values(currentPortfolio).reduce((a, b) => a + b, 0);
-                portfolioHistory.push({ ...currentPortfolio, total: totalValue, contributed: totalContributed });
+                const totalValue = Object.values(currentPortfolio).reduce((acc, asset) => acc + asset.value, 0);
+                portfolioHistory.push({ portfolio: JSON.parse(JSON.stringify(currentPortfolio)), total: totalValue, contributed: totalContributed });
             }
 
             renderResults(portfolioHistory, simulationYears, inflationRate);
@@ -698,7 +793,7 @@
                 },
                 ...ASSET_KEYS.map(key => ({
                     label: ASSET_NAMES[key], 
-                    data: yearlyData.map(p => p[key]), 
+                    data: yearlyData.map(p => p.portfolio[key].value), 
                     borderColor: ASSET_COLORS[key],
                     borderWidth: 1.5,
                     hidden: false,
@@ -723,7 +818,7 @@
                 tableBody.innerHTML = yearlyData.map((data, year) => {
                     const total = data.total || 1;
                     const percentages = ASSET_KEYS.map(key => `
-                        <td class="px-6 py-4 text-center">${(((data[key] || 0) / total) * 100).toFixed(1)}%</td>
+                        <td class="px-6 py-4 text-center">${(((data.portfolio[key].value || 0) / total) * 100).toFixed(1)}%</td>
                     `).join('');
                     return `
                         <tr class="bg-white border-b">
@@ -748,4 +843,6 @@
 
 </body>
 </html>
+
+
 
