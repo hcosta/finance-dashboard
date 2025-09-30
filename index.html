@@ -271,20 +271,20 @@
         const SCENARIOS = {
             manual: {},
             negativo: {
-                growth: { ahorro: 0.75, rf: 1.5, rv: 5.0, oro: 3, plata: 2.5, cryptos: 8.0 },
+                growth: { ahorro: 0.75, rf: 1.5, rv: 5.0, oro: 3, plata: 2.5, cryptos: 5.0 },
                 crises: [
                     { id: Date.now() + 1, year: 4, month: 3, drops: { rv: 35, oro: 20, plata: 30, cryptos: 60 }, auto: true },
                     { id: Date.now() + 2, year: 12, month: 9, drops: { rv: 25, oro: 12, plata: 18, cryptos: 40 }, auto: true }
                 ]
             },
             neutro: {
-                growth: { ahorro: 0.75, rf: 2.5, rv: 6.5, oro: 6, plata: 5, cryptos: 10.0 },
+                growth: { ahorro: 0.75, rf: 2.5, rv: 6.5, oro: 6, plata: 5, cryptos: 6.5 },
                 crises: [
                     { id: Date.now() + 3, year: 7, month: 6, drops: { rv: 25, oro: 12, plata: 18, cryptos: 40 }, auto: true }
                 ]
             },
             positivo: {
-                growth: { ahorro: 0.75, rf: 3.0, rv: 9.5, oro: 9.0, plata: 8.0, cryptos: 15.0 },
+                growth: { ahorro: 0.75, rf: 3.0, rv: 9.5, oro: 9.0, plata: 8.0, cryptos: 9.5 },
                 crises: []
             }
         };
