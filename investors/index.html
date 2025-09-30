@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparativa Visual: Buy & Hold vs. Sistema Algorítmico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 p-4 lg:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white">La Montaña Rusa vs. El Camino Controlado</h1>
+            <p class="text-gray-400 mt-3 text-lg">Evolución de 100.000€ invertidos en el pico de la burbuja (Marzo 2000 - 2025)</p>
+        </header>
+
+        <main class="bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-2xl">
+            <div class="chart-container" style="position: relative; height:60vh; width:100%">
+                <canvas id="portfolioChart"></canvas>
+            </div>
+        </main>
+
+        <footer class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold text-red-400">La Tormenta del "Buy & Hold"</h2>
+                <p class="mt-2 text-gray-400">Sufre caídas catastróficas del -50% y -57%, tardando más de una década solo en recuperar la inversión inicial. Un viaje de pánico y estrés extremo.</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold text-green-400">La Calma del Inversor Sistemático</h2>
+                <p class="mt-2 text-gray-400">Limita las pérdidas a un máximo del -20% (en el anómalo COVID). El sistema protege el capital en cada crisis, permitiendo un crecimiento compuesto mucho más estable y rentable a largo plazo.</p>
+            </div>
+        </footer>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('portfolioChart').getContext('2d');
+
+    // Datos extraídos del documento analisis_peor_escenario.md
+    // Fechas aproximadas para visualización
+    const labels = [
+        'Mar 2000', // Pico Puntocom
+        'Oct 2002', // Fondo Puntocom
+        'Oct 2007', // Pico Pre-GFC
+        'Mar 2009', // Fondo GFC
+        'Feb 2020', // Pico Pre-COVID
+        'Mar 2020', // Fondo COVID
+        'Ene 2022', // Pico Pre-2022
+        'Oct 2022', // Fondo 2022
+        'Sep 2025'  // Actualidad
+    ];
+
+    const buyAndHoldData = [
+        100000, // Mar 2000
+        50000,  // Oct 2002
+        105000, // Oct 2007
+        45000,  // Mar 2009
+        250000, // Feb 2020
+        165000, // Mar 2020
+        300000, // Ene 2022
+        240000, // Oct 2022
+        380000  // Sep 2025
+    ];
+
+    const systematicInvestorData = [
+        100000, // Mar 2000: Inversión inicial
+        90000,  // Oct 2002: Vende a finales de 2000, capital preservado
+        140000, // Oct 2007: Ha capitalizado la recuperación
+        129000, // Mar 2009: Vende a finales de 2007, capital preservado
+        380000, // Feb 2020: Capitaliza la recuperación post-GFC
+        304000, // Mar 2020: Vende tarde, pero protege
+        420000, // Ene 2022: Capitaliza recuperación post-COVID
+        390000, // Oct 2022: Vende en Abril 2022, protege de nuevo
+        550000  // Sep 2025: Capitaliza la última recuperación
+    ];
+    
+    // Puntos de venta del Inversor Sistemático
+    const sellPoints = [
+        { x: 'Oct 2002', y: 90000, label: 'Venta 🔴 (Puntocom)'},
+        { x: 'Mar 2009', y: 129000, label: 'Venta 🔴 (2008)'},
+        { x: 'Mar 2020', y: 304000, label: 'Venta 🔴 (COVID)'},
+        { x: 'Oct 2022', y: 390000, label: 'Venta 🔴 (2022)'}
+    ];
+
+    // Convertir fechas a timestamps para el eje X
+    const dateLabels = labels.map(label => {
+        const [monthStr, year] = label.split(' ');
+        const monthMap = { 'Mar': 2, 'Oct': 9, 'Feb': 1, 'Ene': 0, 'Sep': 8 };
+        return new Date(year, monthMap[monthStr]).getTime();
+    });
+
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dateLabels,
+            datasets: [{
+                label: 'Inversor "Buy & Hold" (La Montaña Rusa)',
+                data: buyAndHoldData,
+                borderColor: 'rgb(248, 113, 113)', // red-400
+                backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                borderWidth: 3,
+                tension: 0.1,
+                pointRadius: 5,
+                pointBackgroundColor: 'rgb(248, 113, 113)',
+                borderDash: [10, 5], // Línea discontinua para el riesgo
+            }, {
+                label: 'Inversor Sistemático (El Camino Controlado)',
+                data: systematicInvestorData,
+                borderColor: 'rgb(52, 211, 153)', // green-400
+                backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                borderWidth: 4, // Línea más gruesa para la estabilidad
+                tension: 0.1,
+                fill: true,
+                pointRadius: 5,
+                pointBackgroundColor: 'rgb(52, 211, 153)',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Evolución del Capital a través de las Crisis',
+                    font: { size: 18, weight: 'bold' },
+                    color: '#E5E7EB'
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#D1D5DB',
+                        font: { size: 14 }
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'year',
+                        tooltipFormat: 'MMM yyyy',
+                        displayFormats: {
+                           year: 'yyyy'
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#9CA3AF',
+                        font: { size: 12 }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Línea Temporal de las Crisis',
+                        color: '#9CA3AF'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#9CA3AF',
+                        font: { size: 12 },
+                        callback: function(value, index, values) {
+                            return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', notation: 'compact' }).format(value);
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Valor de la Cartera (€)',
+                        color: '#9CA3AF'
+                    }
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>

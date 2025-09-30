@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Reequilibrio Global: Composición del Índice 2025 vs. 2050</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+        }
+    </style>
+</head>
+<body class="text-gray-200 p-4 lg:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white">El Mundo en 2050: El Reequilibrio Global</h1>
+            <p class="text-gray-400 mt-3 text-lg">Comparativa del peso hipotético en el FTSE All-World: Hoy vs. Proyección 2050</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <!-- Chart 2025 -->
+            <div class="bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-2xl">
+                <h2 class="text-2xl font-bold text-center text-indigo-400 mb-4">Composición Actual (aprox. 2025)</h2>
+                <div class="chart-container" style="position: relative; height:50vh; width:100%">
+                    <canvas id="chart2025"></canvas>
+                </div>
+            </div>
+            <!-- Chart 2050 -->
+            <div class="bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-2xl">
+                <h2 class="text-2xl font-bold text-center text-green-400 mb-4">Proyección Hipotética (2050)</h2>
+                <div class="chart-container" style="position: relative; height:50vh; width:100%">
+                    <canvas id="chart2050"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <section class="mt-12 bg-gray-800 p-6 rounded-2xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center text-white mb-6">Análisis del Cambio de Poder</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b-2 border-gray-700">
+                            <th class="p-3 text-lg font-semibold">Región / País</th>
+                            <th class="p-3 text-lg font-semibold text-center">Peso Actual (2025)</th>
+                            <th class="p-3 text-lg font-semibold text-center">Proyección (2050)</th>
+                            <th class="p-3 text-lg font-semibold text-center">Cambio de Era</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparison-table">
+                        <!-- Filas generadas por JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const data = [
+        { region: '🇺🇸 Estados Unidos', current: 60, future: 13, analysis: 'El Gran Reequilibrio. Deja de ser el centro hegemónico.' },
+        { region: '🇨🇳 China', current: 3, future: 23, analysis: 'Nuevo Líder. Se convierte en el país con mayor peso.' },
+        { region: '🇮🇳 India', current: 2, future: 17, analysis: 'Ascenso Exponencial. Segunda potencia indiscutible.' },
+        { region: '🇪🇺 Europa', current: 12, future: 10, analysis: 'Pérdida de relevancia relativa.' },
+        { region: '🇯🇵 Japón', current: 6, future: 3, analysis: 'Declive Demográfico. Pierde la mitad de su peso.' },
+        { region: '🌏 Sudeste Asiático', current: 1, future: 5, analysis: 'El Nuevo Motor. Indonesia y Vietnam se vuelven relevantes.' },
+        { region: '🌎 América Latina', current: 1, future: 5, analysis: 'Potencias Consolidadas. Brasil y México crecen.' },
+        { region: 'Otros', current: 15, future: 24, analysis: 'Un Mundo más Diverso. El resto del mundo gana peso.' }
+    ];
+
+    const labels = data.map(d => d.region);
+    const currentData = data.map(d => d.current);
+    const futureData = data.map(d => d.future);
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: '#D1D5DB',
+                    font: { size: 12 },
+                    padding: 20
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.label || '';
+                        if (label) { label += ': '; }
+                        if (context.parsed !== null) { label += context.parsed + '%'; }
+                        return label;
+                    }
+                }
+            }
+        }
+    };
+    
+    // Colores para mantener consistencia entre gráficos
+    const backgroundColors = [
+        '#3B82F6', // Blue 500
+        '#EF4444', // Red 500
+        '#F97316', // Orange 500
+        '#10B981', // Green 500
+        '#A855F7', // Purple 500
+        '#EC4899', // Pink 500
+        '#F59E0B', // Amber 500
+        '#6B7280'  // Gray 500
+    ];
+
+    // Chart 2025
+    const ctx2025 = document.getElementById('chart2025').getContext('2d');
+    new Chart(ctx2025, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Peso en el Índice 2025',
+                data: currentData,
+                backgroundColor: backgroundColors,
+                borderColor: '#1F2937',
+                borderWidth: 2
+            }]
+        },
+        options: chartOptions
+    });
+
+    // Chart 2050
+    const ctx2050 = document.getElementById('chart2050').getContext('2d');
+    new Chart(ctx2050, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Peso en el Índice 2050',
+                data: futureData,
+                backgroundColor: backgroundColors,
+                borderColor: '#1F2937',
+                borderWidth: 2
+            }]
+        },
+        options: chartOptions
+    });
+
+    // Populate Table
+    const tableBody = document.getElementById('comparison-table');
+    data.forEach(item => {
+        const diff = item.future - item.current;
+        const diffSign = diff > 0 ? '+' : '';
+        const diffClass = diff > 0 ? 'text-green-400' : (diff < 0 ? 'text-red-400' : 'text-gray-400');
+        
+        const row = `
+            <tr class="border-b border-gray-700">
+                <td class="p-3 font-bold text-white">${item.region}</td>
+                <td class="p-3 text-center text-lg">${item.current}%</td>
+                <td class="p-3 text-center text-lg font-bold">${item.future}%</td>
+                <td class="p-3 text-center font-semibold ${diffClass}">
+                    <span>${diffSign}${diff}%</span>
+                </td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
+    });
+
+});
+</script>
+
+</body>
+</html>

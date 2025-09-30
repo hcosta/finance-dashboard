@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Inversión a Largo Plazo</title>
+    <title>Simulador Estratégico a Largo Plazo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; }
         .modal {
             position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 50;
             display: flex; justify-content: center; align-items: center;
@@ -21,28 +21,27 @@
             transition: transform 0.3s ease-in-out;
         }
         .modal.active .modal-content { transform: scale(1); }
-        .table-container { max-height: 590px; overflow-y: auto; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-blue-700">Simulador de Inversión Avanzado</h1>
-            <p class="text-gray-600 mt-2">Proyecta tu patrimonio, planifica aportaciones, simula crisis y rebalancea tu cartera.</p>
+            <h1 class="text-4xl font-bold text-indigo-700">Simulador Estratégico</h1>
+            <p class="text-gray-600 mt-2">Proyecta el impacto a largo plazo de tu sistema de inversión.</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Columna de Controles -->
             <div class="lg:col-span-1 space-y-6">
-                 <!-- Escenarios y Gestión de Datos -->
+                 <!-- Escenarios -->
                 <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">Escenario Económico</h2>
-                    <select id="scenario-select" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-indigo-500">Escenario y Datos</h2>
+                    <select id="scenario-select" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5">
                         <option value="manual">Manual</option>
-                        <option value="negativo">Negativo</option>
-                        <option value="neutro">Neutro</option>
-                        <option value="positivo">Positivo</option>
+                        <option value="negativo">Negativo ("Década Perdida")</option>
+                        <option value="neutro">Neutro ("Crecimiento Estable")</option>
+                        <option value="positivo">Positivo ("Mercado Alcista")</option>
                     </select>
                     <div class="flex space-x-2 mt-4">
                         <button id="export-data" class="w-full px-4 py-2 rounded-lg font-semibold text-white bg-green-600 hover:bg-green-700 text-sm">Exportar</button>
@@ -53,7 +52,7 @@
 
                 <!-- Patrimonio Inicial -->
                 <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">Patrimonio Inicial y Crecimiento</h2>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-indigo-500">Patrimonio Inicial y Crecimiento</h2>
                     <div id="patrimonio-inputs" class="space-y-4">
                         <!-- Campos generados por JS -->
                     </div>
@@ -61,15 +60,15 @@
 
                 <!-- Parámetros de Simulación -->
                 <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">Parámetros de Simulación</h2>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-indigo-500">Parámetros de Simulación</h2>
                      <div class="space-y-4">
                         <div>
                             <label for="anos" class="block mb-2 text-sm font-medium text-gray-700">Años a Simular</label>
-                            <input type="number" id="anos" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="30">
+                            <input type="number" id="anos" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5" value="30">
                         </div>
                         <div>
                             <label for="inflacion" class="block mb-2 text-sm font-medium text-gray-700">Inflación Anual Media (%)</label>
-                            <input type="number" id="inflacion" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="2.5" step="0.1">
+                            <input type="number" id="inflacion" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5" value="2.5" step="0.1">
                         </div>
                     </div>
                 </div>
@@ -79,26 +78,18 @@
                     <!-- Aportaciones DCA -->
                     <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-gray-800">Aportaciones (DCA)</h3>
-                            <button id="btn-add-dca" class="px-3 py-1 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-lg">+</button>
+                            <h3 class="text-lg font-bold text-gray-800">Aportaciones Periódicas</h3>
+                            <button id="btn-add-dca" class="px-3 py-1 rounded-lg font-semibold text-white transition-colors duration-200 bg-indigo-600 hover:bg-indigo-700 text-lg">+</button>
                         </div>
                         <div id="dca-list" class="space-y-2"></div>
                     </div>
-                    <!-- Crisis -->
+                    <!-- Gestión de Crisis -->
                     <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-gray-800">Crisis de Mercado</h3>
-                             <button id="btn-add-crisis" class="px-3 py-1 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-lg">+</button>
+                            <h3 class="text-lg font-bold text-gray-800">Gestión de Crisis (Algoritmo)</h3>
+                             <button id="btn-add-crisis" class="px-3 py-1 rounded-lg font-semibold text-white transition-colors duration-200 bg-indigo-600 hover:bg-indigo-700 text-lg">+</button>
                         </div>
                         <div id="crisis-list" class="space-y-2"></div>
-                    </div>
-                     <!-- Rebalanceos -->
-                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-gray-800">Rebalanceos de Cartera</h3>
-                            <button id="btn-add-rebalance" class="px-3 py-1 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-lg">+</button>
-                        </div>
-                        <div id="rebalance-list" class="space-y-2"></div>
                     </div>
                 </div>
 
@@ -107,42 +98,11 @@
             <!-- Columna de Resultados -->
             <div class="lg:col-span-2">
                 <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">Evolución del Patrimonio y Resumen</h2>
-                    
-                    <div class="my-4">
-                         <label for="observations" class="block mb-2 text-sm font-medium text-gray-700">Observaciones de la Simulación</label>
-                         <textarea id="observations" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Anota aquí los detalles, hipótesis y conclusiones de este escenario..."></textarea>
-                    </div>
-
-                    <div class="relative h-[400px] md:h-[500px]">
+                     <div class="relative h-[500px]">
                          <canvas id="investment-chart"></canvas>
                     </div>
-                    
                     <div id="results-summary" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
                         <!-- Contenido generado por JS -->
-                    </div>
-
-                    <div id="table-section" class="mt-8 hidden">
-                        <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">Resumen Anual Detallado</h2>
-                        <div class="table-container">
-                            <table class="w-full text-sm text-left text-gray-500">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3">Año</th>
-                                        <th scope="col" class="px-6 py-3">Patrimonio Total</th>
-                                        <th scope="col" class="px-6 py-3 text-center">Ahorro %</th>
-                                        <th scope="col" class="px-6 py-3 text-center">RF %</th>
-                                        <th scope="col" class="px-6 py-3 text-center">RV %</th>
-                                        <th scope="col" class="px-6 py-3 text-center">Oro %</th>
-                                        <th scope="col" class="px-6 py-3 text-center">Plata %</th>
-                                        <th scope="col" class="px-6 py-3 text-center">Cryptos %</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="summary-table-body">
-                                    <!-- Filas generadas por JS -->
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -152,695 +112,528 @@
     <!-- Modals -->
     <div id="dca-modal" class="modal">
         <div class="modal-content">
-            <h3 class="text-xl font-bold mb-4">Añadir Aportación (DCA)</h3>
+            <h3 class="text-xl font-bold mb-4">Añadir Aportación</h3>
             <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="dca-ano" class="block mb-2 text-sm font-medium text-gray-700">Año de Inicio</label>
-                        <input type="number" id="dca-ano" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="0" value="1">
+                        <input type="number" id="dca-ano" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" min="0" value="1">
                     </div>
                     <div>
-                        <label for="dca-mes" class="block mb-2 text-sm font-medium text-gray-700">Mes de Inicio</label>
-                        <input type="number" id="dca-mes" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="1" max="12" value="1">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                     <div>
                         <label for="dca-duracion" class="block mb-2 text-sm font-medium text-gray-700">Duración (meses)</label>
-                        <input type="number" id="dca-duracion" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="18" min="1">
-                    </div>
-                    <div>
-                        <label for="dca-cantidad" class="block mb-2 text-sm font-medium text-gray-700">Cantidad Mensual (€)</label>
-                        <input type="number" id="dca-cantidad" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" value="300">
+                        <input type="number" id="dca-duracion" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" min="1" value="120">
                     </div>
                 </div>
-                <div class="mt-2 flex items-center">
-                    <input id="dca-ajustar-inflacion" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="dca-ajustar-inflacion" class="ml-2 text-sm font-medium text-gray-900">Ajustar a inflación anual</label>
+                <div>
+                    <label for="dca-cantidad" class="block mb-2 text-sm font-medium text-gray-700">Cantidad Mensual (€)</label>
+                    <input type="number" id="dca-cantidad" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="500">
                 </div>
-                <div class="mt-2 flex items-center">
-                    <input id="dca-rebalance-rf-rv" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="dca-rebalance-rf-rv" class="ml-2 text-sm font-medium text-gray-900">Traspaso RF a RV (imp. 20% plusvalía)</label>
-                </div>
-                <div class="mt-2 flex items-center">
-                    <input id="dca-rebalance-ahorro-rv" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="dca-rebalance-ahorro-rv" class="ml-2 text-sm font-medium text-gray-900">Traspaso Ahorro a RV (sin plusvalía)</label>
+                <div>
+                    <label for="dca-source" class="block mb-2 text-sm font-medium text-gray-700">Origen del Capital</label>
+                    <select id="dca-source" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5">
+                        <option value="nuevos_ahorros">Nuevos Ahorros</option>
+                        <option value="polvora">Pólvora Seca</option>
+                        <option value="rf">Renta Fija (con 20% imp.)</option>
+                        <option value="metales">Metales (con 20% imp.)</option>
+                    </select>
                 </div>
                 <hr>
                 <p class="font-semibold text-gray-700">Distribución de la aportación (%):</p>
-                <div class="grid grid-cols-3 gap-x-4 gap-y-2" id="dca-pct-inputs">
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2" id="dca-pct-inputs">
                     <!-- Inputs de % generados por JS -->
                 </div>
                 <p id="dca-pct-error" class="text-red-500 text-sm hidden">Los porcentajes deben sumar 100.</p>
             </div>
             <div class="flex justify-end mt-6 space-x-3">
-                <button id="dca-cancel" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-gray-500 hover:bg-gray-600">Cancelar</button>
-                <button id="dca-save" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700">Guardar</button>
+                <button id="dca-cancel" class="px-4 py-2 rounded-lg font-semibold text-white bg-gray-500 hover:bg-gray-600">Cancelar</button>
+                <button id="dca-save" class="px-4 py-2 rounded-lg font-semibold text-white bg-indigo-600 hover:bg-indigo-700">Guardar</button>
             </div>
         </div>
     </div>
     
     <div id="crisis-modal" class="modal">
          <div class="modal-content">
-            <h3 class="text-xl font-bold mb-4">Añadir Crisis de Mercado</h3>
+            <h3 class="text-xl font-bold mb-4">Simular Gestión de Crisis (MMS200)</h3>
             <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="crisis-ano" class="block mb-2 text-sm font-medium text-gray-700">Año</label>
-                        <input type="number" id="crisis-ano" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="0" value="5">
-                    </div>
-                     <div>
-                        <label for="crisis-mes" class="block mb-2 text-sm font-medium text-gray-700">Mes</label>
-                        <input type="number" id="crisis-mes" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="1" max="12" value="3">
-                    </div>
+                <div>
+                    <label for="crisis-ano" class="block mb-2 text-sm font-medium text-gray-700">Año de la Venta (Señal 🔴)</label>
+                    <input type="number" id="crisis-ano" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" min="0" value="5">
                 </div>
-                <p class="font-semibold text-gray-700">Caída de activos de riesgo (%):</p>
-                <div class="grid grid-cols-1 gap-4" id="crisis-pct-inputs">
-                    <!-- Inputs de % generados por JS -->
+                <div>
+                    <label for="crisis-loss" class="block mb-2 text-sm font-medium text-gray-700">Pérdida Inicial RV ("Prima del Seguro", %)</label>
+                    <input type="number" id="crisis-loss" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="8" min="0" max="100">
+                </div>
+                <div>
+                    <label for="crisis-loss-crypto" class="block mb-2 text-sm font-medium text-gray-700">Caída Adicional Crypto (%, sobre RV)</label>
+                    <input type="number" id="crisis-loss-crypto" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="100" min="0" max="500">
+                </div>
+                 <div>
+                    <label for="crisis-out" class="block mb-2 text-sm font-medium text-gray-700">Meses Fuera del Mercado (en Pólvora Seca)</label>
+                    <input type="number" id="crisis-out" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="15" min="1">
+                </div>
+                 <div>
+                    <label for="crisis-dca" class="block mb-2 text-sm font-medium text-gray-700">Meses para Re-invertir (DCA de re-entrada)</label>
+                    <input type="number" id="crisis-dca" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="10" min="1">
                 </div>
             </div>
             <div class="flex justify-end mt-6 space-x-3">
-                <button id="crisis-cancel" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-gray-500 hover:bg-gray-600">Cancelar</button>
-                <button id="crisis-save" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700">Guardar</button>
+                <button id="crisis-cancel" class="px-4 py-2 rounded-lg font-semibold text-white bg-gray-500 hover:bg-gray-600">Cancelar</button>
+                <button id="crisis-save" class="px-4 py-2 rounded-lg font-semibold text-white bg-indigo-600 hover:bg-indigo-700">Guardar</button>
             </div>
         </div>
     </div>
 
-    <div id="rebalance-modal" class="modal">
-        <div class="modal-content">
-            <h3 class="text-xl font-bold mb-4">Añadir Rebalanceo de Cartera</h3>
-             <div class="space-y-4">
-                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="rebalance-ano" class="block mb-2 text-sm font-medium text-gray-700">Año</label>
-                        <input type="number" id="rebalance-ano" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="0" value="10">
-                    </div>
-                     <div>
-                        <label for="rebalance-mes" class="block mb-2 text-sm font-medium text-gray-700">Mes</label>
-                        <input type="number" id="rebalance-mes" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" min="1" max="12" value="1">
-                    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const ASSET_KEYS = ['polvora', 'rf', 'rv', 'metales', 'crypto', 'inmuebles'];
+    const ASSET_NAMES = {
+        polvora: 'Pólvora Seca', rf: 'Renta Fija', rv: 'Renta Variable', metales: 'Metales', crypto: 'Crypto (BTC)', inmuebles: 'Inmuebles'
+    };
+    const ASSET_COLORS = {
+        polvora: 'rgba(153, 102, 255, 0.8)', rf: 'rgba(54, 162, 235, 0.8)', rv: 'rgba(255, 99, 132, 0.8)',
+        metales: 'rgba(255, 206, 86, 0.8)', crypto: 'rgba(255, 159, 64, 0.8)', inmuebles: 'rgba(75, 192, 192, 0.8)',
+        total: 'rgba(0, 0, 0, 1)', contributed: 'rgba(100, 100, 100, 0.7)'
+    };
+     const SCENARIOS = {
+        manual: {},
+        negativo: {
+            growth: { polvora: 0.75, rf: 1.5, rv: 5.5, metales: 3.0, crypto: 6.0, inmuebles: 1.0 },
+            crisisManagements: [ { id: Date.now() + 1, year: 1, initialLoss: 8, monthsOut: 18, dcaMonths: 10, cryptoLoss: 100, auto: true },
+                                 { id: Date.now() + 2, year: 9, initialLoss: 10, monthsOut: 18, dcaMonths: 10, cryptoLoss: 100, auto: true } ]
+        },
+        neutro: {
+            growth: { polvora: 0.75, rf: 2.0, rv: 7.0, metales: 4.0, crypto: 10.0, inmuebles: 2.0 },
+            crisisManagements: [ { id: Date.now() + 3, year: 10, initialLoss: 10, monthsOut: 12, dcaMonths: 10, cryptoLoss: 100, auto: true } ]
+        },
+        positivo: {
+            growth: { polvora: 0.75, rf: 2.5, rv: 9.0, metales: 5.0, crypto: 13.0, inmuebles: 3.0 },
+            crisisManagements: []
+        }
+    };
+
+    let dcaPlans = [];
+    let crisisManagements = [];
+    let editingEventId = null;
+
+    const resultsSummary = document.getElementById('results-summary');
+    const scenarioSelect = document.getElementById('scenario-select');
+
+    const generateInputs = () => {
+        const patrimonioContainer = document.getElementById('patrimonio-inputs');
+        const dcaContainer = document.getElementById('dca-pct-inputs');
+        
+        const defaultValues = { polvora: 10000, rf: 10000, rv: 10000, metales: 10000, crypto: 13000, inmuebles: 30000 };
+        const defaultGrowth = { polvora: 0.75, rf: 2, rv: 7, metales: 4, crypto: 15, inmuebles: 3 };
+
+        patrimonioContainer.innerHTML = ASSET_KEYS.map(key => {
+            const isReadonly = key === 'crypto' || key === 'inmuebles';
+            return `
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="${key}-inicial" class="block mb-2 text-sm font-medium text-gray-700">${ASSET_NAMES[key]} (€)</label>
+                    <input type="number" id="${key}-inicial" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 ${isReadonly ? 'cursor-not-allowed' : ''}" 
+                           value="${defaultValues[key] || 0}" ${isReadonly ? 'readonly' : ''}>
                 </div>
-                <hr>
-                <p class="font-semibold text-gray-700">Nuevos porcentajes objetivo (%):</p>
-                 <div class="grid grid-cols-3 gap-x-4 gap-y-2" id="rebalance-pct-inputs">
-                    <!-- Inputs de % generados por JS -->
+                <div>
+                    <label for="${key}-crecimiento" class="block mb-2 text-sm font-medium text-gray-700">Crec. Anual (%)</label>
+                    <input type="number" id="${key}-crecimiento" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" 
+                           value="${defaultGrowth[key] || 0}" step="0.1">
                 </div>
-                <p id="rebalance-pct-error" class="text-red-500 text-sm hidden">Los porcentajes deben sumar 100.</p>
-             </div>
-             <div class="flex justify-end mt-6 space-x-3">
-                <button id="rebalance-cancel" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-gray-500 hover:bg-gray-600">Cancelar</button>
-                <button id="rebalance-save" class="px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200 bg-blue-600 hover:bg-blue-700">Guardar</button>
             </div>
-        </div>
-    </div>
+        `}).join('');
 
+        dcaContainer.innerHTML = ASSET_KEYS.map(key => {
+             const isReadonly = key === 'crypto' || key === 'inmuebles';
+             return `
+            <div><label for="dca-${key}-pct" class="block text-sm font-medium text-gray-700 text-center ${isReadonly ? 'text-gray-400' : ''}">${ASSET_NAMES[key]}</label>
+            <input type="number" id="dca-${key}-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 text-center" 
+                   value="0" min="0" max="100" ${isReadonly ? 'readonly' : ''}></div>
+        `}).join('');
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // --- CONFIGURACIÓN INICIAL Y CONSTANTES ---
-        const ASSET_KEYS = ['ahorro', 'rf', 'rv', 'oro', 'plata', 'cryptos'];
-        const ASSET_NAMES = {
-            ahorro: 'Ahorro', rf: 'Renta Fija', rv: 'Renta Variable', oro: 'Oro', plata: 'Plata', cryptos: 'Cryptos'
-        };
-        const ASSET_COLORS = {
-            ahorro: 'rgba(153, 102, 255, 0.8)', rf: 'rgba(54, 162, 235, 0.8)', rv: 'rgba(255, 99, 132, 0.8)',
-            oro: 'rgba(255, 215, 0, 0.8)', plata: 'rgba(192, 192, 192, 0.8)', cryptos: 'rgba(255, 159, 64, 0.8)',
-            total: 'rgba(0, 0, 0, 1)',
-            contributed: 'rgba(100, 100, 100, 0.7)'
-        };
-        const SCENARIOS = {
-            manual: {},
-            negativo: {
-                growth: { ahorro: 0.75, rf: 1.5, rv: 5.0, oro: 3, plata: 2.5, cryptos: 5.0 },
-                crises: [
-                    { id: Date.now() + 1, year: 4, month: 3, drops: { rv: 35, oro: 20, plata: 30, cryptos: 60 }, auto: true },
-                    { id: Date.now() + 2, year: 12, month: 9, drops: { rv: 25, oro: 12, plata: 18, cryptos: 40 }, auto: true }
-                ]
-            },
-            neutro: {
-                growth: { ahorro: 0.75, rf: 2.5, rv: 6.5, oro: 6, plata: 5, cryptos: 6.5 },
-                crises: [
-                    { id: Date.now() + 3, year: 7, month: 6, drops: { rv: 25, oro: 12, plata: 18, cryptos: 40 }, auto: true }
-                ]
-            },
-            positivo: {
-                growth: { ahorro: 0.75, rf: 3.0, rv: 9.5, oro: 9.0, plata: 8.0, cryptos: 9.5 },
-                crises: []
-            }
-        };
-
-        // Almacenamiento de eventos
-        let dcaPlans = [];
-        let crises = [];
-        let rebalances = [];
-        let editingEventId = null;
-
-        // Referencias al DOM
-        const resultsSummary = document.getElementById('results-summary');
-        const scenarioSelect = document.getElementById('scenario-select');
-        const observationsTextarea = document.getElementById('observations');
-
-        // --- GENERACIÓN DINÁMICA DE INPUTS ---
-        const generateInputs = () => {
-            const patrimonioContainer = document.getElementById('patrimonio-inputs');
-            const dcaContainer = document.getElementById('dca-pct-inputs');
-            const crisisContainer = document.getElementById('crisis-pct-inputs');
-            const rebalanceContainer = document.getElementById('rebalance-pct-inputs');
-            const defaultGrowth = { ahorro: 0.75, cryptos: 10.0 };
-
-            patrimonioContainer.innerHTML = ASSET_KEYS.map(key => `
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="${key}-inicial" class="block mb-2 text-sm font-medium text-gray-700">${ASSET_NAMES[key]} (€)</label>
-                        <input type="number" id="${key}-inicial" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="0">
-                    </div>
-                    <div>
-                        <label for="${key}-crecimiento" class="block mb-2 text-sm font-medium text-gray-700">Crec. Anual (%)</label>
-                        <input type="number" id="${key}-crecimiento" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="${defaultGrowth[key] || 0}" step="0.1">
-                    </div>
-                </div>
-            `).join('');
-
-            dcaContainer.innerHTML = ASSET_KEYS.map(key => `
-                <div><label for="dca-${key}-pct" class="block text-sm font-medium text-gray-700 text-center">${ASSET_NAMES[key]}</label>
-                <input type="number" id="dca-${key}-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 text-center" value="0" min="0" max="100"></div>
-            `).join('');
-            
-            rebalanceContainer.innerHTML = ASSET_KEYS.map(key => `
-                 <div><label for="rebalance-${key}-pct" class="block text-sm font-medium text-gray-700 text-center">${ASSET_NAMES[key]}</label>
-                 <input type="number" id="rebalance-${key}-pct" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 text-center" value="0" min="0" max="100"></div>
-            `).join('');
-            
-            crisisContainer.innerHTML = ['rv', 'oro', 'plata', 'cryptos'].map(key => `
-                 <div><label for="crisis-caida-${key}" class="block mb-2 text-sm font-medium text-gray-700">${ASSET_NAMES[key]}</label>
-                 <input type="number" id="crisis-caida-${key}" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5" value="0" min="0" max="100"></div>
-            `).join('');
-            
-            document.querySelectorAll('[id$="-crecimiento"]').forEach(input => {
-                input.addEventListener('input', () => {
-                    if (scenarioSelect.value !== 'manual') {
-                        scenarioSelect.value = 'manual';
-                    }
-                });
+        document.querySelectorAll('[id$="-crecimiento"]').forEach(input => {
+            input.addEventListener('input', () => {
+                if (scenarioSelect.value !== 'manual') {
+                    scenarioSelect.value = 'manual';
+                    handleScenarioChange();
+                }
             });
+        });
+    };
+    generateInputs();
+
+    const ctx = document.getElementById('investment-chart').getContext('2d');
+    let investmentChart = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { callback: (v) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(v) } }, x: { title: { display: true, text: 'Años' } } }, plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(c.parsed.y)}` } } } } });
+
+    let debounceTimer;
+    const debouncedRunSimulation = () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            runSimulation();
+            saveState();
+        }, 300);
+    };
+
+    // --- GESTIÓN DE ESTADO (LOCALSTORAGE, IMPORT/EXPORT) ---
+    const saveState = () => {
+        const state = {
+            inputs: {},
+            dcaPlans, crisisManagements,
+            scenario: scenarioSelect.value
         };
-        generateInputs();
-
-        // --- CHART.JS ---
-        const ctx = document.getElementById('investment-chart').getContext('2d');
-        let investmentChart = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { callback: (v) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(v) } }, x: { title: { display: true, text: 'Años' } } }, plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(c.parsed.y)}` } } } } });
-
-        // --- LÓGICA DE SIMULACIÓN (DEBOUNCED) ---
-        let debounceTimer;
-        const debouncedRunSimulation = () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                runSimulation();
-                saveState();
-            }, 300);
-        };
-
-        // --- GESTIÓN DE ESTADO (LOCALSTORAGE) ---
-        const saveState = () => {
-            const state = {
-                inputs: {},
-                dcaPlans, crises, rebalances,
-                scenario: scenarioSelect.value,
-                observations: observationsTextarea.value
-            };
-            document.querySelectorAll('#patrimonio-inputs input, #anos, #inflacion').forEach(input => {
-                state.inputs[input.id] = input.value;
-            });
-            localStorage.setItem('investmentSimState', JSON.stringify(state));
-        };
-
-        const loadState = () => {
-            const state = JSON.parse(localStorage.getItem('investmentSimState'));
-            if (!state) return;
-
-            const cleanObject = (obj, validKeys) => {
-                if (!obj || typeof obj !== 'object') return;
-                 Object.keys(obj).forEach(key => {
-                    if (!validKeys.includes(key)) delete obj[key];
-                });
+        document.querySelectorAll('#patrimonio-inputs input, #anos, #inflacion').forEach(input => {
+            if(!input.readOnly) {
+                 state.inputs[input.id] = input.value;
             }
+        });
+        localStorage.setItem('strategicSimState', JSON.stringify(state));
+    };
 
-            if (state.dcaPlans) {
-                state.dcaPlans.forEach(plan => cleanObject(plan.percentages, ASSET_KEYS));
-            }
-             if (state.rebalances) {
-                state.rebalances.forEach(reb => cleanObject(reb.percentages, ASSET_KEYS));
-            }
-            
-            if(state.inputs) {
-                 Object.keys(state.inputs).forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) { // Only process if element exists in the current DOM
-                        const key = id.replace('-inicial', '').replace('-crecimiento', '');
-                         if (!ASSET_KEYS.includes(key) && (id.endsWith('-inicial') || id.endsWith('-crecimiento'))) {
-                            delete state.inputs[id];
-                        }
-                    } else { // If element doesn't exist, it might be an old asset key
-                        const key = id.replace('-inicial', '').replace('-crecimiento', '');
-                         if (!ASSET_KEYS.includes(key) && !['anos', 'inflacion'].includes(key) ) {
-                             delete state.inputs[id];
-                         }
-                    }
-                });
-            }
+    const loadState = (state) => {
+        if (!state) return;
 
+        if (state.inputs) {
             Object.keys(state.inputs).forEach(id => {
                 const input = document.getElementById(id);
-                if (input) {
-                    input.value = state.inputs[id];
-                }
+                if (input && !input.readOnly) input.value = state.inputs[id];
             });
-            
-            dcaPlans = state.dcaPlans || [];
-            crises = state.crises || [];
-            rebalances = state.rebalances || [];
-            scenarioSelect.value = state.scenario || 'manual';
-            observationsTextarea.value = state.observations || '';
+        }
+        
+        dcaPlans = state.dcaPlans || [];
+        crisisManagements = state.crisisManagements || [];
+        scenarioSelect.value = state.scenario || 'manual';
 
-            renderDcaList();
-            renderCrisisList();
-            renderRebalanceList();
-            handleScenarioChange(); 
+        renderDcaList();
+        renderCrisisList();
+        debouncedRunSimulation();
+    };
+
+    document.getElementById('export-data').addEventListener('click', () => {
+        saveState(); 
+        const state = localStorage.getItem('strategicSimState');
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(state);
+        const exportFileDefaultName = 'simulacion_estrategica.json';
+        let linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+    });
+
+    const importFileInput = document.getElementById('import-file-input');
+    document.getElementById('import-data').addEventListener('click', () => importFileInput.click());
+    importFileInput.addEventListener('change', (event) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const state = JSON.parse(e.target.result);
+                loadState(state);
+            } catch (error) {
+                alert('Error al importar el archivo.');
+                console.error("Error parsing imported JSON:", error);
+            }
+        };
+        reader.readAsText(event.target.files[0]);
+        importFileInput.value = '';
+    });
+    
+    const handleScenarioChange = () => {
+        const scenario = scenarioSelect.value;
+        crisisManagements = crisisManagements.filter(c => !c.auto);
+        if (scenario !== 'manual') {
+            const scenarioData = SCENARIOS[scenario];
+            if (scenarioData.growth) {
+                ASSET_KEYS.forEach(key => {
+                    document.getElementById(`${key}-crecimiento`).value = scenarioData.growth[key] || 0;
+                });
+            }
+            if (scenarioData.crisisManagements) {
+                crisisManagements.push(...JSON.parse(JSON.stringify(scenarioData.crisisManagements)));
+            }
+        }
+        renderCrisisList();
+        debouncedRunSimulation();
+    };
+    scenarioSelect.addEventListener('change', handleScenarioChange);
+
+
+    const openModal = (modalId) => document.getElementById(modalId).classList.add('active');
+    const closeModal = (modalId) => {
+        editingEventId = null;
+        document.getElementById(modalId).classList.remove('active');
+    };
+
+    // --- MODAL DCA ---
+    document.getElementById('btn-add-dca').addEventListener('click', () => {
+        editingEventId = null;
+        document.getElementById('dca-modal').querySelector('h3').textContent = 'Añadir Aportación';
+        openDcaModalForEdit(null);
+        openModal('dca-modal');
+    });
+    document.getElementById('dca-cancel').addEventListener('click', () => closeModal('dca-modal'));
+    document.getElementById('dca-save').addEventListener('click', () => {
+        const errorEl = document.getElementById('dca-pct-error');
+        const pcts = {}; 
+        ASSET_KEYS.forEach(key => { 
+            const input = document.getElementById(`dca-${key}-pct`);
+            if (input && !input.readOnly) pcts[key] = parseFloat(input.value) || 0; 
+        });
+        const totalPct = Object.values(pcts).reduce((a, b) => a + b, 0);
+        if (Math.abs(totalPct - 100) > 0.01) { errorEl.classList.remove('hidden'); return; }
+        errorEl.classList.add('hidden');
+        
+        const newPlan = {
+            id: editingEventId || Date.now(),
+            startYear: parseInt(document.getElementById('dca-ano').value),
+            duration: parseInt(document.getElementById('dca-duracion').value),
+            amount: parseFloat(document.getElementById('dca-cantidad').value),
+            source: document.getElementById('dca-source').value,
+            percentages: {...pcts, crypto: 0, inmuebles: 0},
         };
         
-        // --- IMPORT/EXPORT ---
-        document.getElementById('export-data').addEventListener('click', () => {
-            const state = JSON.parse(localStorage.getItem('investmentSimState') || '{}');
-            const dataStr = JSON.stringify(state, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            const exportFileDefaultName = 'simulacion_inversion.json';
-            let linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-        });
-
-        const importFileInput = document.getElementById('import-file-input');
-        document.getElementById('import-data').addEventListener('click', () => importFileInput.click());
-        importFileInput.addEventListener('change', (event) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const state = JSON.parse(e.target.result);
-                    localStorage.setItem('investmentSimState', JSON.stringify(state));
-                    loadState();
-                    debouncedRunSimulation();
-                } catch (error) {
-                    alert('Error al importar el archivo. Asegúrate de que es un archivo JSON válido exportado desde esta herramienta.');
-                    console.error("Error parsing imported JSON:", error);
-                }
-            };
-            reader.readAsText(event.target.files[0]);
-            importFileInput.value = '';
-        });
-
-        // --- MANEJO DE ESCENARIOS ---
-        const handleScenarioChange = () => {
-            const scenario = scenarioSelect.value;
-            crises = crises.filter(c => !c.auto);
-            if (scenario !== 'manual') {
-                const scenarioData = SCENARIOS[scenario];
-                if (scenarioData.growth) {
-                    ASSET_KEYS.forEach(key => {
-                        document.getElementById(`${key}-crecimiento`).value = scenarioData.growth[key] || 0;
-                    });
-                }
-                if (scenarioData.crises) {
-                    crises.push(...JSON.parse(JSON.stringify(scenarioData.crises)));
-                }
-            }
-            renderCrisisList();
-            debouncedRunSimulation();
-        };
-        scenarioSelect.addEventListener('change', handleScenarioChange);
-
-        // --- MANEJO DE MODALES Y EDICIÓN ---
-        const openModal = (modalId) => document.getElementById(modalId).classList.add('active');
-        const closeModal = (modalId) => {
-            editingEventId = null;
-            document.getElementById(modalId).classList.remove('active');
-        };
-
-        const setupModal = (modalId, openBtnId, saveBtnId, cancelBtnId, saveCallback, openForEditCallback) => {
-            const modal = document.getElementById(modalId);
-            document.getElementById(openBtnId).addEventListener('click', () => {
-                editingEventId = null;
-                modal.querySelector('h3').textContent = modal.querySelector('h3').textContent.replace('Editar', 'Añadir');
-                openForEditCallback(null);
-                openModal(modalId);
-            });
-            document.getElementById(cancelBtnId).addEventListener('click', () => closeModal(modalId));
-            document.getElementById(saveBtnId).addEventListener('click', () => { if(saveCallback()) { closeModal(modalId); } });
-        };
+        if (editingEventId) dcaPlans[dcaPlans.findIndex(p => p.id === editingEventId)] = newPlan;
+        else dcaPlans.push(newPlan);
         
-        const openDcaModalForEdit = (plan) => {
-            document.getElementById('dca-ano').value = plan ? plan.startYear : 1;
-            document.getElementById('dca-mes').value = plan ? plan.startMonth : 1;
-            document.getElementById('dca-duracion').value = plan ? plan.duration : 18;
-            document.getElementById('dca-cantidad').value = plan ? plan.amount : 300;
-            document.getElementById('dca-ajustar-inflacion').checked = plan ? plan.adjustForInflation : false;
-            document.getElementById('dca-rebalance-rf-rv').checked = plan ? plan.isRebalanceRfRv : false;
-            document.getElementById('dca-rebalance-ahorro-rv').checked = plan ? plan.isRebalanceAhorroRv : false;
-            ASSET_KEYS.forEach(key => {
-                document.getElementById(`dca-${key}-pct`).value = plan && plan.percentages[key] ? plan.percentages[key] : 0;
-            });
-            document.getElementById('dca-pct-error').classList.add('hidden');
+        renderDcaList(); debouncedRunSimulation(); closeModal('dca-modal');
+    });
+    
+    function openDcaModalForEdit(plan) {
+        document.getElementById('dca-ano').value = plan ? plan.startYear : 1;
+        document.getElementById('dca-duracion').value = plan ? plan.duration : 120;
+        document.getElementById('dca-cantidad').value = plan ? plan.amount : 500;
+        document.getElementById('dca-source').value = plan ? plan.source : 'nuevos_ahorros';
+        ASSET_KEYS.forEach(key => {
+            const input = document.getElementById(`dca-${key}-pct`);
+            if (input) input.value = plan?.percentages[key] || 0;
+        });
+        document.getElementById('dca-pct-error').classList.add('hidden');
+    }
+
+    // --- MODAL CRISIS ---
+    document.getElementById('btn-add-crisis').addEventListener('click', () => {
+        editingEventId = null;
+        document.getElementById('crisis-modal').querySelector('h3').textContent = 'Simular Gestión de Crisis';
+        openCrisisModalForEdit(null);
+        openModal('crisis-modal');
+    });
+    document.getElementById('crisis-cancel').addEventListener('click', () => closeModal('crisis-modal'));
+    document.getElementById('crisis-save').addEventListener('click', () => {
+        const newCrisis = {
+            id: editingEventId || Date.now(), 
+            year: parseInt(document.getElementById('crisis-ano').value), 
+            initialLoss: parseFloat(document.getElementById('crisis-loss').value),
+            cryptoLoss: parseFloat(document.getElementById('crisis-loss-crypto').value),
+            monthsOut: parseInt(document.getElementById('crisis-out').value),
+            dcaMonths: parseInt(document.getElementById('crisis-dca').value)
         };
-        setupModal('dca-modal', 'btn-add-dca', 'dca-save', 'dca-cancel', () => {
-            const errorEl = document.getElementById('dca-pct-error');
-            const pcts = {}; ASSET_KEYS.forEach(key => { pcts[key] = parseFloat(document.getElementById(`dca-${key}-pct`).value) || 0; });
-            const totalPct = Object.values(pcts).reduce((a, b) => a + b, 0);
-            if (Math.abs(totalPct - 100) > 0.01) { errorEl.textContent = `Los porcentajes deben sumar 100 (actual: ${totalPct}).`; errorEl.classList.remove('hidden'); return false; }
-            errorEl.classList.add('hidden');
-            
-            const newPlan = {
-                id: editingEventId || Date.now(),
-                startYear: parseInt(document.getElementById('dca-ano').value),
-                startMonth: parseInt(document.getElementById('dca-mes').value),
-                duration: parseInt(document.getElementById('dca-duracion').value),
-                amount: parseFloat(document.getElementById('dca-cantidad').value),
-                percentages: pcts,
-                adjustForInflation: document.getElementById('dca-ajustar-inflacion').checked,
-                isRebalanceRfRv: document.getElementById('dca-rebalance-rf-rv').checked,
-                isRebalanceAhorroRv: document.getElementById('dca-rebalance-ahorro-rv').checked
-            };
-            
-            if (editingEventId) {
-                const index = dcaPlans.findIndex(p => p.id === editingEventId);
-                dcaPlans[index] = newPlan;
-            } else {
-                dcaPlans.push(newPlan);
-            }
-            renderDcaList(); debouncedRunSimulation(); return true;
-        }, openDcaModalForEdit);
+        if (editingEventId) crisisManagements[crisisManagements.findIndex(c => c.id === editingEventId)] = newCrisis;
+        else crisisManagements.push(newCrisis);
 
-        const openCrisisModalForEdit = (crisis) => {
-            document.getElementById('crisis-ano').value = crisis ? crisis.year : 5;
-            document.getElementById('crisis-mes').value = crisis ? crisis.month : 3;
-            ['rv', 'oro', 'plata', 'cryptos'].forEach(key => {
-                document.getElementById(`crisis-caida-${key}`).value = crisis && crisis.drops[key] ? crisis.drops[key] : 0;
-            });
-        };
-        setupModal('crisis-modal', 'btn-add-crisis', 'crisis-save', 'crisis-cancel', () => {
-            const drops = {};
-            ['rv', 'oro', 'plata', 'cryptos'].forEach(key => {
-                const value = parseFloat(document.getElementById(`crisis-caida-${key}`).value) || 0;
-                if (value > 0) drops[key] = value;
-            });
+        renderCrisisList(); debouncedRunSimulation(); closeModal('crisis-modal');
+    });
 
-            const newCrisis = {
-                id: editingEventId || Date.now(), year: parseInt(document.getElementById('crisis-ano').value), month: parseInt(document.getElementById('crisis-mes').value),
-                drops: drops
-            };
+    function openCrisisModalForEdit(crisis) {
+        document.getElementById('crisis-ano').value = crisis ? crisis.year : 5;
+        document.getElementById('crisis-loss').value = crisis ? crisis.initialLoss : 8;
+        document.getElementById('crisis-loss-crypto').value = crisis ? crisis.cryptoLoss : 100;
+        document.getElementById('crisis-out').value = crisis ? crisis.monthsOut : 15;
+        document.getElementById('crisis-dca').value = crisis ? crisis.dcaMonths : 10;
+    }
 
-            if (editingEventId) {
-                const index = crises.findIndex(c => c.id === editingEventId);
-                newCrisis.auto = false;
-                crises[index] = newCrisis;
-            } else {
-                crises.push(newCrisis);
-            }
-            renderCrisisList(); debouncedRunSimulation(); return true;
-        }, openCrisisModalForEdit);
+    const renderDcaList = () => {
+        const listEl = document.getElementById('dca-list');
+        listEl.innerHTML = dcaPlans.map(p => {
+            const sourceText = {
+                nuevos_ahorros: "N. Ahorros", polvora: "Pólvora", rf: "RF", metales: "Metales"
+            }[p.source] || "N/A";
+            return `<div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center"><span>Año ${p.startYear}: ${new Intl.NumberFormat('es-ES').format(p.amount)}€/m (${p.duration}m) desde ${sourceText}</span><div class="space-x-1"><button data-id="${p.id}" class="dca-edit px-2 py-1 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600 text-xs">E</button><button data-id="${p.id}" class="dca-delete px-2 py-1 rounded font-semibold text-white bg-red-600 hover:bg-red-700 text-xs">X</button></div></div>`;
+        }).join('');
+        document.querySelectorAll('.dca-delete').forEach(btn => btn.addEventListener('click', (e) => { dcaPlans = dcaPlans.filter(p => p.id != e.target.dataset.id); renderDcaList(); debouncedRunSimulation(); }));
+        document.querySelectorAll('.dca-edit').forEach(btn => btn.addEventListener('click', (e) => {
+            editingEventId = parseInt(e.target.dataset.id);
+            const plan = dcaPlans.find(p => p.id === editingEventId);
+            document.getElementById('dca-modal').querySelector('h3').textContent = 'Editar Aportación';
+            openDcaModalForEdit(plan);
+            openModal('dca-modal');
+        }));
+    };
+    const renderCrisisList = () => {
+        const listEl = document.getElementById('crisis-list');
+        listEl.innerHTML = crisisManagements.map(c => `<div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center ${c.auto ? 'opacity-70' : ''}"><span>Año ${c.year}: Venta (-${c.initialLoss}% RV, -${(c.initialLoss * (1 + c.cryptoLoss / 100)).toFixed(0)}% C), ${c.monthsOut}m fuera, ${c.dcaMonths}m re-e ${c.auto ? '(Auto)' : ''}</span><div class="space-x-1"><button data-id="${c.id}" class="crisis-edit px-2 py-1 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600 text-xs">E</button><button data-id="${c.id}" class="crisis-delete px-2 py-1 rounded font-semibold text-white bg-red-600 hover:bg-red-700 text-xs">X</button></div></div>`).join('');
+        document.querySelectorAll('.crisis-delete').forEach(btn => btn.addEventListener('click', (e) => { crisisManagements = crisisManagements.filter(c => c.id != e.target.dataset.id); renderCrisisList(); debouncedRunSimulation(); }));
+         document.querySelectorAll('.crisis-edit').forEach(btn => btn.addEventListener('click', (e) => {
+            editingEventId = parseInt(e.target.dataset.id);
+            const crisis = crisisManagements.find(c => c.id === editingEventId);
+            document.getElementById('crisis-modal').querySelector('h3').textContent = 'Editar Gestión de Crisis';
+            openCrisisModalForEdit(crisis);
+            openModal('crisis-modal');
+        }));
+    };
+
+    const runSimulation = () => {
+        const initialPortfolio = {};
+        ASSET_KEYS.forEach(key => {
+            const initialValue = parseFloat(document.getElementById(`${key}-inicial`).value) || 0;
+            initialPortfolio[key] = { value: initialValue, cost: initialValue };
+        });
+
+        const annualGrowth = {};
+        ASSET_KEYS.forEach(key => { annualGrowth[key] = parseFloat(document.getElementById(`${key}-crecimiento`).value) || 0; });
+        const simulationYears = parseInt(document.getElementById('anos').value) || 30;
+        const inflationRate = parseFloat(document.getElementById('inflacion').value) || 2.5;
         
-        const openRebalanceModalForEdit = (rebalance) => {
-            document.getElementById('rebalance-ano').value = rebalance ? rebalance.year : 10;
-            document.getElementById('rebalance-mes').value = rebalance ? rebalance.month : 1;
-            ASSET_KEYS.forEach(key => {
-                document.getElementById(`rebalance-${key}-pct`).value = rebalance && rebalance.percentages[key] ? rebalance.percentages[key] : 0;
-            });
-            document.getElementById('rebalance-pct-error').classList.add('hidden');
-        };
-        setupModal('rebalance-modal', 'btn-add-rebalance', 'rebalance-save', 'rebalance-cancel', () => {
-            const errorEl = document.getElementById('rebalance-pct-error');
-            const pcts = {}; ASSET_KEYS.forEach(key => { pcts[key] = parseFloat(document.getElementById(`rebalance-${key}-pct`).value) || 0; });
-            const totalPct = Object.values(pcts).reduce((a, b) => a + b, 0);
-            if (Math.abs(totalPct - 100) > 0.01) { errorEl.textContent = `Los porcentajes deben sumar 100 (actual: ${totalPct}).`; errorEl.classList.remove('hidden'); return false; }
-            errorEl.classList.add('hidden');
+        const monthlyGrowth = {};
+        ASSET_KEYS.forEach(key => { monthlyGrowth[key] = Math.pow(1 + annualGrowth[key] / 100, 1 / 12) - 1; });
+        
+        const totalMonths = simulationYears * 12;
+        let portfolioHistory = [];
+        let currentPortfolio = JSON.parse(JSON.stringify(initialPortfolio));
+        let totalContributed = Object.values(initialPortfolio).reduce((acc, asset) => acc + asset.cost, 0);
+        let crisisState = {};
 
-            const newRebalance = {
-                id: editingEventId || Date.now(), year: parseInt(document.getElementById('rebalance-ano').value), month: parseInt(document.getElementById('rebalance-mes').value), percentages: pcts
-            };
-            if (editingEventId) {
-                const index = rebalances.findIndex(r => r.id === editingEventId);
-                rebalances[index] = newRebalance;
-            } else {
-                rebalances.push(newRebalance);
-            }
-            renderRebalanceList(); debouncedRunSimulation(); return true;
-        }, openRebalanceModalForEdit);
-
-        const renderDcaList = () => {
-            const listEl = document.getElementById('dca-list');
-            listEl.innerHTML = dcaPlans.map(p => `<div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center"><span>Año ${p.startYear}, Mes ${p.startMonth}: ${new Intl.NumberFormat('es-ES').format(p.amount)}€/mes (${p.duration}m) ${p.adjustForInflation ? '📈' : ''} ${p.isRebalanceRfRv ? '🔄 RF a RV' : ''} ${p.isRebalanceAhorroRv ? '↪️ Ahorro a RV' : ''}</span><div class="space-x-1"><button data-id="${p.id}" class="dca-edit px-2 py-1 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600 text-xs">E</button><button data-id="${p.id}" class="dca-delete px-2 py-1 rounded font-semibold text-white bg-red-600 hover:bg-red-700 text-xs">X</button></div></div>`).join('');
-            document.querySelectorAll('.dca-delete').forEach(btn => btn.addEventListener('click', (e) => { dcaPlans = dcaPlans.filter(p => p.id != e.target.dataset.id); renderDcaList(); debouncedRunSimulation(); }));
-            document.querySelectorAll('.dca-edit').forEach(btn => btn.addEventListener('click', (e) => {
-                editingEventId = parseInt(e.target.dataset.id);
-                const plan = dcaPlans.find(p => p.id === editingEventId);
-                document.getElementById('dca-modal').querySelector('h3').textContent = 'Editar Aportación (DCA)';
-                openDcaModalForEdit(plan);
-                openModal('dca-modal');
-            }));
-        };
-        const renderCrisisList = () => {
-             const listEl = document.getElementById('crisis-list');
-            const crisisSummary = c => Object.keys(c.drops).map(key => `${key.toUpperCase()}(${c.drops[key]}%)`).join(' ');
-            listEl.innerHTML = crises.map(c => `<div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center ${c.auto ? 'opacity-70' : ''}"><span>Año ${c.year}, Mes ${c.month}: Caída ${crisisSummary(c)} ${c.auto ? '(Auto)' : ''}</span><div class="space-x-1"><button data-id="${c.id}" class="crisis-edit px-2 py-1 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600 text-xs">E</button><button data-id="${c.id}" class="crisis-delete px-2 py-1 rounded font-semibold text-white bg-red-600 hover:bg-red-700 text-xs">X</button></div></div>`).join('');
-             document.querySelectorAll('.crisis-delete').forEach(btn => btn.addEventListener('click', (e) => { crises = crises.filter(c => c.id != e.target.dataset.id); renderCrisisList(); debouncedRunSimulation(); }));
-             document.querySelectorAll('.crisis-edit').forEach(btn => btn.addEventListener('click', (e) => {
-                editingEventId = parseInt(e.target.dataset.id);
-                const crisis = crises.find(c => c.id === editingEventId);
-                document.getElementById('crisis-modal').querySelector('h3').textContent = 'Editar Crisis de Mercado';
-                openCrisisModalForEdit(crisis);
-                openModal('crisis-modal');
-             }));
-        };
-        const renderRebalanceList = () => {
-            const listEl = document.getElementById('rebalance-list');
-            listEl.innerHTML = rebalances.map(r => `<div class="bg-gray-100 p-2 rounded-md text-sm flex justify-between items-center"><span>Año ${r.year}, Mes ${r.month}: Rebalanceo</span><div class="space-x-1"><button data-id="${r.id}" class="rebalance-edit px-2 py-1 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600 text-xs">E</button><button data-id="${r.id}" class="rebalance-delete px-2 py-1 rounded font-semibold text-white bg-red-600 hover:bg-red-700 text-xs">X</button></div></div>`).join('');
-            document.querySelectorAll('.rebalance-delete').forEach(btn => btn.addEventListener('click', (e) => { rebalances = rebalances.filter(r => r.id != e.target.dataset.id); renderRebalanceList(); debouncedRunSimulation(); }));
-            document.querySelectorAll('.rebalance-edit').forEach(btn => btn.addEventListener('click', (e) => {
-                editingEventId = parseInt(e.target.dataset.id);
-                const rebalance = rebalances.find(r => r.id === editingEventId);
-                document.getElementById('rebalance-modal').querySelector('h3').textContent = 'Editar Rebalanceo de Cartera';
-                openRebalanceModalForEdit(rebalance);
-                openModal('rebalance-modal');
-            }));
-        };
-
-        // Lógica para que los checkboxes de traspaso sean mutuamente excluyentes
-        const rebalanceRfRvCheckbox = document.getElementById('dca-rebalance-rf-rv');
-        const rebalanceAhorroRvCheckbox = document.getElementById('dca-rebalance-ahorro-rv');
-        rebalanceRfRvCheckbox.addEventListener('change', () => {
-            if (rebalanceRfRvCheckbox.checked) {
-                rebalanceAhorroRvCheckbox.checked = false;
-            }
-        });
-        rebalanceAhorroRvCheckbox.addEventListener('change', () => {
-            if (rebalanceAhorroRvCheckbox.checked) {
-                rebalanceRfRvCheckbox.checked = false;
-            }
-        });
-
-        // --- LÓGICA DE SIMULACIÓN PRINCIPAL ---
-        const runSimulation = () => {
-            const initialPortfolio = {};
-            ASSET_KEYS.forEach(key => {
-                const initialValue = parseFloat(document.getElementById(`${key}-inicial`).value) || 0;
-                initialPortfolio[key] = { value: initialValue, cost: initialValue };
-            });
-            const annualGrowth = {};
-            ASSET_KEYS.forEach(key => {
-                annualGrowth[key] = parseFloat(document.getElementById(`${key}-crecimiento`).value) || 0;
-            });
-            const simulationYears = parseInt(document.getElementById('anos').value) || 30;
-            const inflationRate = parseFloat(document.getElementById('inflacion').value) || 2.5;
+        for (let month = 1; month <= totalMonths; month++) {
+            const currentYear = Math.floor((month - 1) / 12);
             
-            const monthlyGrowth = {};
-            ASSET_KEYS.forEach(key => { monthlyGrowth[key] = Math.pow(1 + annualGrowth[key] / 100, 1 / 12) - 1; });
-            
-            const totalMonths = simulationYears * 12;
-            let portfolioHistory = [];
-            let currentPortfolio = JSON.parse(JSON.stringify(initialPortfolio));
-            let totalContributed = Object.values(initialPortfolio).reduce((acc, asset) => acc + asset.cost, 0);
-            
-            for (let month = 0; month <= totalMonths; month++) {
-                const currentYear = Math.floor(month / 12);
-                const currentMonthInYear = (month % 12) + 1;
+            const growthFactors = {...monthlyGrowth};
+            let inCrisisOutPeriod = false;
+            Object.keys(crisisState).forEach(id => {
+                const state = crisisState[id];
+                if (state.active && month > state.startMonth && month <= state.reentryMonth) {
+                    inCrisisOutPeriod = true;
+                }
+            });
+            if (inCrisisOutPeriod) growthFactors.rv = 0; 
 
-                if (month > 0) {
-                    ASSET_KEYS.forEach(key => { currentPortfolio[key].value *= (1 + monthlyGrowth[key]); });
-                    
-                    dcaPlans.forEach(plan => { 
-                        const startTotalMonth = (plan.startYear - 1) * 12 + plan.startMonth;
-                        const endTotalMonth = startTotalMonth + plan.duration;
-                        if (month >= startTotalMonth && month < endTotalMonth) {
-                            let currentAmount = plan.amount;
-                            if (plan.adjustForInflation && !plan.isRebalanceRfRv) { // Inflation adjust only for new money
-                                const yearOfPlan = Math.floor((month - startTotalMonth) / 12);
-                                currentAmount = plan.amount * Math.pow(1 + inflationRate / 100, yearOfPlan);
+            ASSET_KEYS.forEach(key => { currentPortfolio[key].value *= (1 + growthFactors[key]); });
+            
+            dcaPlans.forEach(plan => { 
+                const startTotalMonth = (plan.startYear - 1) * 12 + 1;
+                const endTotalMonth = startTotalMonth + plan.duration -1;
+                if (month >= startTotalMonth && month <= endTotalMonth) {
+                    if (plan.source === 'nuevos_ahorros') {
+                        totalContributed += plan.amount;
+                        ASSET_KEYS.forEach(key => { 
+                            const contribution = plan.amount * ((plan.percentages[key] || 0) / 100);
+                            currentPortfolio[key].value += contribution;
+                            currentPortfolio[key].cost += contribution;
+                        });
+                    } else { 
+                        const sourceAssetKey = plan.source;
+                        if(sourceAssetKey === 'crypto' || sourceAssetKey === 'inmuebles') return; // Cannot rebalance from these
+                        
+                        const sourceAsset = currentPortfolio[sourceAssetKey];
+                        if (sourceAsset.value >= plan.amount) {
+                            const originalValue = sourceAsset.value;
+                            const originalCost = sourceAsset.cost;
+                            const gainRatio = (originalValue > 0 && originalValue > originalCost) ? (originalValue - originalCost) / originalValue : 0;
+                            const gainInTransfer = plan.amount * gainRatio;
+                            const tax = (plan.source === 'rf' || plan.source === 'metales') && gainInTransfer > 0 ? gainInTransfer * 0.20 : 0;
+                            const netAmount = plan.amount - tax;
+                            sourceAsset.value -= plan.amount;
+                            if (originalValue > 0) {
+                                sourceAsset.cost -= plan.amount * (originalCost / originalValue);
                             }
-
-                            if (plan.isRebalanceRfRv) {
-                                const transferAmount = currentAmount;
-                                const sourceAsset = 'rf';
-                                const destinationAsset = 'rv';
-
-                                if (currentPortfolio[sourceAsset].value >= transferAmount) {
-                                    const sourceBefore = { ...currentPortfolio[sourceAsset] };
-                                    let gainRatio = 0;
-                                    if (sourceBefore.value > sourceBefore.cost && sourceBefore.value > 0) {
-                                        gainRatio = (sourceBefore.value - sourceBefore.cost) / sourceBefore.value;
-                                    }
-
-                                    const gainInTransfer = transferAmount * gainRatio;
-                                    const tax = gainInTransfer > 0 ? gainInTransfer * 0.20 : 0;
-                                    const netAmount = transferAmount - tax;
-
-                                    // Update Source (RF)
-                                    currentPortfolio[sourceAsset].value -= transferAmount;
-                                    if (sourceBefore.value > 0) {
-                                        currentPortfolio[sourceAsset].cost -= transferAmount * (sourceBefore.cost / sourceBefore.value);
-                                    }
-
-                                    // Update Destination (RV)
-                                    currentPortfolio[destinationAsset].value += netAmount;
-                                    currentPortfolio[destinationAsset].cost += netAmount;
-                                }
-                            } else if (plan.isRebalanceAhorroRv) {
-                                const transferAmount = currentAmount;
-                                const sourceAsset = 'ahorro';
-                                const destinationAsset = 'rv';
-
-                                if (currentPortfolio[sourceAsset].value >= transferAmount) {
-                                    // Update Source (Ahorro)
-                                    currentPortfolio[sourceAsset].value -= transferAmount;
-                                    currentPortfolio[sourceAsset].cost -= transferAmount;
-                                    
-                                    // Update Destination (RV)
-                                    currentPortfolio[destinationAsset].value += transferAmount;
-                                    currentPortfolio[destinationAsset].cost += transferAmount;
-                                }
-                            } else {
-                                totalContributed += currentAmount;
-                                ASSET_KEYS.forEach(key => { 
-                                    const contribution = currentAmount * ((plan.percentages[key] || 0) / 100);
-                                    currentPortfolio[key].value += contribution;
-                                    currentPortfolio[key].cost += contribution;
-                                });
-                            }
-                        }
-                    });
-                    
-                    crises.forEach(crisis => { 
-                        if ((crisis.year - 1) === currentYear && crisis.month === currentMonthInYear) {
-                             Object.keys(crisis.drops).forEach(assetKey => {
-                                if (currentPortfolio[assetKey] !== undefined) {
-                                    currentPortfolio[assetKey].value *= (1 - (crisis.drops[assetKey] || 0) / 100);
-                                }
+                            ASSET_KEYS.forEach(key => {
+                                const distribution = netAmount * ((plan.percentages[key] || 0) / 100);
+                                currentPortfolio[key].value += distribution;
+                                currentPortfolio[key].cost += distribution;
                             });
                         }
-                    });
-                    
-                    rebalances.forEach(rebalance => { 
-                         if ((rebalance.year - 1) === currentYear && rebalance.month === currentMonthInYear) {
-                            const totalValue = ASSET_KEYS.reduce((acc, key) => acc + currentPortfolio[key].value, 0);
-                            const totalCost = ASSET_KEYS.reduce((acc, key) => acc + currentPortfolio[key].cost, 0);
-                            ASSET_KEYS.forEach(key => { 
-                                const targetPct = (rebalance.percentages[key] || 0) / 100;
-                                currentPortfolio[key].value = totalValue * targetPct;
-                                currentPortfolio[key].cost = totalCost * targetPct;
-                             });
-                        }
-                    });
+                    }
                 }
-                
-                const totalValue = Object.values(currentPortfolio).reduce((acc, asset) => acc + asset.value, 0);
-                portfolioHistory.push({ portfolio: JSON.parse(JSON.stringify(currentPortfolio)), total: totalValue, contributed: totalContributed });
-            }
+            });
 
-            renderResults(portfolioHistory, simulationYears, inflationRate);
-        };
-        
-        // --- RENDERIZADO DE RESULTADOS (Gráfico y Tabla) ---
-        const renderResults = (history, years, inflationRate) => {
-            const labels = Array.from({ length: years + 1 }, (_, i) => i);
-            const yearlyData = labels.map(year => history[year * 12]);
-            const finalValue = history[history.length - 1].total;
-            const adjustedFinalValue = finalValue / Math.pow(1 + inflationRate / 100, years);
+            crisisManagements.forEach(crisis => {
+                if (currentYear === crisis.year - 1 && (month % 12) === 1 && !crisisState[crisis.id]) {
+                    // Sell RV
+                    const rvValue = currentPortfolio.rv.value;
+                    const rvLossAmount = rvValue * (crisis.initialLoss / 100);
+                    const rvCapitalToMove = rvValue - rvLossAmount;
+                    currentPortfolio.rv.value = 0;
+                    currentPortfolio.rv.cost = 0; 
+                    currentPortfolio.polvora.value += rvCapitalToMove;
+                    currentPortfolio.polvora.cost += rvCapitalToMove;
+                    
+                    // Crash Crypto
+                    const cryptoDrop = crisis.initialLoss * (1 + (crisis.cryptoLoss / 100));
+                    currentPortfolio.crypto.value *= (1 - cryptoDrop / 100);
 
-            investmentChart.data.labels = labels;
-            investmentChart.data.datasets = [
-                { 
-                    label: 'Patrimonio Total', 
-                    data: yearlyData.map(p => p.total), 
-                    borderColor: ASSET_COLORS.total, 
-                    borderWidth: 3, 
-                    tension: 0.1 
-                },
-                {
-                    label: 'Inversión Aportada',
-                    data: yearlyData.map(p => p.contributed),
-                    borderColor: ASSET_COLORS.contributed,
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    tension: 0.1,
-                    fill: false
-                },
-                ...ASSET_KEYS.map(key => ({
-                    label: ASSET_NAMES[key], 
-                    data: yearlyData.map(p => p.portfolio[key].value), 
-                    borderColor: ASSET_COLORS[key],
-                    borderWidth: 1.5,
-                    hidden: false,
-                }))
-            ];
-            investmentChart.update();
+                    crisisState[crisis.id] = {
+                        active: true, capital: rvCapitalToMove, startMonth: month,
+                        reentryMonth: month + crisis.monthsOut,
+                        dcaStartMonth: month + crisis.monthsOut,
+                        dcaEndMonth: month + crisis.monthsOut + crisis.dcaMonths - 1,
+                        dcaAmount: rvCapitalToMove / crisis.dcaMonths
+                    };
+                }
+            });
+
+            Object.keys(crisisState).forEach(id => {
+                const state = crisisState[id];
+                if (state.active && month >= state.dcaStartMonth && month <= state.dcaEndMonth) {
+                    const amountToMove = state.dcaAmount;
+                    if (currentPortfolio.polvora.value >= amountToMove) {
+                        currentPortfolio.polvora.value -= amountToMove;
+                        const polvoraCostRatio = (currentPortfolio.polvora.value + amountToMove > 0) ? currentPortfolio.polvora.cost / (currentPortfolio.polvora.value + amountToMove) : 1;
+                        currentPortfolio.polvora.cost -= amountToMove * polvoraCostRatio;
+                        currentPortfolio.rv.value += amountToMove;
+                        currentPortfolio.rv.cost += amountToMove;
+                    }
+                    if(month === state.dcaEndMonth) state.active = false; 
+                }
+            });
             
-            resultsSummary.innerHTML = `
-                <div>
-                    <p class="text-lg">Después de <span class="font-bold">${years}</span> años, tu patrimonio estimado es:</p>
-                    <p class="text-4xl font-bold text-blue-700 mt-2">${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(finalValue)}</p>
-                </div>
-                <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-6">
-                    <p class="text-lg">Tu patrimonio ajustado a la inflación del <span class="font-bold">${inflationRate}%</span> es:</p>
-                    <p class="text-4xl font-bold text-green-700 mt-2">${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(adjustedFinalValue)}</p>
-                </div>
-            `;
+            const totalValue = ASSET_KEYS.reduce((acc, key) => acc + currentPortfolio[key].value, 0);
+            portfolioHistory[month] = { portfolio: JSON.parse(JSON.stringify(currentPortfolio)), total: totalValue, contributed: totalContributed };
+        }
+        portfolioHistory[0] = { portfolio: JSON.parse(JSON.stringify(initialPortfolio)), total: Object.values(initialPortfolio).reduce((acc, asset) => acc + asset.value, 0), contributed: totalContributed };
 
-            const tableBody = document.getElementById('summary-table-body');
-            const tableSection = document.getElementById('table-section');
-            if (yearlyData.length > 1) {
-                tableBody.innerHTML = yearlyData.map((data, year) => {
-                    const total = data.total || 1;
-                    const percentages = ASSET_KEYS.map(key => `
-                        <td class="px-6 py-4 text-center">${(((data.portfolio[key].value || 0) / total) * 100).toFixed(1)}%</td>
-                    `).join('');
-                    return `
-                        <tr class="bg-white border-b">
-                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${year}</th>
-                            <td class="px-6 py-4 font-bold">${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(data.total)}</td>
-                            ${percentages}
-                        </tr>
-                    `;
-                }).join('');
-                tableSection.classList.remove('hidden');
-            } else {
-                tableSection.classList.add('hidden');
-            }
-        };
+        renderResults(portfolioHistory, simulationYears, inflationRate);
+    };
+    
+    const renderResults = (history, years, inflationRate) => {
+        const labels = Array.from({ length: years + 1 }, (_, i) => i);
+        const yearlyData = history.length > 1 ? labels.map(year => history[year * 12]) : [history[0]];
+        const finalValue = history[history.length - 1].total;
+        const adjustedFinalValue = finalValue / Math.pow(1 + inflationRate / 100, years);
 
-        // --- INICIALIZACIÓN ---
-        document.querySelectorAll('input, select, textarea').forEach(el => el.addEventListener('input', debouncedRunSimulation));
-        loadState();
+        investmentChart.data.labels = labels;
+        investmentChart.data.datasets = [
+            { label: 'Patrimonio Total', data: yearlyData.map(p => p.total), borderColor: ASSET_COLORS.total, borderWidth: 3, tension: 0.1 },
+            { label: 'Inversión Aportada', data: yearlyData.map(p => p.contributed), borderColor: ASSET_COLORS.contributed, borderWidth: 2, borderDash: [5, 5], tension: 0.1, fill: false },
+            ...ASSET_KEYS.map(key => ({
+                label: ASSET_NAMES[key], data: yearlyData.map(p => p.portfolio[key].value), borderColor: ASSET_COLORS[key], borderWidth: 1.5, hidden: false,
+            }))
+        ];
+        investmentChart.update();
+        
+        resultsSummary.innerHTML = `
+            <div>
+                <p class="text-lg">Patrimonio Final (tras ${years} años):</p>
+                <p class="text-4xl font-bold text-indigo-700 mt-2">${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(finalValue)}</p>
+            </div>
+            <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-6">
+                <p class="text-lg">Patrimonio ajustado a inflación (${inflationRate}%):</p>
+                <p class="text-4xl font-bold text-green-700 mt-2">${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(adjustedFinalValue)}</p>
+            </div>
+        `;
+    };
+
+    // --- INITIALIZATION ---
+    document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', debouncedRunSimulation));
+    
+    const savedStateString = localStorage.getItem('strategicSimState');
+    if (savedStateString) {
+        try {
+            const savedState = JSON.parse(savedStateString);
+            loadState(savedState);
+        } catch(e) {
+            console.error("Could not parse saved state from localStorage", e);
+            debouncedRunSimulation();
+        }
+    } else {
         debouncedRunSimulation();
-    });
-    </script>
+    }
+});
+</script>
 
 </body>
 </html>
