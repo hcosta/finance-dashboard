@@ -55,7 +55,7 @@ Herramienta de decisión en tiempo real que actúa como un semáforo para la inv
 **Características:**
 - **Señal Verde (INVERTIDO):** Cuando el precio está por encima de la MMS200 - Tendencia alcista
 - **Señal Roja (LIQUIDEZ):** Cuando el precio está por debajo de la MMS200 - Tendencia bajista
-- Consulta automática de datos del mercado mediante API de Alpha Vantage
+- Consulta automática de datos del mercado mediante API de Alpha Vantage (pasarla por get asi `?apikey=XXXXXXXXX`)
 - Caché inteligente de datos (actualización cada hora)
 - Visualización clara de precio actual vs. MMS200
 - Interfaz tipo semáforo con animación
