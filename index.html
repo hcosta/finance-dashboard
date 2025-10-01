@@ -222,11 +222,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const patrimonioContainer = document.getElementById('patrimonio-inputs');
         const dcaContainer = document.getElementById('dca-pct-inputs');
         
-        const defaultValues = { polvora: 10000, rf: 10000, rv: 10000, metales: 10000, crypto: 13000, inmuebles: 30000 };
+        const defaultValues = { polvora: 10000, rf: 10000, rv: 10000, metales: 10000, crypto: 10000, inmuebles: 10000 };
         const defaultGrowth = { polvora: 0.75, rf: 2, rv: 7, metales: 4, crypto: 15, inmuebles: 3 };
 
         patrimonioContainer.innerHTML = ASSET_KEYS.map(key => {
-            const isReadonly = key === 'crypto' || key === 'inmuebles';
+            // const isReadonly = key === 'crypto' || key === 'inmuebles'; 
+            const isReadonly = false; //
             return `
             <div class="grid grid-cols-2 gap-4">
                 <div>
